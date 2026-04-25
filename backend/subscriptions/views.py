@@ -1,0 +1,137 @@
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
+from datetime import timedelta
+
+from .models import Subscription
+from .serializers import (
+    SubscriptionSerializer,
+    SubscribeRequestSerializer,
+    SubscriptionResponseSerializer,
+)
+
+
+class SubscriptionViewSet(viewsets.ViewSet):
+    """
+    API endpoints for managing user subscriptions.
+
+    Endpoints:
+    - POST /api/v1/subscriptions/subscribe/        → Create or update subscription
+    - POST /api/v1/subscriptions/unsubscribe/      → Cancel subscription
+    - GET  /api/v1/subscriptions/get_subscription/ → Get current subscription status
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """Disabled — not needed for this use case."""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    # ── Subscribe ──────────────────────────────────────────────────────────────
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def subscribe(self, request):
+        """
+        Create or update user subscription.
+
+        Request body:
+            { "plan": "Monthly" | "Quarterly" | "Annual" }
+
+        Returns:
+            { isSubscribed, plan, status, endDate, daysRemaining }
+        """
+        serializer = SubscribeRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        plan = serializer.validated_data['plan']
+        user = request.user
+
+        # Always recalculate end_date — handles both new subscriptions
+        # and plan upgrades/downgrades correctly.
+        duration_map = {
+            'Monthly':   30,
+            'Quarterly': 90,
+            'Annual':    365,
+        }
+        end_date = timezone.now() + timedelta(days=duration_map[plan])
+
+        try:
+            subscription, created = Subscription.objects.update_or_create(
+                user=user,
+                defaults={
+                    'plan':     plan,
+                    'status':   'active',
+                    'end_date': end_date,   # ← key fix: always refresh end_date
+                }
+            )
+
+            response_serializer = SubscriptionResponseSerializer(subscription)
+            return Response(
+                response_serializer.data,
+                status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    # ── Unsubscribe ────────────────────────────────────────────────────────────
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def unsubscribe(self, request):
+        """
+        Cancel user subscription.
+
+        Returns:
+            { isSubscribed: false, plan, status: "cancelled", endDate, daysRemaining }
+        """
+        user = request.user
+
+        try:
+            subscription = Subscription.objects.get(user=user)
+            subscription.status = 'cancelled'
+            subscription.save()
+
+            response_serializer = SubscriptionResponseSerializer(subscription)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+        except Subscription.DoesNotExist:
+            # No subscription found — return a safe empty response
+            response_serializer = SubscriptionResponseSerializer(None)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    # ── Get subscription status ────────────────────────────────────────────────
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def get_subscription(self, request):
+        """
+        Get current subscription status for the authenticated user.
+
+        Returns:
+            {
+                "isSubscribed":    bool,
+                "plan":            string | null,
+                "status":          "active" | "cancelled" | null,
+                "endDate":         datetime | null,
+                "daysRemaining":   int
+            }
+        """
+        user = request.user
+
+        try:
+            subscription = Subscription.objects.get(user=user)
+        except Subscription.DoesNotExist:
+            subscription = None
+
+        response_serializer = SubscriptionResponseSerializer(subscription)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)

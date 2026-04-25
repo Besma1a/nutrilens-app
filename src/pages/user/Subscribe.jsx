@@ -1,0 +1,341 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../components/layout/Toast';
+
+const PLANS = [
+  {
+    id: 'monthly', icon: '🌙', name: 'Monthly', price: 29, period: 'month',
+    features: ['Unlimited AI meal scans', 'Personalized meal plans', '2 consultations/month', 'Direct nutritionist messaging', 'Progress tracking & reports', 'Cancel anytime'],
+    popular: false,
+  },
+  {
+    id: 'quarterly', icon: '⭐', name: 'Quarterly', price: 69, period: '3 months', savings: 'Save $18',
+    features: ['All Monthly features', '8 consultations total', 'Priority support', 'Seasonal meal plans', 'Recipe library access', '20% savings'],
+    popular: true,
+  },
+  {
+    id: 'annual', icon: '🚀', name: 'Annual', price: 199, period: 'year', savings: 'Save $149',
+    monthlyEquivalent: '~$16.58/month',
+    features: ['All Quarterly features', 'Unlimited consultations', 'Personal health coach', 'Custom meal planning', 'Premium analytics', 'Best value'],
+    popular: false,
+  },
+];
+
+const TABLE_ROWS = [
+  { feature: 'AI Meal Scans',              free: '3/day',   premium: 'Unlimited' },
+  { feature: 'Personalized Meal Plans',    free: '✗',       premium: '✓' },
+  { feature: 'Nutritionist Consultations', free: '✗',       premium: '2–8/month' },
+  { feature: 'Direct Messaging',           free: '✗',       premium: '✓' },
+  { feature: 'Progress Reports',           free: 'Basic',   premium: 'Advanced' },
+  { feature: 'Recipe Library',             free: '✗',       premium: '✓' },
+  { feature: 'AI Weekly Check-ins',        free: '✗',       premium: '✓' },
+];
+
+const PAYMENT_HISTORY = [
+  { date: 'Mar 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
+  { date: 'Feb 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
+  { date: 'Jan 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
+  { date: 'Jan 3, 2026',  desc: 'NutriLens Premium · First Month (20% off)',       amount: '$63.20', method: '•••• 4242', status: 'Paid' },
+];
+
+export default function Subscribe() {
+  const { user, subscribe, unsubscribe } = useAuth();
+  const navigate  = useNavigate();
+  const toast     = useToast();
+
+  const [processing,    setProcessing]    = useState(null);    // plan.id while subscribing
+  const [cancelConfirm, setCancelConfirm] = useState(false);   // false | true | 'processing' | 'success'
+
+  // ── Subscribe to a plan (calls real backend) ───────────────────────────────
+  const handleSubscribe = async (plan) => {
+    setProcessing(plan.id);
+    try {
+      await subscribe(plan.name);   // AuthContext → subscriptionsApi.subscribe()
+      toast({
+        message:  `You're now on the ${plan.name} Plan! Premium features unlocked.`,
+        type:     'success',
+        duration: 5000,
+      });
+      navigate('/user/dashboard');
+    } catch (err) {
+      toast({
+        message: err.message || 'Subscription failed. Please try again.',
+        type:    'error',
+      });
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  // ── Cancel subscription (calls real backend) ───────────────────────────────
+  const handleCancel = async () => {
+    setCancelConfirm('processing');
+    try {
+      const response = await unsubscribe();  // AuthContext → subscriptionsApi.unsubscribe()
+
+      setCancelConfirm('success');
+
+      // Format the end date for the toast if available
+      const endDateStr = response?.endDate
+        ? new Date(response.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'your billing period end';
+
+      toast({
+        message:  `Subscription cancelled. Access continues until ${endDateStr}.`,
+        type:     'info',
+      });
+
+      // Brief pause so user sees the success tick, then reset
+      setTimeout(() => setCancelConfirm(false), 2000);
+
+    } catch (err) {
+      toast({
+        message: err.message || 'Cancellation failed. Please try again.',
+        type:    'error',
+      });
+      setCancelConfirm(true);  // reset back to confirm buttons so they can retry
+    }
+  };
+
+  // ── Format subscription end date for display ───────────────────────────────
+  const formatEndDate = (dateStr) => {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+    });
+  };
+
+  /* ── Active subscriber view ─────────────────────────────────────────────── */
+  if (user.isSubscribed) {
+    const endDate = formatEndDate(user.subscriptionEndDate);
+
+    return (
+      <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 16px' }}>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20, marginBottom: 24 }}>
+
+          {/* Current Plan Card */}
+          <div style={{
+            background:    'var(--surf)',
+            borderRadius:  'var(--r-xl)',
+            padding:       24,
+            border:        '1px solid var(--border)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 11, opacity: .65, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 4 }}>Current Plan</div>
+                <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-.5px' }}>NutriLens Premium</div>
+                <div style={{ fontSize: 13, opacity: .8, marginTop: 4 }}>
+                  {user.planName || 'Monthly'} · {user.subscriptionDaysRemaining} days remaining
+                </div>
+              </div>
+              <div style={{
+                background:  'rgba(16, 185, 129, 0.15)',
+                color:       '#10b981',
+                padding:     '6px 16px',
+                borderRadius:'999px',
+                fontSize:    11,
+                fontWeight:  700,
+                border:      '1px solid rgba(16, 185, 129, 0.3)',
+              }}>
+                ✓ ACTIVE
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 12, marginBottom: 20 }}>
+              {[
+                { label: 'Plan',       val: user.planName || 'Monthly' },
+                { label: 'Expires',    val: endDate },
+                { label: 'Status',     val: user.subscriptionStatus || 'Active' },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'rgba(255,255,255,.1)', borderRadius: 'var(--r-md)', padding: '10px 12px' }}>
+                  <div style={{ fontSize: 10, opacity: .6, textTransform: 'uppercase', letterSpacing: '.3px', marginBottom: 3 }}>{s.label}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+             
+              <button
+                style={{ padding: '11px 20px', background: 'rgba(255,255,255,.15)', color: 'white', border: '1px solid rgba(255,255,255,.3)', borderRadius: 'var(--r)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                onClick={() => toast({ message: 'Billing portal coming soon.', type: 'info' })}
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+
+          {/* What's Included */}
+          <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginBottom: 16 }}>What's Included</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {['Unlimited AI meal scans', '2 consultations per month', 'Personalized AI meal planning', 'Progress tracking & reports', 'Direct nutritionist messaging', 'Seasonal meal plans'].map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5, color: 'var(--ink-3)' }}>
+                  <div style={{ width: 20, height: 20, background: 'var(--g-light)', border: '1px solid var(--g-mid)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--g2)" strokeWidth="2.5" strokeLinecap="round" style={{ width: 11, height: 11 }}>
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  {f}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Payment History */}
+        <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Payment History</div>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="tbl" style={{ minWidth: 700, width: '100%' }}>
+              <thead>
+                <tr><th>Date</th><th>Description</th><th>Amount</th><th>Method</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {PAYMENT_HISTORY.map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.date}</td>
+                    <td>{row.desc}</td>
+                    <td style={{ fontWeight: 700 }}>{row.amount}</td>
+                    <td style={{ color: 'var(--ink-5)' }}>{row.method}</td>
+                    <td><span className="badge badge-green">{row.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Cancel Zone */}
+          <div style={{ marginTop: 28, padding: '18px 22px', background: 'var(--red-bg)', border: '1px solid #fecaca', borderRadius: 'var(--r)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#991b1b' }}>Cancel subscription</div>
+              <div style={{ fontSize: 12.5, color: '#b91c1c', marginTop: 4 }}>
+                You'll retain full access until {endDate}
+              </div>
+            </div>
+
+            {!cancelConfirm ? (
+              <button className="btn btn-red btn-sm" onClick={() => setCancelConfirm(true)}>
+                Cancel Plan
+              </button>
+
+            ) : cancelConfirm === 'processing' ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#991b1b' }}>
+                <div style={{ width: 16, height: 16, border: '2px solid #991b1b', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
+                Cancelling…
+              </div>
+
+            ) : cancelConfirm === 'success' ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#16a34a' }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" style={{ width: 18, height: 18 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span style={{ fontWeight: 600 }}>Cancelled successfully</span>
+              </div>
+
+            ) : (
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <span style={{ color: '#991b1b', fontWeight: 600 }}>Are you sure?</span>
+                <button className="btn btn-red btn-sm" onClick={handleCancel}>Yes, cancel</button>
+                <button className="btn btn-sec btn-sm" onClick={() => setCancelConfirm(false)}>Keep plan</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  /* ── Free user view ──────────────────────────────────────────────────────── */
+  return (
+    <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 16px' }}>
+
+      {/* Plan Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: 24, marginBottom: 48 }}>
+        {PLANS.map(plan => (
+          <div key={plan.id} style={{
+            background:   'var(--surf)',
+            border:       `2px solid ${plan.popular ? 'var(--g2)' : 'var(--border)'}`,
+            borderRadius: 'var(--r-xl)',
+            overflow:     'hidden',
+            transform:    plan.popular ? 'scale(1.03)' : 'none',
+            boxShadow:    plan.popular ? 'var(--sh-lg)' : 'var(--sh-xs)',
+          }}>
+            {plan.popular && (
+              <div style={{ background: 'linear-gradient(135deg,var(--g1),var(--g2))', color: 'white', textAlign: 'center', fontSize: 11, fontWeight: 800, padding: '7px 0', letterSpacing: 1 }}>
+                MOST POPULAR
+              </div>
+            )}
+            <div style={{ padding: '28px 22px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{ fontSize: 42, marginBottom: 12 }}>{plan.icon}</div>
+                <div style={{ fontSize: 17, fontWeight: 700 }}>{plan.name}</div>
+                <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-1px', margin: '10px 0 6px' }}>
+                  ${plan.price}<span style={{ fontSize: 14, fontWeight: 500, opacity: .75 }}>/{plan.period}</span>
+                </div>
+                {plan.monthlyEquivalent && <div style={{ fontSize: 12, color: 'var(--g2)', fontWeight: 600 }}>{plan.monthlyEquivalent}</div>}
+                {plan.savings && <span className="badge badge-green" style={{ marginTop: 8 }}>{plan.savings}</span>}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+                {plan.features.map((f, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 14, color: 'var(--ink-3)' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g2)" strokeWidth="2.5" strokeLinecap="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {f}
+                  </div>
+                ))}
+              </div>
+
+              <button
+                className={`btn ${plan.popular ? 'btn-prim' : 'btn-sec'}`}
+                style={{ width: '100%', padding: '13px', fontSize: 15, fontWeight: 700 }}
+                onClick={() => handleSubscribe(plan)}
+                disabled={!!processing}
+              >
+                {processing === plan.id ? (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                    <div style={{ width: 16, height: 16, border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
+                    Processing…
+                  </span>
+                ) : 'Get Started'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Feature Comparison Table */}
+      <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)', marginBottom: 32 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Free vs Premium</div>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="tbl" style={{ width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left' }}>Feature</th>
+                <th style={{ textAlign: 'center' }}>Free</th>
+                <th style={{ textAlign: 'center', color: 'var(--g2)' }}>Premium</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TABLE_ROWS.map((row, i) => (
+                <tr key={i}>
+                  <td>{row.feature}</td>
+                  <td style={{ textAlign: 'center', color: row.free === '✗' ? '#ef4444' : 'var(--ink-3)' }}>{row.free}</td>
+                  <td style={{ textAlign: 'center', color: '#10b981', fontWeight: 600 }}>{row.premium}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}

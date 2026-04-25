@@ -1,0 +1,49 @@
+.design-system {
+    --green: #2B5726;
+    --red: #A50C05;
+    --lime: #DEE660;
+    --orange: #F19335;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --contrast-dark: #000;
+    --contrast-light: #fff;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--green);
+    color: var(--contrast-dark);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+}
+
+button {
+    background-color: var(--lime);
+    color: var(--contrast-dark);
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--orange);
+}
+
+.card {
+    background-color: var(--white);
+    border: 1px solid var(--lime);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--white);
+}

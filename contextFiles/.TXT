@@ -1,0 +1,66 @@
+1. Backend Architecture: Django & Django REST Framework (DRF)
+The backend is developed using Django, a high-level Python web framework, following the Model-Template-View (MTV) pattern, but adapted into a RESTful API architecture using Django REST Framework (DRF). This allows for a clean separation between the data processing logic and the frontend interface.
+
+2. Core Technical Components
+Authentication (JWT): Secure stateless authentication using SimpleJWT. This ensures that user sessions are handled securely across the Dashboard, Nutritionist, and Admin panels.
+
+Asynchronous Processing (Celery/Redis): To prevent the web server from hanging during AI image processing, the YOLOv8 detection tasks are offloaded to an asynchronous task queue.
+
+Object Storage: Media management for uploaded food images, utilizing Django’s FileField and ImageField (configured for local storage or AWS S3).
+
+Database (PostgreSQL): A relational database is used to maintain strict data integrity for user health profiles, calorie logs, and nutritionist assignments.
+
+3. API Module Breakdown
+The backend logic is organized into the following Django "Apps":
+
+A. users App (Account & Profile Management)
+Models: Custom User model, UserProfile (weight, goal, BMR).
+
+Endpoints: /api/auth/register/, /api/auth/login/, /api/profile/update/.
+
+Logic: Handles password hashing, email verification signals, and health metric calculations.
+
+B. ai_engine App (The NutriLens "Lens")
+Integration: Wraps the YOLOv8 PyTorch model.
+
+Endpoints: /api/ai/detect/ (POST image).
+
+Logic: Receives image → Runs Inference → Extracts labels → Calculates portion volume → Returns JSON with food names and confidence scores.
+
+C. nutrition App (Logging & Database Mapping)
+Models: FoodItem, DailyLog, NutritionPlan.
+
+Endpoints: /api/logs/daily/, /api/plans/browse/.
+
+Logic: Maps the AI-detected labels to a local or external nutrition database (like Edamam) to retrieve caloric and macro-nutrient data.
+
+D. consultations App (External Integrations)
+Models: Appointment, Subscription.
+
+Endpoints: /api/appointments/book/, /api/zoom/link/.
+
+Logic: Manages the logic for booking sessions and stores external Zoom API metadata. It also tracks the "Subscribed" status required to access these views.
+
+4. Database Schema (ERD Logic)
+Table	Key Fields
+Users	id, email, is_premium, role (User/Nutri/Admin)
+HealthProfiles	user_id, current_weight, target_goal, daily_kcal_limit
+MealLogs	id, user_id, image_path, raw_ai_output, confirmed_calories, timestamp
+DietPlans	id, nutritionist_id, patient_id, plan_json, created_at
+5. AI Workflow Integration
+In the Django backend, the image processing follows this sequence:
+
+Request: The frontend sends a multipart/form-data request with the food image.
+
+Inference: The ai_engine triggers the YOLOv8 model.
+
+Post-Processing: The backend filters results by confidence threshold (>0.5) and calculates calories based on the AI2 (Portion Estimation) logic.
+
+Response: Returns a temporary "Draft Log" object that the user can confirm or edit.
+
+6. Security & Middleware
+CORS Headers: Configured to allow requests only from the NutriLens frontend domain.
+
+Throttling: Limits the number of AI requests per user to prevent API abuse.
+
+Permissions: IsAuthenticated and IsNutritionist custom permissions to protect sensitive medical and billing data.
