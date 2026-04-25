@@ -1,13 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { T, css, IBtn, StatusBadge, Avatar, SearchBar, Select, PageHead, Drawer, DrawerField, EmptyState, FormInput, FormTextarea, ErrorMsg, SuccessMsg, Pagination } from "./adminUtils";
-
-const USERS_DATA = [
-  { name: "Sarah Johnson", email: "sarah.j@email.com", plan: "Premium", status: "Active", joined: "Jan 15, 2024", phone: "+1 555 0101", consultations: 8, notes: "Long-term client, very engaged." },
-  { name: "Michael Chen", email: "michael.c@email.com", plan: "Basic", status: "Active", joined: "Feb 20, 2024", phone: "+1 555 0102", consultations: 3, notes: "Just started." },
-  { name: "Emily Davis", email: "emily.d@email.com", plan: "VIP", status: "Suspended", joined: "Jan 10, 2024", phone: "+1 555 0103", consultations: 12, notes: "Payment dispute." },
-  { name: "James Wilson", email: "james.w@email.com", plan: "Premium", status: "Active", joined: "Mar 5, 2024", phone: "+1 555 0104", consultations: 5, notes: "" },
-  { name: "Lisa Anderson", email: "lisa.a@email.com", plan: "Basic", status: "Pending", joined: "Feb 28, 2024", phone: "+1 555 0105", consultations: 0, notes: "Email not verified." },
-];
+import { apiFetch } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 
 function ConfirmDialog({ user, onConfirm, onCancel }) {
   if (!user) return null;
@@ -37,8 +31,9 @@ const validateForm = (form) => {
 };
 
 export default function UsersPage() {
-  const [users, setUsers] = useState(USERS_DATA);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [statusF, setStatusF] = useState("All Status");
   const [planF, setPlanF] = useState("All Plans");
   const [selected, setSelected] = useState(null);
@@ -48,37 +43,47 @@ export default function UsersPage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [pendingDelete, setPendingDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const itemsPerPage = 10;
+  const fetchUsers = async () => {
+    const params = new URLSearchParams({
+      search: debouncedSearch,
+      status: statusF,
+      plan: planF,
+      page: String(currentPage),
+      limit: "10",
+    });
+    const data = await apiFetch(`/users?${params.toString()}`);
+    setUsers(data.users || []);
+    setTotalPages(data.totalPages || 1);
+  };
 
-  const filtered = useMemo(() => {
-    return users.filter(u =>
-      (u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())) &&
-      (statusF === "All Status" || u.status === statusF) &&
-      (planF === "All Plans" || u.plan === planF)
-    );
-  }, [users, search, statusF, planF]);
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedUsers = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  useEffect(() => {
+    fetchUsers().catch(() => {});
+  }, [debouncedSearch, statusF, planF, currentPage]);
 
   const toggleBan = (email) => {
-    setUsers(p => {
-      const next = p.map(u => u.email === email ? { ...u, status: u.status === "Suspended" ? "Active" : "Suspended" } : u);
-      if (selected?.email === email) setSelected(prev => ({ ...prev, status: next.find(u => u.email === email).status }));
-      return next;
-    });
+    const user = users.find((u) => u.email === email);
+    if (!user) return;
+    apiFetch(`/users/${user.id}/ban`, { method: "PATCH" }).then(() => fetchUsers());
   };
 
   const requestDelete = (user) => setPendingDelete(user);
 
   const confirmDelete = () => {
     if (!pendingDelete) return;
-    setUsers(p => p.filter(u => u.email !== pendingDelete.email));
-    if (selected?.email === pendingDelete.email) setSelected(null);
-    setPendingDelete(null);
-    setSuccessMsg("User deleted");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    apiFetch(`/users/${pendingDelete.id}`, { method: "DELETE" })
+      .then(() => {
+        if (selected?.email === pendingDelete.email) setSelected(null);
+        setPendingDelete(null);
+        fetchUsers();
+        setSuccessMsg("User deleted");
+        setTimeout(() => setSuccessMsg(""), 2000);
+      })
+      .catch(() => {
+        setSuccessMsg("Delete failed");
+        setTimeout(() => setSuccessMsg(""), 2000);
+      });
   };
 
   const openProfile = (u) => {
@@ -95,11 +100,13 @@ export default function UsersPage() {
       setFormErrors(errors);
       return;
     }
-    setUsers(prev => prev.map(u => u.email === selected.email ? { ...u, ...editForm } : u));
-    setSelected(prev => ({ ...prev, ...editForm }));
-    setEditMode(false);
-    setSuccessMsg("Profile updated");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    apiFetch(`/users/${selected.id}`, { method: "PUT", body: JSON.stringify(editForm) }).then(() => {
+      setSelected((prev) => ({ ...prev, ...editForm }));
+      setEditMode(false);
+      fetchUsers();
+      setSuccessMsg("Profile updated");
+      setTimeout(() => setSuccessMsg(""), 2000);
+    });
   };
 
   return (
@@ -111,10 +118,10 @@ export default function UsersPage() {
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <SearchBar value={search} onChange={setSearch} placeholder="Search users..." />
         <Select value={statusF} onChange={setStatusF} opts={["All Status", "Active", "Pending", "Suspended"]} />
-        <Select value={planF} onChange={setPlanF} opts={["All Plans", "Basic", "Premium", "VIP"]} />
+        <Select value={planF} onChange={setPlanF} opts={["All Plans", "Monthly", "Quarterly", "Annual", "Unsubscribed", "Cancelled"]} />
       </div>
 
-      {paginatedUsers.length === 0 ? (
+      {users.length === 0 ? (
         <EmptyState title="No users found" message={search ? "Try adjusting your search" : "No users yet"} />
       ) : (
         <>
@@ -124,7 +131,7 @@ export default function UsersPage() {
                 <tr>{["User", "Email", "Plan", "Status", "Joined", "Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
               </thead>
               <tbody>
-                {paginatedUsers.map(u => (
+                {users.map(u => (
                   <tr key={u.email} style={{ cursor: "pointer" }} onClick={() => openProfile(u)}>
                     <td style={css.td}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -133,7 +140,7 @@ export default function UsersPage() {
                       </div>
                     </td>
                     <td style={{ ...css.td, color: T.gray }}>{u.email}</td>
-                    <td style={css.td}><span style={css.badge(T.greenLight, T.greenTx)}>{u.plan}</span></td>
+                    <td style={css.td}><span style={css.badge(u.planStatus === "Cancelled" ? T.redLt : T.greenLight, u.planStatus === "Cancelled" ? T.redTx : T.greenTx)}>{u.plan}</span></td>
                     <td style={css.td}><StatusBadge status={u.status} /></td>
                     <td style={{ ...css.td, color: T.gray }}>{u.joined}</td>
                     <td style={css.td} onClick={e => e.stopPropagation()}>

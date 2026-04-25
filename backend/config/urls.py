@@ -49,6 +49,7 @@ urlpatterns = [
     path("api/v1/dashboard/", include("dashboard.urls")),
     path("api/blogs/", include("blogs.urls")),
     path("api/v1/blogs/", include("blogs.urls")),
+    path("api/admin/", include("adminpanel.urls")),
 
     # DRF browsable API login (dev only)
     path('api-auth/', include('rest_framework.urls')),

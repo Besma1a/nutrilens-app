@@ -1,19 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { T, css, IBtn, StatusBadge, Avatar, SearchBar, Select, PageHead, KpiCard, Drawer, DrawerField, EmptyState, FormInput, FormTextarea, SuccessMsg, Pagination } from "./adminUtils";
-
-const NUTRIS_DATA = [
-  { name: "Dr. Amanda Rodriguez", email: "amanda.r@nutri.com", specialty: "Sports Nutrition", patients: 24, status: "Active", joined: "Jan 10, 2024", phone: "+1 555 0201", credentials: "MSc Nutrition, RD, CSSD", bio: "12 years experience in sports performance nutrition." },
-  { name: "Dr. Robert Kim", email: "robert.k@nutri.com", specialty: "Weight Management", patients: 18, status: "Active", joined: "Feb 1, 2024", phone: "+1 555 0202", credentials: "PhD Clinical Nutrition, RD", bio: "Specialist in metabolic disorders." },
-  { name: "Dr. Maria Santos", email: "maria.s@nutri.com", specialty: "Clinical Nutrition", patients: 0, status: "Pending", joined: "Mar 20, 2024", phone: "+1 555 0203", credentials: "MD, MSc Dietetics", bio: "Hospital-based clinical dietitian." },
-  { name: "Dr. Thomas Brown", email: "thomas.b@nutri.com", specialty: "Pediatric Nutrition", patients: 31, status: "Active", joined: "Dec 5, 2023", phone: "+1 555 0204", credentials: "RD, CNSC, PhD Pediatrics", bio: "Pediatric nutrition specialist with 15 years experience." },
-  { name: "Dr. Jennifer Lee", email: "jennifer.l@nutri.com", specialty: "Diabetes Nutrition", patients: 15, status: "Active", joined: "Jan 28, 2024", phone: "+1 555 0205", credentials: "RD, CDE, MSc", bio: "Certified Diabetes Educator." },
-];
-
-const UNASSIGNED_USERS = [
-  { id: 1, name: "Noah Clark", email: "noah.c@email.com" },
-  { id: 2, name: "Sophia Miller", email: "sophia.m@email.com" },
-  { id: 3, name: "Liam Walker", email: "liam.w@email.com" },
-];
+import { apiFetch } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 
 function loadIndicator(patients) {
   if (patients <= 10) return { label: "Low", color: T.greenTx, bg: T.greenLight };
@@ -22,62 +10,95 @@ function loadIndicator(patients) {
 }
 
 export default function NutritionistsPage() {
-  const [nutris, setNutris] = useState(NUTRIS_DATA);
+  const [nutris, setNutris] = useState([]);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [statusF, setStatusF] = useState("All Status");
   const [selected, setSelected] = useState(null);
   const [addMode, setAddMode] = useState(false);
-  const [unassignedUsers, setUnassignedUsers] = useState(UNASSIGNED_USERS);
+  const [unassignedUsers, setUnassignedUsers] = useState([]);
   const [assignTarget, setAssignTarget] = useState(null);
   const [newNutri, setNewNutri] = useState({ name: "", email: "", phone: "", specialty: "", credentials: "", bio: "" });
   const [formErrors, setFormErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState("");
+  const [tempPasswordInfo, setTempPasswordInfo] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filtered = useMemo(() => {
-    let rows = nutris.filter(n =>
-      (n.name.toLowerCase().includes(search.toLowerCase()) || n.specialty.toLowerCase().includes(search.toLowerCase())) &&
-      (statusF === "All Status" || n.status === statusF)
-    );
-    return rows.sort((a, b) => {
-      if (a.status === "Pending" && b.status !== "Pending") return -1;
-      if (a.status !== "Pending" && b.status === "Pending") return 1;
-      return a.name.localeCompare(b.name);
+  const filtered = useMemo(() => nutris, [nutris]);
+
+  const fetchNutritionists = async () => {
+    const params = new URLSearchParams({
+      search: debouncedSearch,
+      status: statusF,
+      page: String(currentPage),
+      limit: "10",
     });
-  }, [nutris, search, statusF]);
+    const data = await apiFetch(`/nutritionists?${params.toString()}`);
+    const mapped = (data.nutritionists || []).map((n) => ({
+      ...n,
+      specialty: n.specialization,
+      credentials: n.licenseNumber,
+      clinic: n.clinic,
+      patients: n.patientsCount,
+    }));
+    setNutris(mapped);
+    setTotalPages(data.totalPages || 1);
+  };
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedNutris = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const fetchAssignableUsers = async () => {
+    const data = await apiFetch("/assignable-users");
+    setUnassignedUsers(data.users || []);
+  };
+
+  useEffect(() => {
+    fetchNutritionists().catch(() => {});
+  }, [debouncedSearch, statusF, currentPage]);
+
+  useEffect(() => {
+    fetchAssignableUsers().catch(() => {});
+  }, []);
 
   const pending = nutris.filter(n => n.status === "Pending").length;
-  const active = nutris.filter(n => n.status === "Active").length;
+  const active = nutris.filter(n => n.status === "Approved" || n.status === "Active").length;
   const avgPts = active.length ? Math.round(active.reduce((s, n) => s + n.patients, 0) / active.length) : 0;
 
   const approve = (email) => {
-    setNutris(p => p.map(n => n.email === email ? { ...n, status: "Active" } : n));
-    if (selected?.email === email) setSelected(prev => ({ ...prev, status: "Active" }));
+    const n = nutris.find((x) => x.email === email);
+    if (!n) return;
+    apiFetch(`/nutritionists/${n.id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Approved" }) }).then(fetchNutritionists);
     setSuccessMsg("Nutritionist approved");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const reject = (email) => {
-    setNutris(p => p.map(n => n.email === email ? { ...n, status: "Rejected" } : n));
-    if (selected?.email === email) setSelected(prev => ({ ...prev, status: "Rejected" }));
+    const n = nutris.find((x) => x.email === email);
+    if (!n) return;
+    apiFetch(`/nutritionists/${n.id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Suspended" }) }).then(fetchNutritionists);
     setSuccessMsg("Nutritionist rejected");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const suspend = (email) => {
-    setNutris(p => p.map(n => n.email === email ? { ...n, status: "Suspended" } : n));
-    if (selected?.email === email) setSelected(prev => ({ ...prev, status: "Suspended" }));
+    const n = nutris.find((x) => x.email === email);
+    if (!n) return;
+    apiFetch(`/nutritionists/${n.id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Suspended" }) }).then(fetchNutritionists);
     setSuccessMsg("Nutritionist suspended");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
-  const assignPatient = (email) => {
-    setNutris(p => p.map(n => n.email === email ? { ...n, patients: n.patients + 1 } : n));
-    if (selected?.email === email) setSelected(prev => ({ ...prev, patients: prev.patients + 1 }));
+  const assignPatient = (nutritionist) => {
+    if (!nutritionist || !unassignedUsers.length) return;
+    const user = unassignedUsers[0];
+    apiFetch(`/nutritionists/${nutritionist.id}/assign-user`, {
+      method: "POST",
+      body: JSON.stringify({ userId: user.id }),
+    }).then(() => {
+      setUnassignedUsers((p) => p.filter((x) => x.id !== user.id));
+      fetchNutritionists();
+      setSuccessMsg(`Assigned ${user.name} to ${nutritionist.name}`);
+      setTimeout(() => setSuccessMsg(""), 2500);
+    });
   };
 
   const validateForm = (form) => {
@@ -94,31 +115,32 @@ export default function NutritionistsPage() {
       setFormErrors(errors);
       return;
     }
-    setNutris(prev => [
-      {
-        name: newNutri.name.trim(),
-        email: newNutri.email.trim().toLowerCase(),
-        specialty: newNutri.specialty.trim() || "General Nutrition",
-        patients: 0,
-        status: "Pending",
-        joined: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-        phone: newNutri.phone.trim() || "N/A",
-        credentials: newNutri.credentials.trim() || "Pending Verification",
-        bio: newNutri.bio.trim(),
-      },
-      ...prev,
-    ]);
-    setAddMode(false);
-    setNewNutri({ name: "", email: "", phone: "", specialty: "", credentials: "", bio: "" });
-    setFormErrors({});
-    setSuccessMsg("Nutritionist added (pending review)");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    apiFetch("/nutritionists", {
+      method: "POST",
+      body: JSON.stringify({
+        name: newNutri.name,
+        email: newNutri.email,
+        phone: newNutri.phone,
+        specialization: newNutri.specialty,
+        licenseNumber: newNutri.credentials,
+        clinic: "",
+      }),
+    }).then((res) => {
+      fetchNutritionists();
+      setAddMode(false);
+      setNewNutri({ name: "", email: "", phone: "", specialty: "", credentials: "", bio: "" });
+      setFormErrors({});
+      setTempPasswordInfo(`Temp password for ${newNutri.email}: ${res.tempPassword}`);
+      setSuccessMsg("Nutritionist added with Pending status");
+      setTimeout(() => setSuccessMsg(""), 3000);
+    });
   };
 
   return (
     <>
       <PageHead title="Nutritionist Management" sub="Approve applications, manage profiles, and monitor caseloads." />
       <SuccessMsg message={successMsg} show={!!successMsg} />
+      <SuccessMsg message={tempPasswordInfo} show={!!tempPasswordInfo} />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
         {[
@@ -133,7 +155,7 @@ export default function NutritionistsPage() {
         <div style={{ flex: 1, minWidth: 280 }}>
           <SearchBar value={search} onChange={setSearch} placeholder="Search nutritionists..." />
         </div>
-        <Select value={statusF} onChange={setStatusF} opts={["All Status", "Active", "Pending", "Suspended", "Rejected"]} />
+        <Select value={statusF} onChange={setStatusF} opts={["All Status", "Approved", "Pending", "Suspended", "Rejected"]} />
         <button style={css.btn(T.green, "#fff")} onClick={() => setAddMode(true)}>
           <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -143,7 +165,7 @@ export default function NutritionistsPage() {
         </button>
       </div>
 
-      {paginatedNutris.length === 0 ? (
+      {filtered.length === 0 ? (
         <EmptyState title="No nutritionists found" />
       ) : (
         <>
@@ -153,7 +175,7 @@ export default function NutritionistsPage() {
                 <tr>{["Name", "Specialty", "Patients / Load", "Status", "Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
               </thead>
               <tbody>
-                {paginatedNutris.map(n => {
+                {filtered.map(n => {
                   const load = loadIndicator(n.patients);
                   return (
                     <tr key={n.email} style={{ cursor: "pointer" }} onClick={() => setSelected(n)}>
@@ -214,7 +236,7 @@ export default function NutritionistsPage() {
                 <div style={{ fontSize: 13, color: T.gray }}>{selected.specialty}</div>
                 <div style={{ marginTop: 6, display: "flex", gap: 6 }}>
                   <StatusBadge status={selected.status} />
-                  {selected.status === "Active" && (
+                  {selected.status === "Approved" && (
                     <span style={css.badge(loadIndicator(selected.patients).bg, loadIndicator(selected.patients).color)}>
                       {loadIndicator(selected.patients).label} load
                     </span>
@@ -238,7 +260,7 @@ export default function NutritionistsPage() {
                   <button
                     style={css.btn(T.greenLight, T.greenTx)}
                     onClick={() => {
-                      assignPatient(selected.email);
+                      assignPatient(selected);
                       setSuccessMsg("Patient assigned");
                       setTimeout(() => setSuccessMsg(""), 2000);
                     }}
@@ -258,7 +280,7 @@ export default function NutritionistsPage() {
                 </button>
               </div>
             )}
-            {selected.status === "Active" && (
+            {selected.status === "Approved" && (
               <div style={{ marginTop: 20 }}>
                 <button style={css.btn(T.redLt, T.redTx)} onClick={() => suspend(selected.email)}>
                   Suspend Account
@@ -301,10 +323,15 @@ export default function NutritionistsPage() {
                     <button
                       style={css.btn(T.greenLight, T.greenTx)}
                       onClick={() => {
-                        assignPatient(assignTarget.email);
-                        setUnassignedUsers(p => p.filter(x => x.id !== u.id));
-                        setSuccessMsg("Patient assigned");
-                        setTimeout(() => setSuccessMsg(""), 2000);
+                        apiFetch(`/nutritionists/${assignTarget.id}/assign-user`, {
+                          method: "POST",
+                          body: JSON.stringify({ userId: u.id }),
+                        }).then(() => {
+                          setUnassignedUsers(p => p.filter(x => x.id !== u.id));
+                          fetchNutritionists();
+                          setSuccessMsg("Patient assigned");
+                          setTimeout(() => setSuccessMsg(""), 2000);
+                        });
                       }}
                     >
                       Assign

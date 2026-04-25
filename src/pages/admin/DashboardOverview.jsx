@@ -10,32 +10,24 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useEffect, useState } from "react";
 import { T, css, KpiCard, StatusBadge } from "./adminUtils";
-
-const growthData = [
-  { m: "Jan", u: 180 },
-  { m: "Feb", u: 260 },
-  { m: "Mar", u: 340 },
-  { m: "Apr", u: 430 },
-  { m: "May", u: 490 },
-  { m: "Jun", u: 580 },
-];
-
-const donutData = [
-  { name: "Basic", value: 145, color: T.gray },
-  { name: "Premium", value: 280, color: T.green },
-  { name: "VIP", value: 95, color: T.blue },
-];
-
-const activity = [
-  { name: "Sarah Johnson", action: "Registered account", time: "2h ago", status: "Active" },
-  { name: "Michael Chen", action: "Updated subscription", time: "4h ago", status: "Active" },
-  { name: "Emily Davis", action: "Requested consultation", time: "5h ago", status: "Pending" },
-  { name: "James Wilson", action: "Completed payment", time: "1d ago", status: "Active" },
-  { name: "Lisa Anderson", action: "Submitted support ticket", time: "1d ago", status: "Pending" },
-];
+import { apiFetch } from "../../services/adminApi";
 
 export default function DashboardOverview() {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalNutritionists: 0,
+    activeSubscriptions: 0,
+    openTickets: 0,
+    userGrowth: [],
+    subscriptionDistribution: [],
+    recentActivity: [],
+  });
+
+  useEffect(() => {
+    apiFetch("/stats").then(setStats).catch(() => {});
+  }, []);
   const greeting = () => {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning';
@@ -46,7 +38,7 @@ export default function DashboardOverview() {
   const kpis = [
     {
       label: "Total Users",
-      value: "1,247",
+      value: stats.totalUsers.toLocaleString(),
       delta: "↑ +12.5% this month",
       up: true,
       icon: (
@@ -59,7 +51,7 @@ export default function DashboardOverview() {
     },
     {
       label: "Nutritionists",
-      value: "89",
+      value: stats.totalNutritionists.toLocaleString(),
       delta: "↑ +5.2% this month",
       up: true,
       icon: (
@@ -73,7 +65,7 @@ export default function DashboardOverview() {
     },
     {
       label: "Active Subs",
-      value: "520",
+      value: stats.activeSubscriptions.toLocaleString(),
       delta: "↑ +8.3% this month",
       up: true,
       icon: (
@@ -85,7 +77,7 @@ export default function DashboardOverview() {
     },
     {
       label: "Open Tickets",
-      value: "24",
+      value: stats.openTickets.toLocaleString(),
       delta: "5 urgent · needs attention",
       up: false,
       icon: <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />,
@@ -138,7 +130,7 @@ export default function DashboardOverview() {
             </select>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={growthData}>
+            <LineChart data={stats.userGrowth}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="m" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: T.grayMd }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: T.grayMd }} />
@@ -157,24 +149,24 @@ export default function DashboardOverview() {
             <div style={{ width: 130, height: 130, flexShrink: 0 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={donutData} innerRadius={44} outerRadius={62} dataKey="value" paddingAngle={2}>
-                    {donutData.map(d => (
-                      <Cell key={d.name} fill={d.color} />
+                  <Pie data={stats.subscriptionDistribution} innerRadius={44} outerRadius={62} dataKey="value" paddingAngle={2}>
+                    {stats.subscriptionDistribution.map((d, i) => (
+                      <Cell key={d.name} fill={[T.gray, T.green, T.blue, T.purple][i % 4]} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
             <div>
-              {donutData.map(d => (
+              {stats.subscriptionDistribution.map((d, i) => (
                 <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: 2, background: d.color, display: "inline-block", flexShrink: 0 }} />
+                  <span style={{ width: 10, height: 10, borderRadius: 2, background: [T.gray, T.green, T.blue, T.purple][i % 4], display: "inline-block", flexShrink: 0 }} />
                   <span style={{ fontSize: 13, color: T.textMd }}>
                     {d.name} — <strong style={{ color: T.text }}>{d.value}</strong>
                   </span>
                 </div>
               ))}
-              <div style={{ fontSize: 12, color: T.gray, marginTop: 4 }}>Total: 520 subscribers</div>
+              <div style={{ fontSize: 12, color: T.gray, marginTop: 4 }}>Total: {stats.activeSubscriptions} subscribers</div>
             </div>
           </div>
         </div>
@@ -191,7 +183,7 @@ export default function DashboardOverview() {
             <tr>{["User", "Action", "Time", "Status"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {activity.map((r, i) => (
+            {stats.recentActivity.map((r, i) => (
               <tr key={i}>
                 <td style={{ ...css.td, fontWeight: 600, color: T.text }}>{r.name}</td>
                 <td style={{ ...css.td, color: T.textMd }}>{r.action}</td>

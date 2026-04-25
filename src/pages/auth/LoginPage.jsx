@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { loginUser } from "../../services/api";
+import { adminApi, saveAdminSession } from "../../services/adminApi";
 
 const EyeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -41,18 +42,19 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Call the real backend
-      const data = await loginUser(formData.email, formData.password);
+      try {
+        const adminData = await adminApi.login(formData.email, formData.password);
+        saveAdminSession(adminData.token, adminData.admin);
+        window.location.href = "/admin/dashboard";
+        return;
+      } catch {
+        // Fallback to regular user/nutritionist auth path.
+      }
 
-      // Pass user + token to AuthContext
-      // login() will store token in global store and state
+      const data = await loginUser(formData.email, formData.password);
       login(data.user, data.token);
 
-      // Route based on user role and onboarding status.
-      // NOTE: data.user comes directly from the backend (snake_case).
-      // AuthContext.login() normalizes it, but we check here before that happens.
       if (data.user.is_staff || data.user.is_superuser) {
-        // Admin users → Django admin panel
         window.location.href = "/admin/dashboard";
       } else if (data.user.is_nutritionist) {
         navigate("/nutritionist/dashboard");
@@ -61,9 +63,8 @@ export default function LoginPage() {
       } else {
         navigate("/user/dashboard");
       }
-
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login failed");
     } finally {
       setIsLoading(false);
     }

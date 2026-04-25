@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminUiContext } from "./adminUtils";
 import DashboardOverview  from "./DashboardOverview";
 import UsersPage          from "./UsersPage";
@@ -9,6 +9,7 @@ import SupportPage        from "./SupportPage";
 import RevenuePage        from "./RevenuePage";
 import TestimonialsPage   from "./TestimonialsPage";
 import AdminProfilePage   from "./AdminProfilePage";
+import { adminApi } from "../../services/adminApi";
 
 // ─── Nav Config ───────────────────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -76,9 +77,40 @@ function Icon({ children, className = "si" }) {
 // ─── Root Shell ───────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const [page, setPage] = useState("dashboard");
+  const [admin, setAdmin] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("adminUser") || "null");
+    } catch {
+      return null;
+    }
+  });
 
   const [open, setOpen] = useState(false);
   const { title, sub } = META[page] || { title: "Admin", sub: "" };
+  const initials = useMemo(() => {
+    const name = admin?.name || "Admin User";
+    return name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }, [admin]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+    adminApi
+      .me()
+      .then((res) => {
+        setAdmin(res);
+        localStorage.setItem("adminUser", JSON.stringify(res));
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "white" }}>
@@ -131,9 +163,9 @@ export default function AdminDashboard() {
 
         <div className="sb-footer">
           <div className="sb-user" role="button" tabIndex={0} onClick={() => setPage("profile")} title="View profile">
-            <div className="sb-av">AU</div>
+            <div className="sb-av">{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="sb-user-name">Admin User</div>
+              <div className="sb-user-name">{admin?.name || "Admin User"}</div>
               
             </div>
           </div>
@@ -181,14 +213,14 @@ export default function AdminDashboard() {
             <span className="hdr-notif-dot" aria-hidden />
           </button>
 
-          <div className="hdr-av" role="button" tabIndex={0} title="Admin User" onClick={() => setPage("profile")} aria-label="Your profile">
-            AU
+          <div className="hdr-av" role="button" tabIndex={0} title={admin?.name || "Admin User"} onClick={() => setPage("profile")} aria-label="Your profile">
+            {initials}
           </div>
         </header>
 
         <div className="content">
           <div className="nl-wrap">
-            <AdminUiContext.Provider value={{ showPageHead: false }}>
+            <AdminUiContext.Provider value={{ showPageHead: false, admin }}>
               {PAGE_MAP[page]}
             </AdminUiContext.Provider>
           </div>

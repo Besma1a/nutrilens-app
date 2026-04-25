@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'notifications',
     'dashboard',
     'blogs',
+    'adminpanel',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'

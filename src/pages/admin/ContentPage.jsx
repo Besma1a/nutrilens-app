@@ -1,13 +1,8 @@
 // ContentPage.jsx - FIXED VERSION (Same pattern for all pages)
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { T, css, IBtn, StatusBadge, SearchBar, Select, PageHead, Drawer, DrawerField, EmptyState, SuccessMsg, Pagination } from "./adminUtils";
-
-const CONTENT_DATA = [
-  { id: 1, title: "10 Tips for Healthy Diet", type: "Article", author: "Dr. Amanda Rodriguez", date: "Mar 1", status: "Pending", risk: "Low", body: "A comprehensive guide..." },
-  { id: 2, title: "Understanding Macronutrients", type: "Guide", author: "Dr. Robert Kim", date: "Feb 28", status: "Approved", risk: "Low", body: "Proteins, fats, and carbs..." },
-  { id: 3, title: "Meal Prep for Beginners", type: "Video", author: "Dr. Maria Santos", date: "Feb 25", status: "Pending", risk: "Medium", body: "Step-by-step video guide..." },
-  { id: 4, title: "Rapid Weight Loss Methods", type: "Article", author: "Unknown", date: "Feb 18", status: "Pending", risk: "High", body: "Extreme restriction methods..." },
-];
+import { apiFetch } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 
 const TYPE_COLORS = {
   Article: [T.greenLight, T.greenTx],
@@ -23,42 +18,41 @@ const RISK_MAP = {
 };
 
 export default function ContentPage() {
-  const [items, setItems] = useState(CONTENT_DATA);
+  const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [typeF, setTypeF] = useState("All Types");
   const [statusF, setStatusF] = useState("All Status");
   const [preview, setPreview] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filtered = useMemo(() => {
-    let rows = items.filter(c =>
-      (c.title.toLowerCase().includes(search.toLowerCase()) || c.author.toLowerCase().includes(search.toLowerCase())) &&
-      (typeF === "All Types" || c.type === typeF) &&
-      (statusF === "All Status" || c.status === statusF)
-    );
-    return rows.sort((a, b) => {
-      if (a.status === "Pending" && b.status !== "Pending") return -1;
-      if (a.status !== "Pending" && b.status === "Pending") return 1;
-      return a.title.localeCompare(b.title);
+  useEffect(() => {
+    const params = new URLSearchParams({
+      search: debouncedSearch,
+      type: typeF,
+      status: statusF,
+      page: String(currentPage),
+      limit: "8",
     });
-  }, [items, search, typeF, statusF]);
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedItems = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    apiFetch(`/content?${params.toString()}`).then((data) => {
+      setItems(data.items || []);
+      setTotalPages(data.totalPages || 1);
+    }).catch(() => {});
+  }, [debouncedSearch, typeF, statusF, currentPage]);
 
   const pending = items.filter(c => c.status === "Pending").length;
 
   const approve = (id) => {
-    setItems(p => p.map(c => c.id === id ? { ...c, status: "Approved" } : c));
+    apiFetch(`/content/${id}/approve`, { method: "PATCH" }).then(() => setItems((p) => p.map((c) => c.id === id ? { ...c, status: "Approved" } : c)));
     setPreview(prev => prev?.id === id ? { ...prev, status: "Approved" } : prev);
     setSuccessMsg("Content approved");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const reject = (id) => {
-    setItems(p => p.map(c => c.id === id ? { ...c, status: "Rejected" } : c));
+    apiFetch(`/content/${id}/reject`, { method: "PATCH" }).then(() => setItems((p) => p.map((c) => c.id === id ? { ...c, status: "Rejected" } : c)));
     setPreview(prev => prev?.id === id ? { ...prev, status: "Rejected" } : prev);
     setSuccessMsg("Content rejected");
     setTimeout(() => setSuccessMsg(""), 2000);
@@ -77,7 +71,7 @@ export default function ContentPage() {
         <Select value={statusF} onChange={setStatusF} opts={["All Status", "Pending", "Approved", "Rejected"]} />
       </div>
 
-      {paginatedItems.length === 0 ? (
+      {items.length === 0 ? (
         <EmptyState title="No content found" />
       ) : (
         <>
@@ -87,7 +81,7 @@ export default function ContentPage() {
                 <tr>{["Title", "Type", "Author", "Date", "Risk", "Status", "Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
               </thead>
               <tbody>
-                {paginatedItems.map(c => {
+                {items.map(c => {
                   const [tb, tc] = TYPE_COLORS[c.type] || [T.grayLt, T.gray];
                   const [rb, rc] = RISK_MAP[c.risk];
                   return (

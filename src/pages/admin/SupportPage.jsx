@@ -1,112 +1,59 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { T, css, IBtn, StatusBadge, SearchBar, Select, PageHead, Drawer, EmptyState, SuccessMsg, Pagination } from "./adminUtils";
-
-const TICKETS_DATA = [
-  {
-    id: "T-001",
-    user: "Sarah Johnson",
-    subject: "Cannot access meal plans",
-    priority: "High",
-    date: "Mar 1",
-    status: "Open",
-    assigned: null,
-    messages: [{ from: "Sarah Johnson", role: "user", text: "I can't see my meal plans anymore.", time: "2h ago" }],
-  },
-  {
-    id: "T-002",
-    user: "Michael Chen",
-    subject: "Billing inquiry",
-    priority: "Medium",
-    date: "Mar 1",
-    status: "In Progress",
-    assigned: "Admin",
-    messages: [
-      { from: "Michael Chen", role: "user", text: "I was charged twice for February.", time: "4h ago" },
-      { from: "Admin", role: "admin", text: "Looking into this now.", time: "3h ago" },
-    ],
-  },
-  {
-    id: "T-003",
-    user: "Emily Davis",
-    subject: "Schedule consultation",
-    priority: "Low",
-    date: "Feb 29",
-    status: "Waiting",
-    assigned: "Dr. Kim",
-    messages: [{ from: "Emily Davis", role: "user", text: "I need to reschedule my session.", time: "5h ago" }],
-  },
-  {
-    id: "T-004",
-    user: "James Wilson",
-    subject: "Account verification issue",
-    priority: "High",
-    date: "Feb 28",
-    status: "In Progress",
-    assigned: "Dr. Kim",
-    messages: [{ from: "James Wilson", role: "user", text: "My account shows as unverified.", time: "1d ago" }],
-  },
-];
+import { apiFetch } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 
 const TICKET_STATUSES = ["Open", "In Progress", "Waiting for User", "Resolved", "Closed"];
 
 export default function SupportPage() {
-  const [tickets, setTickets] = useState(TICKETS_DATA);
+  const [tickets, setTickets] = useState([]);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [statusF, setStatusF] = useState("All Status");
   const [priorityF, setPriorityF] = useState("All Priority");
   const [selected, setSelected] = useState(null);
   const [reply, setReply] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filtered = useMemo(() => {
-    const rows = tickets.filter(t =>
-      (t.user.toLowerCase().includes(search.toLowerCase()) || t.subject.toLowerCase().includes(search.toLowerCase())) &&
-      (statusF === "All Status" || t.status === statusF) &&
-      (priorityF === "All Priority" || t.priority === priorityF)
-    );
-    const rank = { Open: 0, "In Progress": 1, "Waiting for User": 2, Resolved: 3, Closed: 4 };
-    return rows.sort((a, b) => (rank[a.status] ?? 5) - (rank[b.status] ?? 5));
-  }, [tickets, search, statusF, priorityF]);
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedTickets = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const fetchTickets = () => {
+    const params = new URLSearchParams({ search: debouncedSearch, status: statusF, priority: priorityF, page: String(currentPage), limit: "10" });
+    apiFetch(`/tickets?${params.toString()}`).then((data) => {
+      setTickets(data.tickets || []);
+      setTotalPages(data.totalPages || 1);
+    }).catch(() => {});
+  };
+  useEffect(() => {
+    fetchTickets();
+  }, [debouncedSearch, statusF, priorityF, currentPage]);
 
   const resolve = (id) => {
-    setTickets(p => p.map(t => (t.id === id ? { ...t, status: "Resolved" } : t)));
+    apiFetch(`/tickets/${id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Resolved" }) }).then(fetchTickets);
     if (selected?.id === id) setSelected(prev => ({ ...prev, status: "Resolved" }));
     setSuccessMsg("Ticket resolved");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const close = (id) => {
-    setTickets(p => p.map(t => (t.id === id ? { ...t, status: "Closed" } : t)));
+    apiFetch(`/tickets/${id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Closed" }) }).then(fetchTickets);
     if (selected?.id === id) setSelected(prev => ({ ...prev, status: "Closed" }));
     setSuccessMsg("Ticket closed");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const setStatus = (id, status) => {
-    setTickets(p => p.map(t => (t.id === id ? { ...t, status } : t)));
-    if (selected?.id === id) setSelected(prev => ({ ...prev, status }));
+    apiFetch(`/tickets/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }).then(fetchTickets);
   };
 
   const setAssigned = (id, assigned) => {
-    const nextAssigned = assigned === "Unassigned" ? null : assigned;
-    setTickets(p => p.map(t => (t.id === id ? { ...t, assigned: nextAssigned } : t)));
-    if (selected?.id === id) setSelected(prev => ({ ...prev, assigned: nextAssigned }));
+    const nextAssigned = assigned === "Unassigned" ? "" : assigned;
+    apiFetch(`/tickets/${id}/assign`, { method: "PATCH", body: JSON.stringify({ assigned: nextAssigned }) }).then(fetchTickets);
   };
 
   const sendReply = () => {
     if (!selected || !reply.trim()) return;
-    const msg = { from: "Admin", role: "admin", text: reply.trim(), time: "Just now" };
-    setTickets(p =>
-      p.map(t =>
-        t.id === selected.id ? { ...t, messages: [...t.messages, msg], status: "In Progress" } : t
-      )
-    );
-    setSelected(prev => ({ ...prev, messages: [...prev.messages, msg], status: "In Progress" }));
+    apiFetch(`/tickets/${selected.id}/reply`, { method: "POST", body: JSON.stringify({ text: reply.trim() }) }).then(fetchTickets);
     setReply("");
     setSuccessMsg("Reply sent");
     setTimeout(() => setSuccessMsg(""), 2000);
@@ -138,7 +85,7 @@ export default function SupportPage() {
         <Select value={priorityF} onChange={setPriorityF} opts={["All Priority", "High", "Medium", "Low"]} />
       </div>
 
-      {paginatedTickets.length === 0 ? (
+      {tickets.length === 0 ? (
         <EmptyState title="No tickets found" />
       ) : (
         <>
@@ -148,7 +95,7 @@ export default function SupportPage() {
                 <tr>{["ID", "User", "Subject", "Priority", "Date", "Status", "Assigned", "Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
               </thead>
               <tbody>
-                {paginatedTickets.map(t => (
+                {tickets.map(t => (
                   <tr key={t.id} style={{ cursor: "pointer" }} onClick={() => setSelected(t)}>
                     <td style={{ ...css.td, color: T.gray, fontFamily: "monospace", fontSize: 12 }}>{t.id}</td>
                     <td style={{ ...css.td, fontWeight: 600, color: T.text }}>{t.user}</td>

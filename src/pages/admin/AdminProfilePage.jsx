@@ -1,14 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { T, css, Avatar, FormInput, FormTextarea, SuccessMsg, ErrorMsg } from "./adminUtils";
+import { adminApi } from "../../services/adminApi";
 
-const ADMIN_INIT = {
-  name: "Admin User",
-  email: "admin@nutrilens.com",
-  phone: "+1 (555) 0100",
-  role: "Platform Administrator",
-  timezone: "UTC-5 (EST)",
-  bio: "Oversees platform operations, support, and account management.",
-};
+const ADMIN_INIT = { name: "", email: "", phone: "", role: "", timezone: "", bio: "" };
 
 export default function AdminProfilePage() {
   const [profile, setProfile] = useState(ADMIN_INIT);
@@ -24,6 +18,10 @@ export default function AdminProfilePage() {
     setProfile(prev => ({ ...prev, [key]: value }));
   };
 
+  useEffect(() => {
+    adminApi.profile().then(setProfile).catch(() => {});
+  }, []);
+
   const validatePassword = () => {
     const errors = {};
     if (!pwForm.current.trim()) errors.current = "Enter your current password";
@@ -38,16 +36,24 @@ export default function AdminProfilePage() {
       setPwErrors(errors);
       return;
     }
-    setPwMsg({ type: "success", text: "Password updated successfully." });
-    setPwForm({ current: "", next: "", confirm: "" });
-    setPwErrors({});
-    setTimeout(() => setPwMsg(null), 3000);
+    adminApi.changePassword({ currentPassword: pwForm.current, newPassword: pwForm.next })
+      .then(() => {
+        setPwMsg({ type: "success", text: "Password updated successfully." });
+        setPwForm({ current: "", next: "", confirm: "" });
+        setPwErrors({});
+        setTimeout(() => setPwMsg(null), 3000);
+      })
+      .catch((e) => setPwMsg({ type: "error", text: e.message }));
   };
 
   const handleSaveProfile = () => {
-    setSaved(true);
-    setSuccessMsg("Profile updated successfully");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    adminApi.updateProfile({ name: profile.name, phone: profile.phone, timezone: profile.timezone, bio: profile.bio })
+      .then((res) => {
+        setProfile(res);
+        setSaved(true);
+        setSuccessMsg("Profile updated successfully");
+        setTimeout(() => setSuccessMsg(""), 2000);
+      });
   };
 
   return (
@@ -122,7 +128,7 @@ export default function AdminProfilePage() {
                 label="Email Address"
                 type="email"
                 value={profile.email}
-                onChange={e => update("email", e.target.value)}
+                onChange={() => {}}
               />
               <FormInput
                 label="Phone Number"

@@ -1,48 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { T, css, StatusBadge, Avatar, SearchBar, Select, PageHead, KpiCard, Drawer, DrawerField, EmptyState, SuccessMsg, Pagination } from "./adminUtils";
-
-const TESTIMONIALS_DATA = [
-  { id: 1, name: "Sarah Johnson", plan: "Premium", date: "Mar 1", rating: 5, text: "NutriLens completely changed my relationship with food!", status: "Pending", featured: false },
-  { id: 2, name: "Michael Chen", plan: "Basic", date: "Feb 28", rating: 4, text: "Great platform! The meal plans are easy to follow.", status: "Approved", featured: true },
-  { id: 3, name: "James Wilson", plan: "Premium", date: "Feb 25", rating: 5, text: "Worth every penny. My energy levels are amazing!", status: "Approved", featured: false },
-  { id: 4, name: "Emma Thompson", plan: "VIP", date: "Feb 20", rating: 5, text: "The VIP plan is incredible. Life-changing.", status: "Pending", featured: false },
-  { id: 5, name: "Lisa Anderson", plan: "Basic", date: "Feb 15", rating: 3, text: "Decent platform but wish there were more recipes.", status: "Rejected", featured: false },
-  { id: 6, name: "David Martinez", plan: "Premium", date: "Feb 10", rating: 5, text: "Dr. Kim is brilliant. He understood my athletic goals.", status: "Approved", featured: true },
-];
+import { apiFetch } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 
 export default function TestimonialsPage() {
-  const [items, setItems] = useState(TESTIMONIALS_DATA);
+  const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [statusF, setStatusF] = useState("All Status");
   const [userDrawer, setUserDrawer] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filtered = items.filter(t =>
-    (t.name.toLowerCase().includes(search.toLowerCase()) || t.text.toLowerCase().includes(search.toLowerCase())) &&
-    (statusF === "All Status" || t.status === statusF)
-  );
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedItems = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  useEffect(() => {
+    const params = new URLSearchParams({ search: debouncedSearch, status: statusF, page: String(currentPage), limit: "5" });
+    apiFetch(`/testimonials?${params.toString()}`).then((data) => {
+      setItems(data.testimonials || []);
+      setTotalPages(data.totalPages || 1);
+    }).catch(() => {});
+  }, [debouncedSearch, statusF, currentPage]);
 
   const approve = (id) => {
-    setItems(p => p.map(t => (t.id === id ? { ...t, status: "Approved" } : t)));
+    apiFetch(`/testimonials/${id}/approve`, { method: "PATCH" }).then(() => setItems((p) => p.map((t) => (t.id === id ? { ...t, status: "Approved" } : t))));
     setUserDrawer(prev => (prev?.id === id ? { ...prev, status: "Approved" } : prev));
     setSuccessMsg("Testimonial approved");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const reject = (id) => {
-    setItems(p => p.map(t => (t.id === id ? { ...t, status: "Rejected", featured: false } : t)));
+    apiFetch(`/testimonials/${id}/reject`, { method: "PATCH" }).then(() => setItems((p) => p.map((t) => (t.id === id ? { ...t, status: "Rejected", featured: false } : t))));
     setUserDrawer(prev => (prev?.id === id ? { ...prev, status: "Rejected", featured: false } : prev));
     setSuccessMsg("Testimonial rejected");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
   const feature = (id) => {
-    setItems(p => p.map(t => (t.id === id ? { ...t, featured: !t.featured } : t)));
+    apiFetch(`/testimonials/${id}/feature`, { method: "PATCH" }).then(() => setItems((p) => p.map((t) => (t.id === id ? { ...t, featured: !t.featured } : t))));
     setUserDrawer(prev => (prev?.id === id ? { ...prev, featured: !prev.featured } : prev));
     setSuccessMsg(featured ? "Unfeatured" : "Featured");
     setTimeout(() => setSuccessMsg(""), 2000);
@@ -72,12 +66,12 @@ export default function TestimonialsPage() {
         <Select value={statusF} onChange={setStatusF} opts={["All Status", "Pending", "Approved", "Rejected"]} />
       </div>
 
-      {paginatedItems.length === 0 ? (
+      {items.length === 0 ? (
         <EmptyState title="No testimonials found" />
       ) : (
         <>
           <div style={css.cardPad}>
-            {paginatedItems.map((t, i) => (
+            {items.map((t, i) => (
               <div key={t.id} style={{ display: "flex", gap: 16, padding: "18px 0", borderBottom: i < paginatedItems.length - 1 ? `1px solid ${T.grayLt}` : "none" }}>
                 <div style={{ cursor: "pointer" }} onClick={() => setUserDrawer(t)}>
                   <Avatar name={t.name} size={42} />
