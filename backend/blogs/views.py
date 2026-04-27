@@ -28,12 +28,34 @@ class BlogListCreateView(generics.ListCreateAPIView):
         return BlogReadSerializer
 
     def get_queryset(self):
-        return Blog.objects.filter(is_published=True).select_related("author")
+        return Blog.objects.filter(
+            is_published=True, moderation_status=Blog.STATUS_APPROVED
+        ).select_related("author")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        # Admin notification for new content awaiting moderation (best-effort)
+        try:
+            from adminpanel.models import AdminNotification
+
+            author = getattr(serializer.instance, "author", None)
+            author_name = (
+                f"{author.first_name} {author.last_name}".strip() or getattr(author, "username", "Nutritionist")
+                if author
+                else "Nutritionist"
+            )
+            AdminNotification.create(
+                title="New blog submitted",
+                message=f"{author_name} submitted a blog: “{serializer.instance.title}”.",
+                notification_type=AdminNotification.TYPE_CONTENT,
+                link="/admin#content",
+            )
+        except Exception:
+            pass
+
         read = BlogReadSerializer(serializer.instance, context={"request": request})
         headers = self.get_success_headers(serializer.data)
         return Response(read.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -63,7 +85,7 @@ class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
         user = self.request.user
         base = Blog.objects.all().select_related("author")
         if self.request.method == "GET":
-            return base.filter(is_published=True)
+            return base.filter(is_published=True, moderation_status=Blog.STATUS_APPROVED)
         if user.is_authenticated and getattr(user, "is_nutritionist", False):
             return base.filter(author=user)
         return Blog.objects.none()

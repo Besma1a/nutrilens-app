@@ -1,24 +1,28 @@
 from collections import Counter
 from decimal import Decimal
+import random
 
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from blogs.models import Blog
 from consultations.models import Consultation, ConsultationFeedback, Nutritionist
 from profiles.models import UserProfile
-from subscriptions.models import Subscription
+from subscriptions.models import Subscription, SubscriptionPlan
+from subscriptions.serializers import SubscriptionPlanSerializer
 
 from .auth import create_admin_token, hash_password, humanize_age, verify_password
 from .models import (
     AdminAccount,
+    AdminNotification,
     NutritionistAdminProfile,
     SupportTicket,
     SupportTicketMessage,
@@ -28,6 +32,22 @@ from .models import (
 from .permissions import AdminAuth
 
 User = get_user_model()
+PLAN_PRICES = {
+    "free": Decimal("0"),
+    "pro": Decimal("9.99"),
+    "premium": Decimal("19.99"),
+}
+
+
+def _plan_price(subscription):
+    plan_obj = getattr(subscription, "subscription_plan", None)
+    if plan_obj and plan_obj.price is not None:
+        return Decimal(plan_obj.price)
+    return PLAN_PRICES.get((subscription.plan or "").lower(), Decimal("0"))
+
+
+def _is_paid_subscription(subscription):
+    return _plan_price(subscription) > 0
 
 
 def paginate_queryset(request, queryset, default_limit=10):
@@ -39,12 +59,80 @@ def paginate_queryset(request, queryset, default_limit=10):
     return queryset[start : start + limit], total, total_pages
 
 
+def _paginate_list(request, data, default_limit=10):
+    page = max(int(request.query_params.get("page", 1)), 1)
+    limit = max(int(request.query_params.get("limit", default_limit)), 1)
+    total = len(data)
+    total_pages = (total + limit - 1) // limit if total else 1
+    start = (page - 1) * limit
+    return data[start : start + limit], total, total_pages
+
+
+def _build_mock_revenue_payload():
+    now = timezone.now()
+    monthly_revenue = []
+    for months_back in range(5, -1, -1):
+        d = now - timezone.timedelta(days=30 * months_back)
+        # Smooth synthetic growth curve with gentle variance.
+        month_index = 5 - months_back
+        revenue = 5200 + month_index * 850 + ((month_index % 3) - 1) * 220
+        monthly_revenue.append({"m": d.strftime("%b"), "r": revenue})
+
+    revenue_by_plan = [
+        {"name": "Starter", "value": 4200},
+        {"name": "Pro", "value": 9800},
+        {"name": "Premium", "value": 13600},
+    ]
+
+    mrr = sum(item["value"] for item in revenue_by_plan)
+    new_revenue = monthly_revenue[-1]["r"] if monthly_revenue else 0
+
+    return {
+        "mrr": float(mrr),
+        "newRevenue": float(new_revenue),
+        "churn": 2.4,
+        "refundsTotal": 740.0,
+        "monthlyRevenue": monthly_revenue,
+        "revenueByPlan": revenue_by_plan,
+    }
+
+
+def _build_mock_transactions():
+    first_names = ["Amine", "Sara", "Maya", "Yassine", "Nour", "Adam", "Lina", "Yara"]
+    last_names = ["B.", "A.", "K.", "M.", "R.", "T.", "H.", "Z."]
+    plans = [("Starter", 19), ("Pro", 39), ("Premium", 69)]
+    statuses = ["Paid", "Paid", "Paid", "Refunded", "Failed"]
+    methods = ["Card", "PayPal", "Apple Pay"]
+
+    rng = random.Random(42)
+    now = timezone.now()
+    rows = []
+    for i in range(36):
+        plan_name, base_amount = plans[i % len(plans)]
+        status = statuses[i % len(statuses)]
+        amount = float(base_amount + rng.randint(0, 8))
+        created_at = now - timezone.timedelta(days=i * 3)
+        rows.append(
+            {
+                "id": f"demo-tx-{1000 + i}",
+                "user": f"{first_names[i % len(first_names)]} {last_names[i % len(last_names)]}",
+                "plan": plan_name,
+                "amount": amount,
+                "date": created_at.strftime("%b %d"),
+                "method": methods[i % len(methods)],
+                "status": status,
+                "refundStatus": "Processed" if status == "Refunded" else None,
+            }
+        )
+    return rows
+
+
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
-        password = request.data.get("password") or ""
+        password = (request.data.get("password") or "").strip()
         if not email or not password:
             return Response({"detail": "Email and password are required."}, status=400)
         try:
@@ -281,7 +369,7 @@ class AdminNutritionistsView(APIView):
             specialization=request.data.get("specialization", "general"),
             credentials=request.data.get("licenseNumber", ""),
             availability_url=request.data.get("clinic", ""),
-            is_active=False,
+            is_active=True,
         )
         username_seed = (request.data.get("email", "").split("@")[0] or f"nutri{n.id}")[:25]
         username = f"{username_seed}_{n.id}"
@@ -297,11 +385,11 @@ class AdminNutritionistsView(APIView):
         linked_user.save(update_fields=["password"])
 
         NutritionistAdminProfile.objects.create(
-            nutritionist=n, linked_user=linked_user, status="Pending"
+            nutritionist=n, linked_user=linked_user, status="Approved"
         )
 
         return Response(
-            {"id": n.id, "tempPassword": temp_password, "status": "Pending"}, status=201
+            {"id": n.id, "tempPassword": temp_password, "status": "Approved"}, status=201
         )
 
 
@@ -341,59 +429,6 @@ class AdminNutritionistStatusView(APIView):
         return Response({"status": status_value})
 
 
-class AdminAssignableUsersView(APIView):
-    permission_classes = [AdminAuth]
-
-    def get(self, request):
-        search = (request.query_params.get("search") or "").strip()
-        qs = (
-            User.objects.filter(is_nutritionist=False, profile__managed_by__isnull=True, subscription__status="active")
-            .select_related("subscription")
-            .order_by("-created_at")
-        )
-        if search:
-            qs = qs.filter(
-                Q(first_name__icontains=search)
-                | Q(last_name__icontains=search)
-                | Q(username__icontains=search)
-                | Q(email__icontains=search)
-            )
-        users = [
-            {
-                "id": u.id,
-                "name": f"{u.first_name} {u.last_name}".strip() or u.username,
-                "email": u.email,
-                "plan": getattr(getattr(u, "subscription", None), "plan", "Unknown"),
-            }
-            for u in qs[:200]
-        ]
-        return Response({"users": users})
-
-
-class AdminAssignUserToNutritionistView(APIView):
-    permission_classes = [AdminAuth]
-
-    def post(self, request, nutritionist_id):
-        user_id = request.data.get("userId")
-        admin_profile = NutritionistAdminProfile.objects.filter(nutritionist_id=nutritionist_id).select_related("linked_user").first()
-        if not admin_profile or not admin_profile.linked_user:
-            return Response({"detail": "Nutritionist account is not linked."}, status=400)
-
-        user = User.objects.filter(id=user_id, is_nutritionist=False).first()
-        if not user:
-            return Response({"detail": "User not found."}, status=404)
-        subscription = getattr(user, "subscription", None)
-        if not subscription or subscription.status != "active":
-            return Response({"detail": "Only active subscribed users can be assigned."}, status=400)
-
-        profile, _ = UserProfile.objects.get_or_create(user=user)
-        if profile.managed_by is not None:
-            return Response({"detail": "User is already assigned."}, status=400)
-        profile.managed_by = admin_profile.linked_user
-        profile.save(update_fields=["managed_by", "updated_at"])
-        return Response({"detail": "User assigned successfully."})
-
-
 class AdminSubscriptionsView(APIView):
     permission_classes = [AdminAuth]
 
@@ -411,7 +446,6 @@ class AdminSubscriptionsView(APIView):
             qs = qs.filter(plan=plan)
         rows, total, total_pages = paginate_queryset(request, qs)
         data = []
-        amount_map = {"Monthly": 29, "Quarterly": 59, "Annual": 99}
         for s in rows:
             user_name = f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username
             data.append(
@@ -423,10 +457,42 @@ class AdminSubscriptionsView(APIView):
                     "status": "Active" if s.status == "active" else "Cancelled",
                     "startDate": s.start_date.date().isoformat(),
                     "nextBilling": s.end_date.date().isoformat(),
-                    "amount": amount_map.get(s.plan, 0),
+                    "amount": float(getattr(getattr(s, "subscription_plan", None), "price", 0) or 0),
                 }
             )
         return Response({"subscriptions": data, "total": total, "totalPages": total_pages})
+
+
+class AdminSubscriptionPlansView(APIView):
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        plans = SubscriptionPlan.objects.order_by("sort_order", "price", "name")
+        return Response({"plans": SubscriptionPlanSerializer(plans, many=True).data})
+
+    def post(self, request):
+        serializer = SubscriptionPlanSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
+
+
+class AdminSubscriptionPlanDetailView(APIView):
+    permission_classes = [AdminAuth]
+
+    def put(self, request, plan_id):
+        plan = SubscriptionPlan.objects.get(id=plan_id)
+        serializer = SubscriptionPlanSerializer(plan, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, plan_id):
+        plan = SubscriptionPlan.objects.filter(id=plan_id).first()
+        if not plan:
+            return Response(status=204)
+        plan.delete()
+        return Response(status=204)
 
 
 class AdminSubscriptionCancelView(APIView):
@@ -452,7 +518,7 @@ class AdminContentView(APIView):
         if type_q and type_q != "All Types":
             pass
         if status_q and status_q != "All Status":
-            qs = qs.filter(is_published=(status_q == "Approved"))
+            qs = qs.filter(moderation_status=status_q)
         rows, total, total_pages = paginate_queryset(request, qs, default_limit=8)
         items = []
         for b in rows:
@@ -472,7 +538,7 @@ class AdminContentView(APIView):
                     "type": "Article",
                     "author": author,
                     "date": b.created_at.strftime("%b %d"),
-                    "status": "Approved" if b.is_published else "Pending",
+                    "status": b.moderation_status,
                     "risk": risk,
                     "body": b.excerpt or b.content[:280],
                 }
@@ -485,8 +551,9 @@ class AdminContentApproveView(APIView):
 
     def patch(self, request, content_id):
         blog = Blog.objects.get(id=content_id)
+        blog.moderation_status = Blog.STATUS_APPROVED
         blog.is_published = True
-        blog.save(update_fields=["is_published"])
+        blog.save(update_fields=["moderation_status", "is_published"])
         return Response({"status": "Approved"})
 
 
@@ -495,9 +562,78 @@ class AdminContentRejectView(APIView):
 
     def patch(self, request, content_id):
         blog = Blog.objects.get(id=content_id)
+        blog.moderation_status = Blog.STATUS_REJECTED
         blog.is_published = False
-        blog.save(update_fields=["is_published"])
+        blog.save(update_fields=["moderation_status", "is_published"])
         return Response({"status": "Rejected"})
+
+
+class PublicTestimonialsView(APIView):
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get(self, request):
+        qs = Testimonial.objects.filter(status="Approved").order_by("-created_at")
+        items = [
+            {
+                "id": t.id,
+                "name": t.name,
+                "plan": t.plan,
+                "rating": t.rating,
+                "text": t.text,
+                "featured": t.featured,
+                "createdAt": t.created_at.isoformat(),
+            }
+            for t in qs
+        ]
+        return Response({"testimonials": items})
+
+    def post(self, request):
+        text = (request.data.get("text") or "").strip()
+        if len(text) < 30:
+            return Response(
+                {"detail": "Testimonial text must be at least 30 characters."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        name = (request.data.get("name") or "").strip()
+        if not name:
+            full_name = (
+                f"{request.user.first_name} {request.user.last_name}".strip()
+                if request.user.is_authenticated
+                else ""
+            )
+            name = full_name or getattr(request.user, "username", "Anonymous")
+
+        rating = int(request.data.get("rating") or 5)
+        rating = min(max(rating, 1), 5)
+
+        t = Testimonial.objects.create(
+            user=request.user,
+            name=name,
+            plan=(request.data.get("plan") or "Basic")[:40],
+            rating=rating,
+            text=text,
+            status="Pending",
+            featured=False,
+        )
+
+        # Admin notification (best-effort)
+        try:
+            AdminNotification.create(
+                title="New testimonial pending review",
+                message=f"{name} submitted a testimonial.",
+                notification_type=AdminNotification.TYPE_TESTIMONIAL,
+                link="/admin#testimonials",
+            )
+        except Exception:
+            pass
+        return Response(
+            {"id": t.id, "status": t.status, "detail": "Submitted for admin review."},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class AdminTicketsView(APIView):
@@ -507,37 +643,29 @@ class AdminTicketsView(APIView):
         qs = SupportTicket.objects.prefetch_related("messages").order_by("-created_at")
         search = (request.query_params.get("search") or "").strip()
         status_q = request.query_params.get("status")
-        priority_q = request.query_params.get("priority")
         if search:
-            qs = qs.filter(Q(subject__icontains=search) | Q(user__email__icontains=search))
+            qs = qs.filter(
+                Q(contact_name__icontains=search)
+                | Q(contact_email__icontains=search)
+                | Q(message__icontains=search)
+                | Q(user__email__icontains=search)
+            )
         if status_q and status_q != "All Status":
             qs = qs.filter(status=status_q)
-        if priority_q and priority_q != "All Priority":
-            qs = qs.filter(priority=priority_q)
         rows, total, total_pages = paginate_queryset(request, qs)
         tickets = []
         for t in rows:
-            user_name = (
-                f"{t.user.first_name} {t.user.last_name}".strip() if t.user else "Unknown user"
-            )
+            user_name = f"{t.user.first_name} {t.user.last_name}".strip() if t.user else ""
+            user_email = t.user.email if t.user else ""
+            first_user_message = next((m for m in t.messages.all() if m.role == "user"), None)
             tickets.append(
                 {
                     "id": t.id,
-                    "user": user_name,
-                    "subject": t.subject,
-                    "priority": t.priority,
+                    "name": t.contact_name or (first_user_message.from_name if first_user_message else user_name) or "Unknown",
+                    "email": t.contact_email or user_email,
+                    "message": t.message or (first_user_message.text if first_user_message else ""),
                     "date": t.created_at.strftime("%b %d"),
                     "status": t.status,
-                    "assigned": t.assigned or None,
-                    "messages": [
-                        {
-                            "from": m.from_name,
-                            "role": m.role,
-                            "text": m.text,
-                            "time": humanize_age(m.created_at),
-                        }
-                        for m in t.messages.all()
-                    ],
                 }
             )
         return Response({"tickets": tickets, "total": total, "totalPages": total_pages})
@@ -548,9 +676,69 @@ class AdminTicketStatusView(APIView):
 
     def patch(self, request, ticket_id):
         ticket = SupportTicket.objects.get(id=ticket_id)
-        ticket.status = request.data.get("status", ticket.status)
+        next_status = request.data.get("status", ticket.status)
+        if next_status not in ["Open", "Resolved"]:
+            return Response({"detail": "Invalid status."}, status=400)
+        ticket.status = next_status
         ticket.save(update_fields=["status", "updated_at"])
         return Response({"status": ticket.status})
+
+
+class PublicSupportTicketCreateView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        name = (request.data.get("name") or "").strip()
+        email = (request.data.get("email") or "").strip().lower()
+        message = (request.data.get("message") or "").strip()
+
+        if not name:
+            return Response({"name": ["This field is required."]}, status=400)
+        if not email:
+            return Response({"email": ["This field is required."]}, status=400)
+        if not message:
+            return Response({"message": ["This field is required."]}, status=400)
+
+        linked_user = None
+        if getattr(request.user, "is_authenticated", False):
+            linked_user = request.user
+        else:
+            linked_user = User.objects.filter(email__iexact=email).first()
+
+        ticket = SupportTicket.objects.create(
+            user=linked_user,
+            contact_name=name,
+            contact_email=email,
+            message=message,
+            subject=f"Support request from {name}",
+            priority="Medium",
+            status="Open",
+            assigned="",
+        )
+        SupportTicketMessage.objects.create(
+            ticket=ticket,
+            from_name=name,
+            role="user",
+            text=message,
+        )
+
+        # Admin notification (best-effort)
+        try:
+            AdminNotification.create(
+                title="New support ticket",
+                message=f"{name} submitted a support request.",
+                notification_type=AdminNotification.TYPE_SUPPORT,
+                link="/admin#support",
+            )
+        except Exception:
+            pass
+        return Response(
+            {
+                "ticketId": ticket.id,
+                "detail": "Support ticket submitted successfully.",
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class AdminTicketAssignView(APIView):
@@ -585,97 +773,158 @@ class AdminTicketReplyView(APIView):
         )
 
 
+class AdminNotificationsView(APIView):
+    """
+    GET /api/admin/notifications?unread_only=true&limit=20
+    """
+
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        qs = AdminNotification.objects.filter(
+            Q(recipient__isnull=True) | Q(recipient=request.admin)
+        ).order_by("-created_at")
+
+        if request.query_params.get("unread_only", "").lower() in ("1", "true", "yes"):
+            qs = qs.filter(is_read=False)
+
+        limit = int(request.query_params.get("limit") or 20)
+        limit = max(1, min(limit, 100))
+        qs = qs[:limit]
+
+        items = [
+            {
+                "id": n.id,
+                "type": n.notification_type,
+                "title": n.title,
+                "message": n.message,
+                "link": n.link,
+                "isRead": n.is_read,
+                "createdAt": n.created_at.isoformat(),
+            }
+            for n in qs
+        ]
+
+        unread_count = AdminNotification.objects.filter(
+            Q(recipient__isnull=True) | Q(recipient=request.admin),
+            is_read=False,
+        ).count()
+
+        return Response({"items": items, "unreadCount": unread_count})
+
+
+class AdminNotificationsMarkAllReadView(APIView):
+    permission_classes = [AdminAuth]
+
+    def post(self, request):
+        updated = AdminNotification.objects.filter(
+            Q(recipient__isnull=True) | Q(recipient=request.admin),
+            is_read=False,
+        ).update(is_read=True)
+        return Response({"markedRead": updated})
+
+
+class AdminNotificationReadView(APIView):
+    permission_classes = [AdminAuth]
+
+    def patch(self, request, notification_id):
+        notif = AdminNotification.objects.filter(
+            Q(recipient__isnull=True) | Q(recipient=request.admin),
+            id=notification_id,
+        ).first()
+        if not notif:
+            return Response({"detail": "Not found."}, status=404)
+        notif.is_read = True
+        notif.save(update_fields=["is_read", "updated_at"])
+        return Response({"id": notif.id, "isRead": True})
+
+
 class AdminRevenueStatsView(APIView):
     permission_classes = [AdminAuth]
 
     def get(self, request):
-        paid_tx = Transaction.objects.filter(status__in=["Paid", "Refunded"])
-        mrr = paid_tx.aggregate(v=Sum("amount"))["v"] or Decimal("0")
-        new_revenue = Transaction.objects.filter(
-            status="Paid", created_at__gte=timezone.now() - timezone.timedelta(days=30)
-        ).aggregate(v=Sum("amount"))["v"] or Decimal("0")
-        refunds_total = Transaction.objects.filter(status="Refunded").aggregate(v=Sum("amount"))[
-            "v"
-        ] or Decimal("0")
-        total_subscriptions = Subscription.objects.count()
-        churn = (
-            round(
-                Subscription.objects.filter(status="cancelled").count() / total_subscriptions * 100, 1
-            )
-            if total_subscriptions
-            else 0
-        )
-        monthly_revenue = []
-        now = timezone.now()
-        for months_back in range(5, -1, -1):
-            d = now - timezone.timedelta(days=30 * months_back)
-            month_start = d.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            next_month = (month_start + timezone.timedelta(days=32)).replace(day=1)
-            month_sum = (
-                Transaction.objects.filter(
-                    created_at__gte=month_start, created_at__lt=next_month, status__in=["Paid", "Refunded"]
-                ).aggregate(v=Sum("amount"))["v"]
-                or Decimal("0")
-            )
-            monthly_revenue.append({"m": month_start.strftime("%b"), "r": float(month_sum)})
-        by_plan = Transaction.objects.values("plan").annotate(value=Sum("amount")).order_by("plan")
+        return Response(_build_mock_revenue_payload())
+
+
+class AdminRevenueSummaryView(APIView):
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        active_subscriptions = Subscription.objects.filter(status="active").select_related("subscription_plan")
+        counts = Counter()
+        mrr = Decimal("0")
+        for subscription in active_subscriptions:
+            plan_name = (subscription.plan or "unknown").lower()
+            counts[plan_name] += 1
+            mrr += _plan_price(subscription)
+
         return Response(
             {
-                "mrr": float(mrr),
-                "newRevenue": float(new_revenue),
-                "churn": churn,
-                "refundsTotal": float(refunds_total),
-                "monthlyRevenue": monthly_revenue,
-                "revenueByPlan": [
-                    {"name": row["plan"], "value": float(row["value"] or 0)} for row in by_plan
-                ],
+                "totalMrr": float(mrr),
+                "subscriberCountByPlan": dict(sorted(counts.items())),
             }
         )
+
+
+class AdminRevenueTrendView(APIView):
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        grouped = (
+            Subscription.objects.filter(status="active")
+            .select_related("subscription_plan")
+            .annotate(month=TruncMonth("created_at"))
+            .values("id", "month")
+            .order_by("month")
+        )
+        buckets = {}
+        subscriptions = {s.id: s for s in Subscription.objects.filter(id__in=[r["id"] for r in grouped]).select_related("subscription_plan")}
+        for row in grouped:
+            month = row["month"].strftime("%Y-%m")
+            buckets.setdefault(month, Decimal("0"))
+            subscription = subscriptions.get(row["id"])
+            if subscription:
+                buckets[month] += _plan_price(subscription)
+
+        trend = [{"month": month, "mrr": float(mrr)} for month, mrr in buckets.items()]
+        return Response({"trend": trend})
+
+
+class AdminRevenueSubscribersView(APIView):
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        subscriptions = (
+            Subscription.objects.filter(status="active")
+            .select_related("user")
+            .order_by("-created_at")
+        )
+        subscribers = []
+        for subscription in subscriptions:
+            if not _is_paid_subscription(subscription):
+                continue
+            user = subscription.user
+            full_name = f"{user.first_name} {user.last_name}".strip() or user.username
+            start_at = user.plan_started_at or subscription.created_at
+            subscribers.append(
+                {
+                    "userId": user.id,
+                    "name": full_name,
+                    "email": user.email,
+                    "plan": subscription.plan,
+                    "planStartedAt": start_at.isoformat() if start_at else None,
+                }
+            )
+        return Response({"subscribers": subscribers})
 
 
 class AdminTransactionsView(APIView):
     permission_classes = [AdminAuth]
 
     def get(self, request):
-        tx_qs = Transaction.objects.select_related("user").order_by("-created_at")
-        data = []
-        if tx_qs.exists():
-            rows, total, total_pages = paginate_queryset(request, tx_qs, default_limit=8)
-            for t in rows:
-                user_name = (
-                    f"{t.user.first_name} {t.user.last_name}".strip() if t.user else "Unknown user"
-                )
-                data.append(
-                    {
-                        "id": str(t.id),
-                        "user": user_name,
-                        "plan": t.plan,
-                        "amount": float(t.amount),
-                        "date": t.created_at.strftime("%b %d"),
-                        "method": t.method,
-                        "status": t.status,
-                        "refundStatus": None if t.refund_status == "None" else t.refund_status,
-                    }
-                )
-            return Response({"transactions": data, "total": total, "totalPages": total_pages})
-
-        subs = Subscription.objects.select_related("user").order_by("-created_at")
-        rows, total, total_pages = paginate_queryset(request, subs, default_limit=8)
-        amount_map = {"Monthly": 29, "Quarterly": 59, "Annual": 99}
-        for s in rows:
-            data.append(
-                {
-                    "id": f"sub-{s.id}",
-                    "user": f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username,
-                    "plan": s.plan,
-                    "amount": float(amount_map.get(s.plan, 0)),
-                    "date": s.created_at.strftime("%b %d"),
-                    "method": "Stripe",
-                    "status": "Paid" if s.status == "active" else "Refunded",
-                    "refundStatus": "Processed" if s.status == "cancelled" else None,
-                }
-            )
-        return Response({"transactions": data, "total": total, "totalPages": total_pages})
+        all_transactions = _build_mock_transactions()
+        rows, total, total_pages = _paginate_list(request, all_transactions, default_limit=8)
+        return Response({"transactions": rows, "total": total, "totalPages": total_pages})
 
 
 class AdminTransactionRefundView(APIView):

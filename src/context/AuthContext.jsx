@@ -29,6 +29,7 @@ function normalizeUser(raw) {
     gender:    raw.gender    ?? "",
     dob:       raw.dob       ?? raw.date_of_birth ?? "",
     location:  raw.location  ?? "",
+    profilePicture: raw.profilePicture ?? raw.profile_picture ?? "",
 
     // Goals & nutrition
     goalType:         raw.goalType         ?? raw.goal_type          ?? "",
@@ -41,6 +42,7 @@ function normalizeUser(raw) {
     goalSettingMode:   raw.goalSettingMode   ?? raw.goal_setting_mode   ?? "auto",
     managedBy:         raw.managedBy         ?? raw.managed_by           ?? null,
     managedByUsername: raw.managedByUsername ?? raw.managed_by_username ?? null,
+    nutritionistId:    raw.nutritionistId    ?? raw.nutritionist_id      ?? null,
 
     // Target Macros
     dailyCalorieGoal: raw.dailyCalorieGoal ?? raw.daily_calorie_goal ?? null,
@@ -204,6 +206,9 @@ export function AuthProvider({ children }) {
       if (profileData) {
         updateUserState((prev) => ({
           ...prev,
+          managedBy: profileData?.managed_by ?? prev?.managedBy ?? null,
+          managedByUsername: profileData?.managed_by_username ?? prev?.managedByUsername ?? null,
+          nutritionistId: profileData?.nutritionist_id ?? prev?.nutritionistId ?? null,
           stats: {
             ...(prev?.stats || {}),
             currentWeight: profileData?.current_weight_kg ?? prev?.stats?.currentWeight ?? null,
@@ -427,6 +432,9 @@ export function AuthProvider({ children }) {
 
         updateUserState({
           ...userData,
+          managedBy: profileData?.managed_by ?? userData?.managed_by ?? null,
+          managedByUsername: profileData?.managed_by_username ?? userData?.managed_by_username ?? null,
+          nutritionistId: profileData?.nutritionist_id ?? userData?.nutritionist_id ?? null,
           ...(profileData
             ? {
                 stats: {

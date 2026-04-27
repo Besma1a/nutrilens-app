@@ -2,13 +2,16 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from django.utils import timezone
+from django.db.models import Q
 
 from .models import Nutritionist, Consultation, NutritionistFeedback, ConsultationFeedback
 from .serializers import (
     NutritionistSerializer,
     NutritionistListSerializer,
+    NutritionistSelfUpdateSerializer,
     ConsultationSerializer,
     ConsultationListSerializer,
     ConsultationCreateSerializer,
@@ -26,7 +29,11 @@ class NutritionistViewSet(viewsets.ReadOnlyModelViewSet):
     GET /api/v1/consultations/nutritionists/        → list
     GET /api/v1/consultations/nutritionists/{id}/   → detail
     """
-    queryset = Nutritionist.objects.filter(is_active=True)
+    # Public "Meet Our Experts" should include all non-suspended nutritionists.
+    # Older records may be marked inactive from the prior admin assignment flow.
+    queryset = Nutritionist.objects.exclude(
+        Q(admin_profile__status="Suspended") | Q(admin_profile__status="Rejected")
+    )
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields   = ['name', 'specialization', 'bio']
@@ -36,6 +43,43 @@ class NutritionistViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'list':
             return NutritionistListSerializer
         return NutritionistSerializer
+
+    def get_permissions(self):
+        if self.action == "list":
+            return [AllowAny()]
+        return [permission() for permission in self.permission_classes]
+
+    @action(
+        detail=False,
+        methods=['get', 'patch'],
+        permission_classes=[IsAuthenticated],
+        url_path='me',
+        parser_classes=[JSONParser, FormParser, MultiPartParser],
+    )
+    def me(self, request):
+        """
+        GET/PATCH /api/v1/consultations/nutritionists/me/
+        Read/update the logged-in nutritionist profile mapped by email.
+        """
+        try:
+            nutritionist = Nutritionist.objects.get(email=request.user.email, is_active=True)
+        except Nutritionist.DoesNotExist:
+            return Response(
+                {"detail": "No active nutritionist profile found for this account."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if request.method == 'GET':
+            return Response(NutritionistSerializer(nutritionist).data)
+
+        serializer = NutritionistSelfUpdateSerializer(
+            nutritionist,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(NutritionistSerializer(nutritionist).data)
 
 
 class ConsultationViewSet(viewsets.ModelViewSet):
@@ -80,9 +124,29 @@ class ConsultationViewSet(viewsets.ModelViewSet):
         return ConsultationSerializer
 
     def perform_create(self, serializer):
+        from adminpanel.models import NutritionistAdminProfile
+        from profiles.models import UserProfile
+        
         nutritionist = serializer.validated_data.get('nutritionist')
+        
+        # If no nutritionist specified, try to get the patient's assigned nutritionist
+        if not nutritionist:
+            try:
+                user_profile = UserProfile.objects.get(user=self.request.user)
+                if user_profile.managed_by:
+                    # Get the Nutritionist linked to this user
+                    admin_profile = NutritionistAdminProfile.objects.filter(
+                        linked_user=user_profile.managed_by
+                    ).first()
+                    if admin_profile:
+                        nutritionist = admin_profile.nutritionist
+            except UserProfile.DoesNotExist:
+                pass
+        
+        # Fallback: use first active nutritionist
         if not nutritionist:
             nutritionist = Nutritionist.objects.filter(is_active=True).first()
+        
         serializer.save(user=self.request.user, nutritionist=nutritionist)
 
     @action(detail=False, methods=['get'])

@@ -1,4 +1,5 @@
 import { Instagram, Twitter, Facebook, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { C, FOOTER_COLS } from "./constants/tokens";
 
 /**
@@ -120,7 +121,21 @@ export default function Footer() {
           <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
             © 2025 NutriLens. All rights reserved.
           </span>
-          
+          <Link
+            to="/support"
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 13,
+              fontWeight: 700,
+              color: C.white,
+              border: "1px solid rgba(255,255,255,0.35)",
+              padding: "8px 14px",
+              borderRadius: 999,
+              textDecoration: "none",
+            }}
+          >
+            Contact Support
+          </Link>
         </div>
       </div>
     </footer>

@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
+import Avatar from '../common/Avatar';
 
 function Icon({ children, className = 'si' }) {
   return (
@@ -164,7 +165,19 @@ export default function UserSidebar({ user, open, onClose }) {
             }}
             title="View Health Profile"
           >
-            <div className="sb-av">{user.avatar}</div>
+            <div className="sb-av">
+              <Avatar
+                user={user}
+                size={32}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#fff",
+                }}
+              />
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="sb-user-name">{user.name}</div>
               <div className="sb-user-plan">

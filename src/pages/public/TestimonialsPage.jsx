@@ -1,18 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../components/layout/Toast";
 import { useModalA11y } from "../../hooks/useModalA11y";
 import Header from "./Header";
 import Footer from "./Footer";
-
-const TESTIMONIALS = [
-  { id: 1, name: "Rania M.", role: "Software Engineer", text: "I built healthy habits that finally stick.", result: "12kg lost", rating: 5 },
-  { id: 2, name: "Marcus R.", role: "Healthcare Manager", text: "My nutrition routine is now clear and manageable.", result: "Better blood sugar", rating: 4 },
-  { id: 3, name: "Jessica L.", role: "Fitness Coach", text: "Meal structure improved my energy and training quality.", result: "Energy +40%", rating: 5 },
-  { id: 4, name: "David K.", role: "Executive", text: "Simple planning helped me stay consistent on busy days.", result: "6kg lost", rating: 4 },
-  { id: 5, name: "Sarah P.", role: "Student", text: "Healthy eating became affordable and easy to follow.", result: "Budget friendly", rating: 5 },
-  { id: 6, name: "Michael T.", role: "Entrepreneur", text: "Tracking progress kept me accountable each week.", result: "91% adherence", rating: 5 },
-];
+import { testimonialsApi } from "../../services/api";
 
 export default function TestimonialsPage() {
   const { user } = useAuth();
@@ -22,14 +14,22 @@ export default function TestimonialsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: user?.name || "", story: "", rating: 5 });
+  const [testimonials, setTestimonials] = useState([]);
+
+  useEffect(() => {
+    testimonialsApi
+      .listApproved()
+      .then((data) => setTestimonials(data?.testimonials || []))
+      .catch(() => setTestimonials([]));
+  }, []);
 
   const closeFormModal = useCallback(() => setFormOpen(false), []);
   const formModalRef = useModalA11y(formOpen, closeFormModal);
 
-  const filtered = TESTIMONIALS.filter(
+  const filtered = testimonials.filter(
     (t) =>
       t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.role.toLowerCase().includes(search.toLowerCase()) ||
+      (t.plan || "").toLowerCase().includes(search.toLowerCase()) ||
       t.text.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -37,7 +37,7 @@ export default function TestimonialsPage() {
     setFormOpen(true);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!form.name.trim() || !form.story.trim()) {
       toast({ message: "Please fill all required fields", type: "warning" });
@@ -47,13 +47,25 @@ export default function TestimonialsPage() {
       toast({ message: "Story must be at least 30 characters", type: "warning" });
       return;
     }
+    if (!user) {
+      toast({ message: "Please login first to submit a testimonial.", type: "warning" });
+      return;
+    }
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      await testimonialsApi.submit({
+        name: form.name.trim(),
+        text: form.story.trim(),
+        rating: form.rating,
+      });
+      toast({ message: "Story submitted for review. Thank you!", type: "success" });
       setSubmitting(false);
       setFormOpen(false);
-      toast({ message: "Story submitted for review. Thank you!", type: "success" });
       setForm({ name: user?.name || "", story: "", rating: 5 });
-    }, 800);
+    } catch (error) {
+      setSubmitting(false);
+      toast({ message: error?.message || "Could not submit your story.", type: "error" });
+    }
   }
 
   return (
@@ -136,7 +148,7 @@ export default function TestimonialsPage() {
                   <p className="tp-text">"{t.text}"</p>
                   <div>
                     <div className="tp-name">{t.name}</div>
-                    <div className="tp-role">{t.role}</div>
+                    <div className="tp-role">{t.plan || "Member"}</div>
                   </div>
                 </article>
               ))}

@@ -1,14 +1,15 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
 from datetime import timedelta
 
-from .models import Subscription
+from django.utils import timezone
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
+from .models import Subscription, SubscriptionPlan
 from .serializers import (
-    SubscriptionSerializer,
     SubscribeRequestSerializer,
+    SubscriptionPlanSerializer,
     SubscriptionResponseSerializer,
 )
 
@@ -26,8 +27,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        """Disabled — not needed for this use case."""
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        """Public plan list for landing and subscribe pages."""
+        plans = SubscriptionPlan.objects.filter(is_active=True).order_by("sort_order", "price", "name")
+        serializer = SubscriptionPlanSerializer(plans, many=True)
+        return Response(serializer.data)
 
     # ── Subscribe ──────────────────────────────────────────────────────────────
 
@@ -45,26 +48,31 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = SubscribeRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        plan = serializer.validated_data['plan']
+        plan_id = serializer.validated_data.get("planId")
+        plan_name = serializer.validated_data.get("plan")
         user = request.user
 
-        # Always recalculate end_date — handles both new subscriptions
-        # and plan upgrades/downgrades correctly.
-        duration_map = {
-            'Monthly':   30,
-            'Quarterly': 90,
-            'Annual':    365,
-        }
-        end_date = timezone.now() + timedelta(days=duration_map[plan])
-
         try:
+            if plan_id:
+                plan = SubscriptionPlan.objects.filter(id=plan_id, is_active=True).first()
+            else:
+                plan = SubscriptionPlan.objects.filter(name=plan_name, is_active=True).first()
+
+            if not plan:
+                return Response(
+                    {"detail": "Selected subscription plan was not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            end_date = timezone.now() + timedelta(days=plan.duration_days)
             subscription, created = Subscription.objects.update_or_create(
                 user=user,
                 defaults={
-                    'plan':     plan,
-                    'status':   'active',
-                    'end_date': end_date,   # ← key fix: always refresh end_date
-                }
+                    "subscription_plan": plan,
+                    "plan": plan.name,
+                    "status": "active",
+                    "end_date": end_date,
+                },
             )
 
             response_serializer = SubscriptionResponseSerializer(subscription)
@@ -75,8 +83,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
         except Exception as e:
             return Response(
-                {'error': str(e)},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     # ── Unsubscribe ────────────────────────────────────────────────────────────
@@ -93,7 +101,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
         try:
             subscription = Subscription.objects.get(user=user)
-            subscription.status = 'cancelled'
+            subscription.status = "cancelled"
             subscription.save()
 
             response_serializer = SubscriptionResponseSerializer(subscription)
@@ -106,8 +114,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
         except Exception as e:
             return Response(
-                {'error': str(e)},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     # ── Get subscription status ────────────────────────────────────────────────
@@ -135,3 +143,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
         response_serializer = SubscriptionResponseSerializer(subscription)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+    def get_permissions(self):
+        if self.action == "list":
+            return [AllowAny()]
+        return super().get_permissions()

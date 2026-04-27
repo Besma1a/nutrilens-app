@@ -1,92 +1,47 @@
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-
-// ── Mock data (replace with API call / import later) ─────────────────────────
-const ARTICLES = {
-  "1": {
-    id: "1",
-    title: "10 High-Protein Breakfasts to Fuel Your Morning",
-    category: "Nutrition",
-    date: "April 10, 2026",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=85",
-    content: [
-      {
-        type: "intro",
-        text: "Breakfast is often called the most important meal of the day — and when it's packed with protein, that claim holds up. A high-protein morning meal stabilizes blood sugar, reduces cravings, and keeps you focused until lunch.",
-      },
-      {
-        type: "heading",
-        text: "Why Protein at Breakfast Matters",
-      },
-      {
-        type: "paragraph",
-        text: "Protein triggers satiety hormones like peptide YY and GLP-1 while suppressing ghrelin — the hunger hormone. Studies show that people who eat 25–30g of protein at breakfast consume significantly fewer calories throughout the day.",
-      },
-      {
-        type: "highlight",
-        text: "Aim for at least 25g of protein in your first meal of the day.",
-      },
-      {
-        type: "heading",
-        text: "Top 10 High-Protein Breakfast Ideas",
-      },
-      {
-        type: "paragraph",
-        text: "1. Greek yogurt parfait with berries and granola — packs up to 20g protein per serving. 2. Scrambled eggs with smoked salmon on whole-grain toast. 3. Cottage cheese bowl with sliced fruit and a drizzle of honey. 4. Protein smoothie with whey, banana, spinach, and almond butter. 5. Overnight oats made with milk and topped with nuts and seeds.",
-      },
-      {
-        type: "paragraph",
-        text: "6. Egg muffins baked with vegetables and cheese — perfect for meal prep. 7. Tofu scramble with turmeric, peppers, and spinach for a plant-based option. 8. Smoked turkey and avocado wrap. 9. Quinoa breakfast bowl with poached egg and greens. 10. Chia pudding made with protein-rich hemp milk.",
-      },
-      {
-        type: "heading",
-        text: "Making It a Habit",
-      },
-      {
-        type: "paragraph",
-        text: "The key to consistency is preparation. Spend 20 minutes on Sunday prepping egg muffins or overnight oats, and you have a high-protein breakfast ready for most of the week. Small habits compound — and a strong morning meal sets a healthy tone for the entire day.",
-      },
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "How to Read a Nutrition Label Like an Expert",
-    category: "Education",
-    date: "April 5, 2026",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=1200&q=85",
-    content: [
-      {
-        type: "intro",
-        text: "Nutrition labels are packed with information — but most people only glance at calories. Learning to read the full label transforms how you shop, cook, and eat.",
-      },
-      {
-        type: "heading",
-        text: "Start with Serving Size",
-      },
-      {
-        type: "paragraph",
-        text: "Everything on the label refers to one serving. If the package contains 2.5 servings and you eat the whole thing, multiply every number by 2.5. This single step changes how most people interpret packaged food.",
-      },
-      {
-        type: "highlight",
-        text: "Serving size is the most overlooked — and most important — line on any label.",
-      },
-      {
-        type: "heading",
-        text: "What to Prioritize",
-      },
-      {
-        type: "paragraph",
-        text: "After serving size, focus on: total calories, added sugars (not total sugars), sodium, fiber, and protein. These five numbers tell you most of what you need to know about whether a food supports your health goals.",
-      },
-    ],
-  },
-};
+import { blogsApi } from "../../../services/api";
 
 const Article = () => {
   const { id } = useParams();
-  const article = ARTICLES[id];
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    blogsApi
+      .getOne(id)
+      .then((data) => {
+        if (!active) return;
+        setArticle(data || null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setArticle(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  const contentBlocks = useMemo(() => {
+    if (!article?.content) return [];
+    return String(article.content)
+      .split(/\n{2,}/)
+      .map((text) => text.trim())
+      .filter(Boolean);
+  }, [article]);
+
+  if (loading) {
+    return (
+      <div style={styles.notFound}>
+        <h2 style={styles.notFoundTitle}>Loading article...</h2>
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -122,11 +77,15 @@ const Article = () => {
           {/* ── Header ── */}
           <div style={styles.header}>
             <div style={styles.meta}>
-              <span style={styles.categoryBadge}>{article.category}</span>
+              <span style={styles.categoryBadge}>Nutrition</span>
               <span style={styles.metaDivider}>·</span>
-              <span style={styles.metaText}>{article.date}</span>
-              <span style={styles.metaDivider}>·</span>
-              <span style={styles.metaText}>{article.readTime}</span>
+              <span style={styles.metaText}>
+                {new Date(article.createdAt).toLocaleDateString(undefined, {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
             </div>
 
             <h1 className="article-title" style={styles.title}>
@@ -136,42 +95,29 @@ const Article = () => {
 
           {/* ── Image ── */}
           <div className="article-image" style={styles.imageWrapper}>
-            <img src={article.image} alt={article.title} style={styles.image} />
+            <img
+              src={
+                article.imageUrl ||
+                "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=85"
+              }
+              alt={article.title}
+              style={styles.image}
+            />
           </div>
 
           {/* ── Content ── */}
           <div style={styles.content}>
-            {article.content.map((block, i) => {
-              if (block.type === "intro") {
-                return (
-                  <p key={i} style={styles.intro}>
-                    {block.text}
-                  </p>
-                );
-              }
-              if (block.type === "heading") {
-                return (
-                  <h2 key={i} style={styles.sectionHeading}>
-                    {block.text}
-                  </h2>
-                );
-              }
-              if (block.type === "paragraph") {
-                return (
-                  <p key={i} style={styles.paragraph}>
-                    {block.text}
-                  </p>
-                );
-              }
-              if (block.type === "highlight") {
-                return (
-                  <blockquote key={i} style={styles.highlight}>
-                    {block.text}
-                  </blockquote>
-                );
-              }
-              return null;
-            })}
+            {contentBlocks.map((text, i) =>
+              i === 0 ? (
+                <p key={i} style={styles.intro}>
+                  {text}
+                </p>
+              ) : (
+                <p key={i} style={styles.paragraph}>
+                  {text}
+                </p>
+              )
+            )}
           </div>
 
           {/* ── Footer ── */}

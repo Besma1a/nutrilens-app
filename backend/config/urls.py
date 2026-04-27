@@ -8,6 +8,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from profiles.views import NutritionistPatientsView, PlanAssignmentPatchView
+from adminpanel.views import PublicSupportTicketCreateView, PublicTestimonialsView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -49,6 +50,8 @@ urlpatterns = [
     path("api/v1/dashboard/", include("dashboard.urls")),
     path("api/blogs/", include("blogs.urls")),
     path("api/v1/blogs/", include("blogs.urls")),
+    path("api/v1/testimonials/", PublicTestimonialsView.as_view(), name="public-testimonials"),
+    path("api/v1/support/tickets/", PublicSupportTicketCreateView.as_view(), name="public-support-ticket-create"),
     path("api/admin/", include("adminpanel.urls")),
 
     # DRF browsable API login (dev only)

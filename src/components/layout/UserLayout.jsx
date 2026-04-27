@@ -6,6 +6,7 @@ import { ToastProvider } from './Toast';
 import UserSidebar from './UserSidebar';
 import { useToast } from './Toast';
 import { notificationsApi } from '../../services/api';
+import Avatar from '../common/Avatar';
 
 /* ── Page metadata ── */
 const META = {
@@ -134,7 +135,17 @@ function UserLayout() {
             }}
             aria-label="Your profile"
           >
-            {user.avatar}
+            <Avatar
+              user={user}
+              size={32}
+              style={{
+                width: "100%",
+                height: "100%",
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: "#fff",
+              }}
+            />
           </div>
 
         </header>

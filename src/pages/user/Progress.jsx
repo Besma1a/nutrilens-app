@@ -183,22 +183,6 @@ export default function Progress() {
     loadData();
   }, [isPremium, toast]);
 
-  // Re-fetch profile whenever Profile.jsx saves changes via AuthContext
-  useEffect(() => {
-    if (!user?.stats) return;
-    Promise.all([
-      profileApi.getProfile(),
-      profileApi.getWeightHistory(),
-    ])
-      .then(([profile, weights]) => {
-        setProfileData(profile);
-        const sorted = normalizeListPayload(weights).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-        setWeightHistory(sorted);
-        setForm(f => ({ ...f, weight: sorted[0]?.weight_kg ?? profile?.current_weight_kg ?? '' }));
-      })
-      .catch(() => {});
-  }, [user?.stats?.currentWeight, user?.stats?.goalWeight, user?.stats?.height]);
-
   // ── Derived values ────────────────────────────────────────────────────────
   // weightHistory is sorted newest-first, so [0] = latest, [last] = earliest
   const latestWeightEntry   = weightHistory[0];

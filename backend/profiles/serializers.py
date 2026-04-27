@@ -11,6 +11,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     bmi = serializers.SerializerMethodField()
     subscription_is_active = serializers.SerializerMethodField()
     scans_used_today = serializers.SerializerMethodField()
+    managed_by_username = serializers.SerializerMethodField()
+    nutritionist_id = serializers.SerializerMethodField()
     
     class Meta:
         model = UserProfile
@@ -19,7 +21,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'goal_weight_kg', 'daily_calorie_goal', 'protein_goal_g', 
             'carbs_goal_g', 'fat_goal_g', 'bmi', 'is_subscribed', 
             'subscription_plan', 'subscription_end_date', 'subscription_is_active',
-            'goal_setting_mode', 'managed_by', 'scans_used_today',
+            'goal_setting_mode', 'managed_by', 'managed_by_username', 'nutritionist_id', 'scans_used_today',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['user', 'created_at', 'updated_at', 'bmi', 'subscription_is_active', 'scans_used_today']
@@ -32,6 +34,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     def get_scans_used_today(self, obj):
         return obj.scans_used_today()
+
+    def get_managed_by_username(self, obj):
+        manager = getattr(obj, "managed_by", None)
+        if not manager:
+            return None
+        name = f"{manager.first_name} {manager.last_name}".strip()
+        return name or manager.username
+
+    def get_nutritionist_id(self, obj):
+        manager = getattr(obj, "managed_by", None)
+        if not manager:
+            return None
+        try:
+            from adminpanel.models import NutritionistAdminProfile
+            admin_profile = (
+                NutritionistAdminProfile.objects
+                .select_related("nutritionist")
+                .filter(linked_user=manager, status="Approved")
+                .first()
+            )
+            return admin_profile.nutritionist_id if admin_profile else None
+        except Exception:
+            return None
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -134,13 +159,13 @@ class NutritionistPatientSerializer(serializers.ModelSerializer):
     has_active_plan  = serializers.SerializerMethodField()
     active_diet_plan = serializers.SerializerMethodField()
 
-    # ── Body metrics (direct profile fields) ─────────────────────────────
-    height_cm         = serializers.FloatField(read_only=True)
-    current_weight_kg = serializers.FloatField(read_only=True)
-    goal_weight_kg    = serializers.FloatField(read_only=True)
+    # ── Body metrics with fallback to CustomUser onboarding fields ───────
+    height_cm         = serializers.SerializerMethodField()
+    current_weight_kg = serializers.SerializerMethodField()
+    goal_weight_kg    = serializers.SerializerMethodField()
 
     # ── Nutrition goals ───────────────────────────────────────────────────
-    daily_calorie_goal = serializers.IntegerField(read_only=True)
+    daily_calorie_goal = serializers.SerializerMethodField()
     protein_goal_g     = serializers.FloatField(read_only=True)
     carbs_goal_g       = serializers.FloatField(read_only=True)
     fat_goal_g         = serializers.FloatField(read_only=True)
@@ -244,6 +269,30 @@ class NutritionistPatientSerializer(serializers.ModelSerializer):
         except Exception:
             pass
         return None
+
+    def get_height_cm(self, obj):
+        value = getattr(obj, "height_cm", None)
+        if value is not None:
+            return value
+        return getattr(obj.user, "height", None)
+
+    def get_current_weight_kg(self, obj):
+        value = getattr(obj, "current_weight_kg", None)
+        if value is not None:
+            return value
+        return getattr(obj.user, "weight", None)
+
+    def get_goal_weight_kg(self, obj):
+        value = getattr(obj, "goal_weight_kg", None)
+        if value is not None:
+            return value
+        return getattr(obj.user, "goal_weight", None)
+
+    def get_daily_calorie_goal(self, obj):
+        value = getattr(obj, "daily_calorie_goal", None)
+        if value is not None:
+            return value
+        return getattr(obj.user, "daily_calorie_goal", 2000)
 
     def get_medical_conditions(self, obj):
         """Return patient's medical conditions from user profile."""

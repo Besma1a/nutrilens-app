@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ToastProvider, useToast } from './Toast';
-import { currentUser } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
+import Avatar from '../common/Avatar';
 
 /* ─── API config — set VITE_API_BASE_URL in .env ──────────────────────────── */
 export const API_CONFIG = {
@@ -9,19 +10,14 @@ export const API_CONFIG = {
   wsUrl:   import.meta.env?.VITE_WS_URL        ?? 'wss://localhost/ws',
 };
 
-/* ─── useCurrentUser ───────────────────────────────────────────────────────
-   Currently returns your existing mockData `currentUser`.
-   TODO: replace the useState initializer with a real fetch:
-     fetch(`${API_CONFIG.baseUrl}/auth/me`, { credentials: 'include' })
-       .then(r => r.json()).then(setUser)
-────────────────────────────────────────────────────────────────────────── */
-function useCurrentUser() {
-  const [user, setUser] = useState(currentUser);
-  // useEffect(() => {
-  //   fetch(`${API_CONFIG.baseUrl}/auth/me`, { credentials: 'include' })
-  //     .then(r => r.json()).then(setUser);
-  // }, []);
-  return user;
+function getInitials(name) {
+  const cleaned = (name || '').trim();
+  if (!cleaned) return 'NU';
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] || '';
+  const second = parts.length > 1 ? (parts[1]?.[0] || '') : (parts[0]?.[1] || '');
+  const out = (first + second).toUpperCase();
+  return out || 'NU';
 }
 
 /* ─── useUnreadCounts ──────────────────────────────────────────────────────
@@ -178,7 +174,19 @@ function NutritionistSidebar({ nutritionist, open, onClose, unread }) {
             onClick={() => { navigate('/nutritionist/profile'); onClose(); }}
             title="View profile"
           >
-            <div className="sb-av">{nutritionist.initials}</div>
+            <div className="sb-av">
+              <Avatar
+                user={nutritionist.user}
+                size={32}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#fff",
+                }}
+              />
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="sb-user-name">{nutritionist.fullName}</div>
               <div className="sb-user-plan">{nutritionist.title} · View Profile →</div>
@@ -204,8 +212,29 @@ function NutritionistLayoutInner() {
   const toast       = useToast();
   const searchTimer = useRef(null);
 
-  const user   = useCurrentUser();
+  const { user: authUser } = useAuth();
   const unread = useUnreadCounts();
+
+  const nutritionist = useMemo(() => {
+    const displayName =
+      authUser?.name ||
+      `${authUser?.firstName || ''} ${authUser?.lastName || ''}`.trim() ||
+      authUser?.username ||
+      authUser?.email ||
+      'Nutritionist';
+
+    // NOTE: we don’t yet have a dedicated "title" for nutritionists from backend;
+    // fall back to a reasonable label.
+    const title = authUser?.isNutritionist ? 'Nutritionist' : (authUser?.isStaff ? 'Staff' : 'User');
+
+    return {
+      user: authUser,
+      fullName: displayName,
+      initials: getInitials(displayName),
+      title,
+      patientsCount: authUser?.patientsCount ?? 0,
+    };
+  }, [authUser]);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   useEffect(() => { closeSidebar(); }, [location.pathname, closeSidebar]);
@@ -235,7 +264,7 @@ function NutritionistLayoutInner() {
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--surf)' }}>
 
       <NutritionistSidebar
-        nutritionist={user}
+        nutritionist={nutritionist}
         open={sidebarOpen}
         onClose={closeSidebar}
         unread={unread}
@@ -296,11 +325,21 @@ function NutritionistLayoutInner() {
             className="hdr-av"
             role="button"
             tabIndex={0}
-            title={user.fullName}
+            title={nutritionist.fullName}
             onClick={() => navigate('/nutritionist/profile')}
             aria-label="Your profile"
           >
-            {user.initials}
+            <Avatar
+              user={nutritionist.user}
+              size={32}
+              style={{
+                width: "100%",
+                height: "100%",
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#fff",
+              }}
+            />
           </div>
         </header>
 

@@ -1,26 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/layout/Toast';
+import { subscriptionsApi } from '../../services/api';
 
-const PLANS = [
-  {
-    id: 'monthly', icon: '🌙', name: 'Monthly', price: 29, period: 'month',
-    features: ['Unlimited AI meal scans', 'Personalized meal plans', '2 consultations/month', 'Direct nutritionist messaging', 'Progress tracking & reports', 'Cancel anytime'],
-    popular: false,
-  },
-  {
-    id: 'quarterly', icon: '⭐', name: 'Quarterly', price: 69, period: '3 months', savings: 'Save $18',
-    features: ['All Monthly features', '8 consultations total', 'Priority support', 'Seasonal meal plans', 'Recipe library access', '20% savings'],
-    popular: true,
-  },
-  {
-    id: 'annual', icon: '🚀', name: 'Annual', price: 199, period: 'year', savings: 'Save $149',
-    monthlyEquivalent: '~$16.58/month',
-    features: ['All Quarterly features', 'Unlimited consultations', 'Personal health coach', 'Custom meal planning', 'Premium analytics', 'Best value'],
-    popular: false,
-  },
-];
+const PLAN_ICONS = ['🌙', '⭐', '🚀', '🥗', '💪', '✨'];
 
 const TABLE_ROWS = [
   { feature: 'AI Meal Scans',              free: '3/day',   premium: 'Unlimited' },
@@ -43,21 +27,47 @@ export default function Subscribe() {
   const { user, subscribe, unsubscribe } = useAuth();
   const navigate  = useNavigate();
   const toast     = useToast();
+  const [searchParams] = useSearchParams();
 
+  const [plans, setPlans] = useState([]);
+  const [plansLoading, setPlansLoading] = useState(true);
   const [processing,    setProcessing]    = useState(null);    // plan.id while subscribing
   const [cancelConfirm, setCancelConfirm] = useState(false);   // false | true | 'processing' | 'success'
+
+  useEffect(() => {
+    subscriptionsApi.listPlans()
+      .then((data) => setPlans(Array.isArray(data) ? data : []))
+      .catch(() => setPlans([]))
+      .finally(() => setPlansLoading(false));
+  }, []);
+
+  const selectedPlanId = searchParams.get('planId') || localStorage.getItem('pendingSubscriptionPlanId');
+  const highlightedPlanId = selectedPlanId ? String(selectedPlanId) : null;
+  const activePlan = useMemo(
+    () => plans.find((plan) => plan.name === user?.planName) || null,
+    [plans, user?.planName]
+  );
+
+  const formatPlanPeriod = (durationDays) => {
+    if (!durationDays) return 'cycle';
+    if (durationDays === 30) return 'month';
+    if (durationDays === 90) return '3 months';
+    if (durationDays === 365) return 'year';
+    return `${durationDays} days`;
+  };
 
   // ── Subscribe to a plan (calls real backend) ───────────────────────────────
   const handleSubscribe = async (plan) => {
     setProcessing(plan.id);
     try {
-      await subscribe(plan.name);   // AuthContext → subscriptionsApi.subscribe()
+      await subscribe({ planId: plan.id });   // AuthContext → subscriptionsApi.subscribe()
+      localStorage.removeItem('pendingSubscriptionPlanId');
       toast({
         message:  `You're now on the ${plan.name} Plan! Premium features unlocked.`,
         type:     'success',
         duration: 5000,
       });
-      navigate('/user/dashboard');
+      navigate('/nutritionists?from=subscription');
     } catch (err) {
       toast({
         message: err.message || 'Subscription failed. Please try again.',
@@ -171,7 +181,7 @@ export default function Subscribe() {
           <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginBottom: 16 }}>What's Included</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {['Unlimited AI meal scans', '2 consultations per month', 'Personalized AI meal planning', 'Progress tracking & reports', 'Direct nutritionist messaging', 'Seasonal meal plans'].map((f, i) => (
+              {((activePlan?.features?.length ? activePlan.features : ['Unlimited AI meal scans', 'Personalized meal plans', 'Progress tracking & reports'])).map((f, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5, color: 'var(--ink-3)' }}>
                   <div style={{ width: 20, height: 20, background: 'var(--g-light)', border: '1px solid var(--g-mid)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="var(--g2)" strokeWidth="2.5" strokeLinecap="round" style={{ width: 11, height: 11 }}>
@@ -256,33 +266,32 @@ export default function Subscribe() {
 
       {/* Plan Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: 24, marginBottom: 48 }}>
-        {PLANS.map(plan => (
+        {plans.map((plan, idx) => (
           <div key={plan.id} style={{
             background:   'var(--surf)',
-            border:       `2px solid ${plan.popular ? 'var(--g2)' : 'var(--border)'}`,
+            border:       `2px solid ${String(plan.id) === highlightedPlanId ? 'var(--g2)' : plan.is_featured ? 'var(--g2)' : 'var(--border)'}`,
             borderRadius: 'var(--r-xl)',
             overflow:     'hidden',
-            transform:    plan.popular ? 'scale(1.03)' : 'none',
-            boxShadow:    plan.popular ? 'var(--sh-lg)' : 'var(--sh-xs)',
+            transform:    plan.is_featured ? 'scale(1.03)' : 'none',
+            boxShadow:    plan.is_featured ? 'var(--sh-lg)' : 'var(--sh-xs)',
           }}>
-            {plan.popular && (
+            {plan.is_featured && (
               <div style={{ background: 'linear-gradient(135deg,var(--g1),var(--g2))', color: 'white', textAlign: 'center', fontSize: 11, fontWeight: 800, padding: '7px 0', letterSpacing: 1 }}>
                 MOST POPULAR
               </div>
             )}
             <div style={{ padding: '28px 22px' }}>
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <div style={{ fontSize: 42, marginBottom: 12 }}>{plan.icon}</div>
+                <div style={{ fontSize: 42, marginBottom: 12 }}>{PLAN_ICONS[idx % PLAN_ICONS.length]}</div>
                 <div style={{ fontSize: 17, fontWeight: 700 }}>{plan.name}</div>
                 <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-1px', margin: '10px 0 6px' }}>
-                  ${plan.price}<span style={{ fontSize: 14, fontWeight: 500, opacity: .75 }}>/{plan.period}</span>
+                  ${plan.price}<span style={{ fontSize: 14, fontWeight: 500, opacity: .75 }}>/{formatPlanPeriod(plan.duration_days)}</span>
                 </div>
-                {plan.monthlyEquivalent && <div style={{ fontSize: 12, color: 'var(--g2)', fontWeight: 600 }}>{plan.monthlyEquivalent}</div>}
-                {plan.savings && <span className="badge badge-green" style={{ marginTop: 8 }}>{plan.savings}</span>}
+                {String(plan.id) === highlightedPlanId && <span className="badge badge-green" style={{ marginTop: 8 }}>Selected from homepage</span>}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
-                {plan.features.map((f, i) => (
+                {(plan.features || []).map((f, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 14, color: 'var(--ink-3)' }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--g2)" strokeWidth="2.5" strokeLinecap="round">
                       <polyline points="20 6 9 17 4 12" />
@@ -293,7 +302,7 @@ export default function Subscribe() {
               </div>
 
               <button
-                className={`btn ${plan.popular ? 'btn-prim' : 'btn-sec'}`}
+                className={`btn ${plan.is_featured ? 'btn-prim' : 'btn-sec'}`}
                 style={{ width: '100%', padding: '13px', fontSize: 15, fontWeight: 700 }}
                 onClick={() => handleSubscribe(plan)}
                 disabled={!!processing}
@@ -309,6 +318,18 @@ export default function Subscribe() {
           </div>
         ))}
       </div>
+
+      {!plansLoading && plans.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', padding: 24, marginBottom: 24, color: 'var(--ink-5)' }}>
+          No subscription plans are available right now.
+        </div>
+      )}
+
+      {plansLoading && (
+        <div className="card" style={{ textAlign: 'center', padding: 24, marginBottom: 24, color: 'var(--ink-5)' }}>
+          Loading plans...
+        </div>
+      )}
 
       {/* Feature Comparison Table */}
       <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)', marginBottom: 32 }}>

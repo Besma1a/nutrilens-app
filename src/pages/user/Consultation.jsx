@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/layout/Toast';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { consultationsApi } from '../../services/api';
@@ -101,17 +102,32 @@ function formatPastForDisplay(consultation) {
   };
 }
 
+function getInitials(name) {
+  if (!name || typeof name !== 'string') return 'N';
+  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  if (parts.length === 0) return 'N';
+  return parts.map((part) => part[0]?.toUpperCase() || '').join('') || 'N';
+}
+
+function asAbsoluteMediaUrl(urlOrPath) {
+  if (!urlOrPath || typeof urlOrPath !== "string") return null;
+  if (urlOrPath.startsWith("http")) return urlOrPath;
+  return `${window.location.protocol}//localhost:8000${urlOrPath}`;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ConsultationContent() {
   const toast    = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   // ── Data state ──────────────────────────────────────────────────────────────
   const [upcoming, setUpcoming]   = useState([]);
   const [past,     setPast]       = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [nutritionistInfo, setNutritionistInfo] = useState(null);
 
   // ── Booking modal state ─────────────────────────────────────────────────────
   const [bookOpen,      setBookOpen]      = useState(false);
@@ -136,16 +152,54 @@ export default function ConsultationContent() {
       // FIX: unwrap paginated responses { count, results: [...] } OR plain arrays.
       // Previously (upcomingData || []).map() would iterate over object keys when
       // pagination was enabled, producing objects with no .id → duplicate React keys.
-      setUpcoming(unwrapList(upcomingData).map(formatSessionForDisplay));
-      setPast(unwrapList(pastData).map(formatPastForDisplay));
+      const upcomingRows = unwrapList(upcomingData);
+      const pastRows = unwrapList(pastData);
+
+      setUpcoming(upcomingRows.map(formatSessionForDisplay));
+      setPast(pastRows.map(formatPastForDisplay));
+
+      // Fallback: infer assigned nutritionist from consultations if user state does not
+      // currently include nutritionistId (older sessions/localStorage users).
+      if (!user?.nutritionistId && !nutritionistInfo) {
+        const sessionWithNutritionist = [...upcomingRows, ...pastRows].find((row) => row?.nutritionist_detail);
+        if (sessionWithNutritionist?.nutritionist_detail) {
+          setNutritionistInfo(sessionWithNutritionist.nutritionist_detail);
+        }
+      }
     } catch (err) {
       toast({ message: 'Failed to load sessions', type: 'error' });
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [nutritionistInfo, toast, user?.nutritionistId]);
 
-  useEffect(() => { loadSessions(); }, [loadSessions]);
+  const loadAssignedNutritionist = useCallback(async () => {
+    try {
+      if (user?.nutritionistId) {
+        const details = await consultationsApi.getNutritionist(user.nutritionistId);
+        if (details) {
+          setNutritionistInfo(details);
+          return;
+        }
+      }
+
+      if (user?.managedByUsername) {
+        const list = await consultationsApi.listNutritionists();
+        const rows = Array.isArray(list) ? list : [];
+        const matchByName = rows.find((n) => n?.name === user.managedByUsername);
+        if (matchByName) {
+          setNutritionistInfo(matchByName);
+        }
+      }
+    } catch {
+      // Keep UI functional with graceful fallback if nutritionist profile cannot be fetched.
+    }
+  }, [user?.managedByUsername, user?.nutritionistId]);
+
+  useEffect(() => {
+    loadSessions();
+    loadAssignedNutritionist();
+  }, [loadAssignedNutritionist, loadSessions]);
 
   // ── Auto-save draft ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -240,6 +294,11 @@ export default function ConsultationContent() {
   };
 
   const stepLabels = ['Date & Time', 'Notes', 'Confirm'];
+  const nutritionistName = nutritionistInfo?.name || user?.managedByUsername || 'Your Nutritionist';
+  const nutritionistSpecialization = nutritionistInfo?.specialization_display || 'Nutrition Specialist';
+  const nutritionistCredentials = nutritionistInfo?.credentials || '';
+  const nutritionistInitials = getInitials(nutritionistName);
+  const nutritionistPhoto = asAbsoluteMediaUrl(nutritionistInfo?.profile_picture);
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -327,16 +386,32 @@ export default function ConsultationContent() {
             borderRadius: 'var(--r-lg)', marginBottom: 16,
             border: '1px solid var(--g-mid)',
           }}>
-            <div style={{
-              width: 48, height: 48, borderRadius: '50%',
-              background: 'linear-gradient(135deg,var(--g1),var(--g2))',
-              color: '#fff', fontWeight: 700, fontSize: 16,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>LC</div>
+            {nutritionistPhoto ? (
+              <img
+                src={nutritionistPhoto}
+                alt={nutritionistName}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '1px solid rgba(0,0,0,.08)',
+                  background: '#fff',
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 48, height: 48, borderRadius: '50%',
+                background: 'linear-gradient(135deg,var(--g1),var(--g2))',
+                color: '#fff', fontWeight: 700, fontSize: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>{nutritionistInitials}</div>
+            )}
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700 }}>Dr. Lisa Chen</div>
-              <div style={{ fontSize: 12, color: 'var(--ink-4)' }}>Clinical Nutritionist · 8 yrs exp</div>
-              <div style={{ fontSize: 12, color: '#d97706', marginTop: 2 }}>⭐ 4.9 · 127 consultations</div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>{nutritionistName}</div>
+              <div style={{ fontSize: 12, color: 'var(--ink-4)' }}>
+                {nutritionistSpecialization}{nutritionistCredentials ? ` · ${nutritionistCredentials}` : ''}
+              </div>
             </div>
           </div>
           <button type="button" className="btn btn-prim" style={{ width: '100%', marginBottom: 8 }} onClick={openBook}>
@@ -371,7 +446,7 @@ export default function ConsultationContent() {
                   <tr key={row.id}>
                     <td>{row.date}</td>
                     <td>{row.type}</td>
-                    <td>Dr. Lisa Chen</td>
+                    <td>{nutritionistName}</td>
                     <td>
                       <span className={`badge badge-${row.statusRaw === 'completed' ? 'green' : row.statusRaw}`}>
                         {row.status}
@@ -402,7 +477,7 @@ export default function ConsultationContent() {
           >
             <div className="modal-head">
               <div className="modal-title" id="consultation-modal-title">
-                Book a Session with Dr. Lisa Chen
+                Book a Session with {nutritionistName}
               </div>
               <button type="button" className="modal-close" onClick={closeBook} aria-label="Close">✕</button>
             </div>
@@ -503,10 +578,10 @@ export default function ConsultationContent() {
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Confirm your booking</div>
                   <div style={{ background: 'var(--g-light)', border: '1px solid var(--g-mid)', borderRadius: 'var(--r-lg)', padding: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,var(--g1),var(--g2))', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>LC</div>
+                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,var(--g1),var(--g2))', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{nutritionistInitials}</div>
                       <div>
-                        <div style={{ fontWeight: 700 }}>Dr. Lisa Chen</div>
-                        <div style={{ fontSize: 12, color: 'var(--ink-5)' }}>Clinical Nutritionist</div>
+                        <div style={{ fontWeight: 700 }}>{nutritionistName}</div>
+                        <div style={{ fontSize: 12, color: 'var(--ink-5)' }}>{nutritionistSpecialization}</div>
                       </div>
                     </div>
                     {[

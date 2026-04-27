@@ -22,6 +22,7 @@ from .serializers import (
     DietPlanSerializer,
     plan_assignment_to_camel,
 )
+from adminpanel.models import NutritionistAdminProfile
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -273,6 +274,55 @@ class AssignPatientView(APIView):
         profile.managed_by = request.user
         profile.save(update_fields=["managed_by"])
         return Response({"status": "assigned", "patient_id": patient_id})
+
+
+class SelectNutritionistView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if getattr(request.user, "is_nutritionist", False):
+            return Response(
+                {"detail": "Nutritionists cannot select a nutritionist."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        nutritionist_id = request.data.get("nutritionist_id")
+        if nutritionist_id is None:
+            return Response(
+                {"detail": "nutritionist_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            nutritionist_id = int(nutritionist_id)
+        except (TypeError, ValueError):
+            return Response(
+                {"detail": "Invalid nutritionist_id."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        admin_profile = (
+            NutritionistAdminProfile.objects.select_related("linked_user", "nutritionist")
+            .filter(nutritionist_id=nutritionist_id, status="Approved")
+            .first()
+        )
+        if not admin_profile or not admin_profile.linked_user:
+            return Response(
+                {"detail": "Selected nutritionist is not currently available."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        profile.managed_by = admin_profile.linked_user
+        profile.save(update_fields=["managed_by", "updated_at"])
+        return Response(
+            {
+                "status": "assigned",
+                "nutritionistId": admin_profile.nutritionist_id,
+                "nutritionistName": admin_profile.nutritionist.name,
+                "managedBy": admin_profile.linked_user_id,
+            }
+        )
 
 
 class NutritionistPatientsView(APIView):

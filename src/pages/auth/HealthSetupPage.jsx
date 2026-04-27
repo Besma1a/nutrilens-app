@@ -209,6 +209,7 @@ function formFromUser(u) {
 export default function HealthSetupPage() {
   const { user, completeHealthOnboarding } = useAuth();
   const navigate = useNavigate();
+  const pendingPlanId = localStorage.getItem("pendingSubscriptionPlanId");
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => formFromUser(user));
   const [condName, setCondName] = useState("");
@@ -221,9 +222,9 @@ export default function HealthSetupPage() {
 
   useEffect(() => {
     if (user?.onboardingComplete) {
-      navigate("/user/dashboard", { replace: true });
+      navigate(pendingPlanId && !user?.isSubscribed ? `/user/subscribe?planId=${pendingPlanId}` : "/user/dashboard", { replace: true });
     }
-  }, [user?.onboardingComplete, navigate]);
+  }, [navigate, pendingPlanId, user?.isSubscribed, user?.onboardingComplete]);
 
   const pct = Math.round((step / TOTAL_STEPS) * 100);
   const bmiNote = useMemo(() => bmiLabel(form.height, form.weight), [form.height, form.weight]);
@@ -342,7 +343,7 @@ export default function HealthSetupPage() {
       // completeHealthOnboarding now accepts the full server response
       completeHealthOnboarding(response);
 
-      navigate("/user/dashboard", { replace: true });
+      navigate(pendingPlanId ? `/user/subscribe?planId=${pendingPlanId}` : "/user/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to save health setup. Please try again.");
       console.error("Health setup error:", err);

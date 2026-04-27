@@ -49,6 +49,7 @@ def build_user_payload(user):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+        'profile_picture': user.profile_picture.url if getattr(user, "profile_picture", None) else None,
         'gender': user.gender,
         'dob': str(user.date_of_birth) if user.date_of_birth else None,
         'location': user.location,

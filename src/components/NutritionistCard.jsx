@@ -1,7 +1,11 @@
-const NutritionistCard = ({ expert }) => {
+const NutritionistCard = ({ expert, buttonText = "Book Consultation", onButtonClick, buttonDisabled = false }) => {
   const { name, specialty, description, image, experience, rating } = expert;
 
   const handleBook = () => {
+    if (onButtonClick) {
+      onButtonClick(expert);
+      return;
+    }
     alert(`Booking consultation with ${name} — coming soon!`);
   };
 
@@ -21,8 +25,8 @@ const NutritionistCard = ({ expert }) => {
           <span style={styles.metaItem}>{experience} exp</span>
         </div>
 
-        <button onClick={handleBook} style={styles.button}>
-          Book Consultation
+        <button onClick={handleBook} style={{ ...styles.button, opacity: buttonDisabled ? 0.6 : 1, cursor: buttonDisabled ? "not-allowed" : "pointer" }} disabled={buttonDisabled}>
+          {buttonText}
         </button>
       </div>
     </div>

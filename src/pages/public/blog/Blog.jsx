@@ -1,67 +1,57 @@
 import Header from "../Header";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BlogCard from "../../../components/blog/BlogCard";
 import Newsletter from "../Newsletter";
 import Footer from "../Footer";
-
-const ARTICLES = [
-  {
-    id: "1",
-    title: "10 High-Protein Breakfasts to Fuel Your Morning",
-    description: "Start your day right with these easy, protein-packed breakfast ideas that keep you full and energized for hours.",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80",
-    category: "Nutrition",
-    date: "April 10, 2026",
-  },
-  {
-    id: "2",
-    title: "How to Read a Nutrition Label Like an Expert",
-    description: "Understanding nutrition labels is the first step to smarter food choices. Here's everything you need to know.",
-    image: "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=600&q=80",
-    category: "Education",
-    date: "April 5, 2026",
-  },
-  {
-    id: "3",
-    title: "The Truth About Intermittent Fasting",
-    description: "Is intermittent fasting right for you? We break down the science, benefits, and what the research actually says.",
-    image: "https://images.unsplash.com/photo-1505253304499-671c55fb57fe?w=600&q=80",
-    category: "Diet",
-    date: "March 28, 2026",
-  },
-  {
-    id: "4",
-    title: "5 Hydration Myths You Should Stop Believing",
-    description: "From the 8-glasses rule to sports drinks — we separate fact from fiction on staying properly hydrated.",
-    image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=80",
-    category: "Wellness",
-    date: "March 20, 2026",
-  },
-  {
-    id: "5",
-    title: "Plant-Based Protein: Complete Guide for Beginners",
-    description: "Going plant-based? Here's how to hit your protein goals without any animal products, with meal ideas included.",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80",
-    category: "Nutrition",
-    date: "March 14, 2026",
-  },
-  {
-    id: "6",
-    title: "Understanding Macros: Carbs, Fats & Proteins Explained",
-    description: "Macronutrients are the foundation of any diet. Learn what they do, how much you need, and how to balance them.",
-    image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&q=80",
-    category: "Education",
-    date: "March 7, 2026",
-  },
-];
+import { blogsApi } from "../../../services/api";
 
 const Blog = () => {
   const [search, setSearch] = useState("");
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const filtered = ARTICLES.filter(
-    (a) =>
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.category.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    let active = true;
+    blogsApi
+      .list()
+      .then((data) => {
+        if (!active) return;
+        setArticles(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(err?.message || "Failed to load articles.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = useMemo(
+    () =>
+      articles
+        .map((a) => ({
+          id: String(a.id),
+          title: a.title,
+          description: a.excerpt || (a.content || "").slice(0, 170),
+          image: a.imageUrl || "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80",
+          category: "Nutrition",
+          date: new Date(a.createdAt).toLocaleDateString(undefined, {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }),
+        }))
+        .filter(
+          (a) =>
+            a.title.toLowerCase().includes(search.toLowerCase()) ||
+            a.category.toLowerCase().includes(search.toLowerCase())
+        ),
+    [articles, search]
   );
 
   return (
@@ -113,7 +103,15 @@ const Blog = () => {
         </div>
 
         <div style={styles.container}>
-          {filtered.length > 0 ? (
+          {loading ? (
+            <div style={styles.empty}>
+              <p style={styles.emptyText}>Loading articles...</p>
+            </div>
+          ) : error ? (
+            <div style={styles.empty}>
+              <p style={styles.emptyText}>{error}</p>
+            </div>
+          ) : filtered.length > 0 ? (
             <div className="blog-grid">
               {filtered.map((article) => (
                 <BlogCard key={article.id} article={article} />

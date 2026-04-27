@@ -36,9 +36,10 @@ export default function TestimonialsPage() {
   };
 
   const feature = (id) => {
+    const target = items.find((t) => t.id === id);
     apiFetch(`/testimonials/${id}/feature`, { method: "PATCH" }).then(() => setItems((p) => p.map((t) => (t.id === id ? { ...t, featured: !t.featured } : t))));
     setUserDrawer(prev => (prev?.id === id ? { ...prev, featured: !prev.featured } : prev));
-    setSuccessMsg(featured ? "Unfeatured" : "Featured");
+    setSuccessMsg(target?.featured ? "Unfeatured" : "Featured");
     setTimeout(() => setSuccessMsg(""), 2000);
   };
 
@@ -72,7 +73,7 @@ export default function TestimonialsPage() {
         <>
           <div style={css.cardPad}>
             {items.map((t, i) => (
-              <div key={t.id} style={{ display: "flex", gap: 16, padding: "18px 0", borderBottom: i < paginatedItems.length - 1 ? `1px solid ${T.grayLt}` : "none" }}>
+              <div key={t.id} style={{ display: "flex", gap: 16, padding: "18px 0", borderBottom: i < items.length - 1 ? `1px solid ${T.grayLt}` : "none" }}>
                 <div style={{ cursor: "pointer" }} onClick={() => setUserDrawer(t)}>
                   <Avatar name={t.name} size={42} />
                 </div>

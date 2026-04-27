@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Subscription
-from users.models import CustomUser
+
+from .models import Subscription, SubscriptionPlan
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
@@ -42,20 +42,34 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return obj.days_remaining
 
 
+class SubscriptionPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubscriptionPlan
+        fields = [
+            "id",
+            "name",
+            "price",
+            "features",
+            "duration_days",
+            "is_active",
+            "is_featured",
+            "sort_order",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
 class SubscribeRequestSerializer(serializers.Serializer):
     """Serializer for subscription request (POST /api/subscribe/)."""
-    
-    plan = serializers.ChoiceField(
-        choices=['Monthly', 'Quarterly', 'Annual'],
-        help_text="Subscription plan: Monthly (30d), Quarterly (90d), or Annual (365d)"
-    )
-    
-    def validate_plan(self, value):
-        if value not in ['Monthly', 'Quarterly', 'Annual']:
-            raise serializers.ValidationError(
-                f"Plan must be one of: Monthly, Quarterly, Annual. Got '{value}'"
-            )
-        return value
+
+    planId = serializers.IntegerField(required=False)
+    plan = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        if not attrs.get("planId") and not attrs.get("plan"):
+            raise serializers.ValidationError("Either planId or plan is required.")
+        return attrs
 
 
 class SubscriptionResponseSerializer(serializers.Serializer):

@@ -1,692 +1,498 @@
-/**
- * Profile.jsx
- * ─────────────────────────────────────────────────────────────────────────────
- * BACKEND INTEGRATION GUIDE
- * ─────────────────────────────────────────────────────────────────────────────
- * 1. Replace every function inside the `/* ── API LAYER ── *\/` block below.
- *    Each function signature is stable — only swap the body.
- * 2. Pass your auth token via the AUTH_TOKEN constant or a context/hook.
- * 3. The component is fully controlled — all state lives in hooks, nothing
- *    is hard-coded in JSX.
- * 4. Mock delays are clearly marked with `// [MOCK]` — remove them in prod.
- * ─────────────────────────────────────────────────────────────────────────────
- */
-
-import { useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Camera, Lock, Save, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Save, User, Settings, Lock,
-  Plus, Eye, EyeOff, Loader2, Camera
-} from "lucide-react";
-import { currentUser } from "../../data/mockData";
+  nutritionistProfileApi,
+  setGlobalToken,
+} from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONFIG — swap BASE_URL and AUTH_TOKEN for your real values
-// ─────────────────────────────────────────────────────────────────────────────
-const BASE_URL   = "/api/nutritionist";   // TODO: set your API base URL
-const AUTH_TOKEN = null;                  // TODO: pull from AuthContext / localStorage
+const SPECIALIZATION_OPTIONS = [
+  { value: "weight_loss", label: "Weight Loss" },
+  { value: "muscle_gain", label: "Muscle Gain" },
+  { value: "disease_management", label: "Disease Management" },
+  { value: "sports_nutrition", label: "Sports Nutrition" },
+  { value: "general", label: "General Nutrition" },
+];
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// API LAYER — replace each body with a real fetch() call
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** @param {object} data – { firstName, lastName, email, phone, specialization, licenseNumber, clinic, languages, bio } */
-async function apiUpdateProfile() {
-  // [REAL] uncomment ↓
-  // const res = await fetch(`${BASE_URL}/profile`, {
-  //   method: "PUT", headers: headers(), body: JSON.stringify(data)
-  // });
-  // if (!res.ok) throw new Error((await res.json()).message ?? res.statusText);
-  // return res.json();
-
-  await delay(800); // [MOCK] remove in production
-  return { success: true };
-}
-
-async function apiUpdatePassword() {
-  // [REAL] uncomment ↓
-  // const res = await fetch(`${BASE_URL}/password`, {
-  //   method: "PUT", headers: headers(), body: JSON.stringify(data)
-  // });
-  // if (!res.ok) throw new Error((await res.json()).message ?? res.statusText);
-  // return res.json();
-
-  await delay(800); // [MOCK]
-  return { success: true };
-}
-
-/** @param {{ language: string, timezone: string, dateFormat: string, calorieUnit: string, workingHours: object }} data */
-async function apiUpdatePreferences() {
-  // [REAL] uncomment ↓
-  // const res = await fetch(`${BASE_URL}/preferences`, {
-  //   method: "PUT", headers: headers(), body: JSON.stringify(data)
-  // });
-  // if (!res.ok) throw new Error((await res.json()).message ?? res.statusText);
-  // return res.json();
-
-  await delay(800); // [MOCK]
-  return { success: true };
-}
-
-/** @param {File} file – image file from <input type="file"> */
-async function apiUploadAvatar(file) {
-  // [REAL] uncomment ↓
-  // const form = new FormData();
-  // form.append("avatar", file);
-  // const res = await fetch(`${BASE_URL}/avatar`, {
-  //   method: "POST",
-  //   headers: AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {},
-  //   body: form
-  // });
-  // if (!res.ok) throw new Error((await res.json()).message ?? res.statusText);
-  // return res.json(); // expects { avatarUrl: string }
-
-  await delay(800); // [MOCK]
-  return { avatarUrl: URL.createObjectURL(file) };
-}
-
-// helper
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CUSTOM HOOK — async request state (loading / saved / error)
-// ─────────────────────────────────────────────────────────────────────────────
-function useApiStatus(resetAfter = 2200) {
-  const [status, setStatus] = useState(null); // null | "loading" | "saved" | "error"
-  const [errorMsg, setErrorMsg] = useState("");
-  const timerRef = useRef(null);
-
-  const run = useCallback(async (fn) => {
-    clearTimeout(timerRef.current);
-    setStatus("loading");
-    setErrorMsg("");
-    try {
-      await fn();
-      setStatus("saved");
-    } catch (err) {
-      setStatus("error");
-      setErrorMsg(err.message || "Something went wrong.");
-    } finally {
-      timerRef.current = setTimeout(() => setStatus(null), resetAfter);
-    }
-  }, [resetAfter]);
-
-  return { status, errorMsg, run };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// STYLES
-// ─────────────────────────────────────────────────────────────────────────────
-const card = {
+const cardStyle = {
   background: "white",
   border: "1px solid var(--border)",
   borderRadius: "var(--r-lg)",
-  padding: "24px",
-  boxShadow: "var(--shadow-sm)"
+  padding: 24,
+  boxShadow: "var(--shadow-sm)",
 };
 
-const inputBase = {
+const inputStyle = {
   height: 42,
+  width: "100%",
   border: "1px solid var(--border)",
   borderRadius: "var(--r-md)",
-  padding: "0 14px",
-  fontSize: 13.5,
-  width: "100%",
-  outline: "none",
-  transition: "border-color 0.15s",
-  boxSizing: "border-box",
-  background: "var(--gray-50, #fafafa)"
+  padding: "0 12px",
+  fontSize: 14,
+  background: "#fafafa",
 };
 
-const labelStyle = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--gray-500)",
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-  marginBottom: 6,
-  display: "block"
-};
-
-const RESPONSIVE_CSS = `
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-  .profile-root * { box-sizing: border-box; }
-
-  .profile-header-card  { flex-direction: row; }
-  .profile-grid         { grid-template-columns: 1fr 1fr; }
-  .tab-strip            { overflow-x: auto; }
-  .wh-row               { flex-direction: row; align-items: center; }
-
-  @media (max-width: 900px) {
-    .profile-grid { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 640px) {
-    .profile-header-card  { flex-direction: column; align-items: flex-start; gap: 16px !important; }
-    .profile-stats        { gap: 20px !important; }
-    .tab-strip button     { padding: 8px 12px !important; font-size: 12.5px !important; }
-    .wh-row               { flex-direction: column; align-items: flex-start; gap: 6px; }
-    .wh-times             { width: 100%; justify-content: flex-start; }
-    .save-row             { flex-direction: column; }
-    .save-row button      { width: 100%; justify-content: center; }
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--green) !important;
-    box-shadow: 0 0 0 3px var(--green-light, #e6f4ea);
-  }
-
-  .profile-tab-content { animation: fadeIn 0.2s ease; }
-`;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SUB-COMPONENTS
-// ─────────────────────────────────────────────────────────────────────────────
-
-function FieldGroup({ label, children }) {
+function Field({ label, children }) {
   return (
-    <div style={{ marginBottom: 18 }}>
-      <label style={labelStyle}>{label}</label>
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 700, marginBottom: 6, color: "var(--gray-600)" }}>
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
-function TextInput({ value, onChange, ...rest }) {
-  return (
-    <input
-      style={inputBase}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      {...rest}
-    />
-  );
-}
-
-function SelectInput({ value, onChange, options }) {
-  return (
-    <select
-      style={{ ...inputBase, cursor: "pointer" }}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((o) => <option key={o} value={o}>{o}</option>)}
-    </select>
-  );
-}
-
-function SaveBtn({ status, onClick, label = "Save Changes", icon = <Save size={15} /> }) {
-  const bgMap = {
-    saved: "var(--green-dark, #276749)",
-    error: "#c53030",
-    loading: "var(--green)",
-    default: "var(--green)"
-  };
-  const bg = bgMap[status] ?? bgMap.default;
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={status === "loading"}
-      style={{
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "11px 26px", borderRadius: "var(--r-md)",
-        background: bg, color: "white", border: "none",
-        fontSize: 14, fontWeight: 600,
-        cursor: status === "loading" ? "not-allowed" : "pointer",
-        opacity: status === "loading" ? 0.8 : 1,
-        transition: "background 0.2s, opacity 0.2s"
-      }}
-    >
-      {status === "loading" ? (
-        <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Saving…</>
-      ) : status === "saved" ? "✓ Saved!" : status === "error" ? "⚠ Error" : <>{icon} {label}</>}
-    </button>
-  );
-}
-
-function CancelBtn({ onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: "11px 22px", borderRadius: "var(--r-md)",
-        border: "1px solid var(--border)", background: "white",
-        fontSize: 14, fontWeight: 600, cursor: "pointer", color: "var(--gray-600)"
-      }}
-    >
-      Cancel
-    </button>
-  );
-}
-
-function ErrorBanner({ msg }) {
-  if (!msg) return null;
-  return (
-    <div style={{
-      marginBottom: 16, padding: "10px 14px",
-      borderRadius: "var(--r-md)",
-      background: "#fff5f5", border: "1px solid #fed7d7",
-      color: "#c53030", fontSize: 13
-    }}>
-      {msg}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PASSWORD STRENGTH
-// ─────────────────────────────────────────────────────────────────────────────
-function calcStrength(pass) {
-  let s = 0;
-  if (pass.length >= 8) s++;
-  if (/[A-Z]/.test(pass)) s++;
-  if (/[0-9]/.test(pass)) s++;
-  if (/[^A-Za-z0-9]/.test(pass)) s++;
-  return s;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
+  const { user, logout, updateUserState } = useAuth();
   const [tab, setTab] = useState("profile");
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // ── API hooks
-  const profileApi  = useApiStatus();
-  const passwordApi = useApiStatus();
-  const prefsApi    = useApiStatus();
-
-  // ── Avatar
-  const [avatarUrl, setAvatarUrl] = useState(null);
-
-  // ── Profile form state
   const [profileData, setProfileData] = useState({
-    firstName:      "Sara",
-    lastName:       "Rahman",
-    email:          currentUser.email,
-    phone:          currentUser.phone,
-    specialization: "Clinical Nutrition & Dietetics",
-    licenseNumber:  currentUser.license,
-    clinic:         currentUser.clinic,
-    languages:      currentUser.languages,
-    bio:            "Senior Clinical Nutritionist with 8+ years of experience in medical nutrition therapy, weight management, and chronic disease dietary management."
+    name: "",
+    email: "",
+    phone: "",
+    specialization: "general",
+    credentials: "",
+    bio: "",
+    profile_picture: "",
+  });
+  const [profilePictureFile, setProfilePictureFile] = useState(null);
+  const [profilePicturePreview, setProfilePicturePreview] = useState("");
+
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
-  const setProfile = (key) => (val) => setProfileData((p) => ({ ...p, [key]: val }));
+  const [profileMsg, setProfileMsg] = useState("");
+  const [passwordMsg, setPasswordMsg] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
-  // ── Preferences form state
-  const [prefsData, setPrefsData] = useState({
-    language:    "Arabic",
-    timezone:    "Africa/Algiers (UTC+1)",
-    dateFormat:  "DD/MM/YYYY",
-    calorieUnit: "kcal"
-  });
-  const setPref = (key) => (val) => setPrefsData((p) => ({ ...p, [key]: val }));
+  const specializationLabel = useMemo(
+    () => SPECIALIZATION_OPTIONS.find((s) => s.value === profileData.specialization)?.label || "General Nutrition",
+    [profileData.specialization]
+  );
 
-  const [workingHours, setWorkingHours] = useState({
-    Monday:    { start: "09:00", end: "17:00" },
-    Tuesday:   { start: "09:00", end: "17:00" },
-    Wednesday: { start: "09:00", end: "17:00" },
-    Thursday:  { start: "09:00", end: "17:00" },
-    Friday:    { start: "09:00", end: "17:00" }
-  });
-  const setWH = (day, field) => (e) =>
-    setWorkingHours((p) => ({ ...p, [day]: { ...p[day], [field]: e.target.value } }));
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await nutritionistProfileApi.getMyProfile();
+        if (!mounted) return;
+        setProfileData((prev) => ({
+          ...prev,
+          name: data?.name || "",
+          email: data?.email || "",
+          phone: data?.phone || "",
+          specialization: data?.specialization || "general",
+          credentials: data?.credentials || "",
+          bio: data?.bio || "",
+          profile_picture: data?.profile_picture || "",
+        }));
+        setProfilePicturePreview(
+          data?.profile_picture
+            ? data.profile_picture.startsWith("http")
+              ? data.profile_picture
+              : `${window.location.protocol}//${window.location.hostname}:8000${data.profile_picture}`
+            : ""
+        );
+      } catch (err) {
+        if (mounted) setProfileMsg(err?.message || "Failed to load profile.");
+      } finally {
+        if (mounted) setLoadingProfile(false);
+      }
+    })();
 
-  // ── Password form state
-  const [passwordData, setPasswordData]     = useState({ current: "", new: "", confirm: "" });
-  const [showPasswords, setShowPasswords]   = useState({ current: false, new: false, confirm: false });
-  const [passwordError, setPasswordError]   = useState("");
-  const passwordStrength = calcStrength(passwordData.new);
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  const handlePasswordField = (field, value) => {
-    setPasswordData((p) => ({ ...p, [field]: value }));
-    setPasswordError("");
-  };
-  const toggleShow = (field) => setShowPasswords((p) => ({ ...p, [field]: !p[field] }));
+  const setProfileField = (key) => (value) =>
+    setProfileData((prev) => ({ ...prev, [key]: value }));
 
-  // ── Handlers
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const onSaveProfile = async () => {
+    setProfileMsg("");
+    setProfileSaving(true);
     try {
-      const { avatarUrl: url } = await apiUploadAvatar(file);
-      setAvatarUrl(url);
-    } catch {
-      alert("Avatar upload failed. Please try again.");
+      const payload = {
+        ...profileData,
+        ...(profilePictureFile ? { profile_picture: profilePictureFile } : {}),
+      };
+      const res = await nutritionistProfileApi.updateMyProfile(payload);
+      if (res?.profile_picture) {
+        setProfileData((prev) => ({ ...prev, profile_picture: res.profile_picture }));
+        setProfilePicturePreview(
+          res.profile_picture.startsWith("http")
+            ? res.profile_picture
+            : `${window.location.protocol}//${window.location.hostname}:8000${res.profile_picture}`
+        );
+        updateUserState((prev) => ({
+          ...prev,
+          profilePicture: res.profile_picture,
+          profile_picture: res.profile_picture,
+        }));
+      }
+      setProfilePictureFile(null);
+      setProfileMsg("Profile saved successfully.");
+      setIsEditing(false);
+    } catch (err) {
+      setProfileMsg(err?.message || "Could not save profile.");
+    } finally {
+      setProfileSaving(false);
     }
   };
 
-  const handleSaveProfile = () =>
-    profileApi.run(() => apiUpdateProfile(profileData));
+  const onChangePassword = async () => {
+    setPasswordMsg("");
+    if (!passwordData.oldPassword) {
+      setPasswordMsg("Current password is required.");
+      return;
+    }
+    if (passwordData.newPassword.length < 8) {
+      setPasswordMsg("New password must be at least 8 characters.");
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMsg("New password and confirmation do not match.");
+      return;
+    }
 
-  const handleSavePrefs = () =>
-    prefsApi.run(() => apiUpdatePreferences({ ...prefsData, workingHours }));
-
-  const handleUpdatePassword = () => {
-    setPasswordError("");
-    if (!passwordData.current) return setPasswordError("Current password is required.");
-    if (passwordData.new.length < 8) return setPasswordError("New password must be at least 8 characters.");
-    if (passwordData.new !== passwordData.confirm) return setPasswordError("Passwords do not match.");
-
-    passwordApi.run(async () => {
-      await apiUpdatePassword({ currentPassword: passwordData.current, newPassword: passwordData.new });
-      setPasswordData({ current: "", new: "", confirm: "" });
-    });
+    setPasswordSaving(true);
+    try {
+      const res = await nutritionistProfileApi.changePassword({
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+        newPasswordConfirm: passwordData.confirmPassword,
+      });
+      const nextToken = res?.token;
+      if (nextToken) {
+        setGlobalToken(nextToken);
+        localStorage.setItem("authToken", nextToken);
+      }
+      setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordMsg("Password updated successfully.");
+    } catch (err) {
+      setPasswordMsg(err?.message || "Could not update password.");
+    } finally {
+      setPasswordSaving(false);
+    }
   };
 
-  // ── Tabs config
-  const TABS = [
-    { id: "profile",  label: "My Profile", Icon: User },
-    { id: "settings", label: "Settings",   Icon: Settings },
-    { id: "security", label: "Security",   Icon: Lock }
-  ];
+  // Get user's initials for avatar
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
-  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="profile-root">
-      <style>{RESPONSIVE_CSS}</style>
-
-     
-
-      {/* ── Profile header card */}
+    <div>
       <div
-        className="profile-header-card"
         style={{
-          ...card,
-          display: "flex", gap: 20, flexWrap: "wrap",
           background: "white",
-          marginBottom: 20
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-lg)",
+          padding: "18px 18px",
+          marginBottom: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {/* Avatar */}
-        <div style={{ position: "relative", flexShrink: 0 }}>
-          <div style={{
-            width: 84, height: 84, borderRadius: "50%",
-            background: avatarUrl ? "transparent" : "linear-gradient(135deg,#5A8FBF,#7B6EA8)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 28, fontWeight: 700, color: "white",
-            border: "4px solid white", boxShadow: "var(--shadow-md)", overflow: "hidden"
-          }}>
-            {avatarUrl
-              ? <img src={avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : `${profileData.firstName[0]}${profileData.lastName[0]}`}
-          </div>
-          <label
-            title="Change photo"
-            style={{
-              position: "absolute", bottom: 0, right: 0,
-              width: 28, height: 28, borderRadius: "50%",
-              background: "var(--green)", border: "2px solid white",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", transition: "opacity 0.15s"
-            }}
-          >
-            <Camera size={13} color="white" />
-            <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
-          </label>
-        </div>
-
-        {/* Info */}
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--gray-800)" }}>{currentUser.fullName}</div>
-          <div style={{ fontSize: 13, color: "var(--gray-600)", marginTop: 3 }}>
-            {currentUser.title} · {currentUser.clinic}
-          </div>
-          <div className="profile-stats" style={{ display: "flex", gap: 28, marginTop: 16, flexWrap: "wrap" }}>
-            {[
-              [currentUser.patientsCount, "Patients"],
-              [currentUser.experience,    "Experience"],
-              [`${currentUser.rating}★`,  "Rating"],
-              [currentUser.plansCreated,  "Plans Created"]
-            ].map(([v, l]) => (
-              <div key={l}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "var(--gray-800)" }}>{v}</div>
-                <div style={{ fontSize: 11, color: "var(--gray-400)", marginTop: 1 }}>{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <span style={{
-          alignSelf: "flex-start",
-          padding: "5px 13px", borderRadius: 20, fontSize: 12, fontWeight: 600,
-          background: "var(--green-light)", color: "var(--green-dark)"
-        }}>● Active</span>
-      </div>
-
-      {/* ── Tab strip */}
-      <div className="tab-strip" style={{
-        display: "flex", gap: 4,
-        background: "var(--gray-100)", borderRadius: "var(--r-lg)",
-        padding: 4, width: "fit-content", maxWidth: "100%", marginBottom: 24
-      }}>
-        {TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            style={{
-              display: "flex", alignItems: "center", gap: 7,
-              padding: "8px 18px", borderRadius: "var(--r-md)", border: "none",
-              fontSize: 13.5, fontWeight: tab === id ? 600 : 500,
-              color: tab === id ? "var(--gray-800)" : "var(--gray-500)",
-              background: tab === id ? "white" : "transparent",
-              cursor: "pointer", whiteSpace: "nowrap",
-              boxShadow: tab === id ? "var(--shadow-sm)" : "none",
-              transition: "background 0.15s, color 0.15s"
-            }}
-          >
-            <Icon size={14} /> {label}
-          </button>
-        ))}
-      </div>
-
-      {/* ════════════════════ PROFILE TAB ════════════════════ */}
-      {tab === "profile" && (
-        <div className="profile-tab-content">
-          <div className="profile-grid" style={{ display: "grid", gap: 20, marginBottom: 24 }}>
-
-            {/* Personal info */}
-            <div style={card}>
-              <SectionTitle>Personal Information</SectionTitle>
-              {[
-                { label: "First Name", key: "firstName", type: "text" },
-                { label: "Last Name",  key: "lastName",  type: "text" },
-                { label: "Email",      key: "email",     type: "email" },
-                { label: "Phone",      key: "phone",     type: "tel" }
-              ].map(({ label, key, type }) => (
-                <FieldGroup key={key} label={label}>
-                  <TextInput type={type} value={profileData[key]} onChange={setProfile(key)} />
-                </FieldGroup>
-              ))}
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              {/* Professional details */}
-              <div style={card}>
-                <SectionTitle>Professional Details</SectionTitle>
-                {[
-                  { label: "Specialization", key: "specialization" },
-                  { label: "License Number", key: "licenseNumber"  },
-                  { label: "Clinic",         key: "clinic"         },
-                  { label: "Languages",      key: "languages"      }
-                ].map(({ label, key }) => (
-                  <FieldGroup key={key} label={label}>
-                    <TextInput value={profileData[key]} onChange={setProfile(key)} />
-                  </FieldGroup>
-                ))}
-              </div>
-
-              {/* Bio */}
-              <div style={card}>
-                <SectionTitle>Bio</SectionTitle>
-                <textarea
-                  style={{ ...inputBase, height: "auto", minHeight: 110, padding: "12px 14px", resize: "vertical" }}
-                  value={profileData.bio}
-                  onChange={(e) => setProfile("bio")(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {profileApi.errorMsg && <ErrorBanner msg={profileApi.errorMsg} />}
-          <div className="save-row" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <SaveBtn status={profileApi.status} onClick={handleSaveProfile} />
-            <CancelBtn onClick={() => navigate("/nutritionist/dashboard")} />
-          </div>
-        </div>
-      )}
-
-      {/* ════════════════════ SETTINGS TAB ════════════════════ */}
-      {tab === "settings" && (
-        <div className="profile-tab-content">
-          <div className="profile-grid" style={{ display: "grid", gap: 20, marginBottom: 24 }}>
-
-            {/* Preferences */}
-            <div style={card}>
-              <SectionTitle>Preferences</SectionTitle>
-
-              <FieldGroup label="Language">
-                <SelectInput value={prefsData.language} onChange={setPref("language")}
-                  options={["Arabic", "French", "English"]} />
-              </FieldGroup>
-
-              <FieldGroup label="Timezone">
-                <SelectInput value={prefsData.timezone} onChange={setPref("timezone")}
-                  options={["Africa/Algiers (UTC+1)", "Europe/Paris (UTC+2)", "UTC"]} />
-              </FieldGroup>
-
-              <FieldGroup label="Date Format">
-                <SelectInput value={prefsData.dateFormat} onChange={setPref("dateFormat")}
-                  options={["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"]} />
-              </FieldGroup>
-
-              <FieldGroup label="Calorie Unit">
-                <SelectInput value={prefsData.calorieUnit} onChange={setPref("calorieUnit")}
-                  options={["kcal", "kJ"]} />
-              </FieldGroup>
-            </div>
-
-            {/* Working hours */}
-            <div style={card}>
-              <SectionTitle>Working Hours</SectionTitle>
-              {Object.entries(workingHours).map(([day, { start, end }]) => (
-                <div
-                  key={day}
-                  className="wh-row"
-                  style={{
-                    display: "flex", justifyContent: "space-between",
-                    padding: "10px 0", borderBottom: "1px solid var(--border-light, #f0f0f0)"
-                  }}
-                >
-                  <span style={{ fontSize: 13, fontWeight: 500, color: "var(--gray-700)", minWidth: 96 }}>{day}</span>
-                  <div className="wh-times" style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <input style={{ ...inputBase, width: 92, height: 36, fontSize: 13 }}
-                      type="time" value={start} onChange={setWH(day, "start")} />
-                    <span style={{ color: "var(--gray-300)", flexShrink: 0 }}>–</span>
-                    <input style={{ ...inputBase, width: 92, height: 36, fontSize: 13 }}
-                      type="time" value={end} onChange={setWH(day, "end")} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {prefsApi.errorMsg && <ErrorBanner msg={prefsApi.errorMsg} />}
-          <div className="save-row" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <SaveBtn status={prefsApi.status} onClick={handleSavePrefs} />
-            <CancelBtn onClick={() => navigate("/nutritionist/dashboard")} />
-          </div>
-        </div>
-      )}
-
-      {/* ════════════════════ SECURITY TAB ════════════════════ */}
-      {tab === "security" && (
-        <div className="profile-tab-content" style={{ maxWidth: 520, width: "100%" }}>
-          <div style={card}>
-            <SectionTitle>Change Password</SectionTitle>
-
-            {[
-              { label: "Current Password",     field: "current", autoComplete: "current-password" },
-              { label: "New Password",         field: "new",     autoComplete: "new-password" },
-              { label: "Confirm New Password", field: "confirm", autoComplete: "new-password" }
-            ].map(({ label, field, autoComplete }) => (
-              <FieldGroup key={field} label={label}>
-                <div style={{ position: "relative" }}>
-                  <input
-                    type={showPasswords[field] ? "text" : "password"}
-                    style={inputBase}
-                    value={passwordData[field]}
-                    onChange={(e) => handlePasswordField(field, e.target.value)}
-                    placeholder="••••••••"
-                    autoComplete={autoComplete}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => toggleShow(field)}
-                    style={{
-                      position: "absolute", right: 13, top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none", border: "none",
-                      cursor: "pointer", color: "var(--gray-400)", lineHeight: 0
-                    }}
-                  >
-                    {showPasswords[field] ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
-                </div>
-              </FieldGroup>
-            ))}
-
-            {/* Strength bar — only shown when new password has content */}
-            {passwordData.new && (
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--gray-500)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>
-                  Password Strength
-                </div>
-                <div style={{ display: "flex", gap: 5 }}>
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} style={{
-                      flex: 1, height: 5, borderRadius: 999,
-                      background: i <= passwordStrength
-                        ? (passwordStrength >= 4 ? "var(--green)" : "var(--amber, #f59e0b)")
-                        : "var(--gray-200)",
-                      transition: "background 0.3s"
-                    }} />
-                  ))}
-                </div>
-                <div style={{ fontSize: 12, marginTop: 6, color: passwordStrength >= 3 ? "var(--green-dark)" : "var(--gray-500)" }}>
-                  {passwordStrength >= 4 ? "Strong ✓" : passwordStrength >= 2 ? "Medium — add symbols or numbers" : "Weak — too short or simple"}
-                </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          {/* Avatar */}
+          <div style={{ position: "relative", width: 72, height: 72 }}>
+            {profilePicturePreview ? (
+              <img
+                src={profilePicturePreview}
+                alt={profileData.name || "Nutritionist"}
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "1px solid rgba(0,0,0,.08)",
+                  background: "#fff",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: "50%",
+                  background: "#8B5A2B",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 26,
+                  fontWeight: 800,
+                  color: "white",
+                }}
+              >
+                {getInitials(profileData.name || "N")}
               </div>
             )}
 
-            <ErrorBanner msg={passwordError || passwordApi.errorMsg} />
-
-            <SaveBtn
-              status={passwordApi.status}
-              onClick={handleUpdatePassword}
-              label="Update Password"
-              icon={<Lock size={15} />}
+            <input
+              id="nutritionist-photo-input"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const f = e.target.files?.[0] || null;
+                setProfilePictureFile(f);
+                if (f) {
+                  setProfilePicturePreview(URL.createObjectURL(f));
+                  setIsEditing(true);
+                }
+              }}
             />
+            <button
+              type="button"
+              onClick={() => document.getElementById("nutritionist-photo-input")?.click()}
+              aria-label="Change profile photo"
+              style={{
+                position: "absolute",
+                right: -4,
+                bottom: -4,
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                border: "1px solid rgba(0,0,0,.10)",
+                background: "white",
+                boxShadow: "0 6px 16px rgba(0,0,0,.10)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <Camera size={14} color="var(--ink-4)" />
+            </button>
+          </div>
+          {/* Name and Gender */}
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink-2)" }}>
+              {profileData.name || "Nutritionist"}
+            </div>
+            <div style={{ marginTop: 4, color: "var(--ink-5)", fontSize: 13 }}>
+              {user?.gender ? user.gender : specializationLabel}
+            </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+        {/* Action Buttons */}
+        <div style={{ display: "flex", gap: 12 }}>
+          <button
+            type="button"
+            onClick={() => {
+              setTab("profile");
+              setIsEditing(true);
+            }}
+            style={{
+              border: "1px solid var(--border)",
+              borderRadius: "var(--r-md)",
+              padding: "8px 16px",
+              fontWeight: 600,
+              cursor: "pointer",
+              background: "white",
+              color: "var(--ink-3)",
+              fontSize: 14,
+            }}
+          >
+            Edit profile
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // Navigate out of the protected /nutritionist area first so
+              // route guards don't redirect to /login during logout.
+              navigate("/", { replace: true });
+              logout();
+            }}
+            style={{
+              border: "1px solid #fecaca",
+              borderRadius: "var(--r-md)",
+              padding: "8px 16px",
+              fontWeight: 600,
+              cursor: "pointer",
+              background: "white",
+              color: "#b42318",
+              fontSize: 14,
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TINY HELPER
-// ─────────────────────────────────────────────────────────────────────────────
-function SectionTitle({ children }) {
-  return (
-    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--gray-700)", marginBottom: 18, paddingBottom: 10, borderBottom: "1px solid var(--border-light, #f0f0f0)" }}>
-      {children}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <button
+          type="button"
+          onClick={() => setTab("profile")}
+          style={{
+            border: "none",
+            borderRadius: "var(--r-md)",
+            padding: "9px 14px",
+            fontWeight: 600,
+            cursor: "pointer",
+            background: tab === "profile" ? "var(--green-light)" : "var(--gray-100)",
+          }}
+        >
+          <User size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+          My Profile
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("security")}
+          style={{
+            border: "none",
+            borderRadius: "var(--r-md)",
+            padding: "9px 14px",
+            fontWeight: 600,
+            cursor: "pointer",
+            background: tab === "security" ? "var(--green-light)" : "var(--gray-100)",
+          }}
+        >
+          <Lock size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+          Security
+        </button>
+      </div>
+
+      {tab === "profile" && (
+        <div style={cardStyle}>
+          {loadingProfile ? (
+            <div style={{ color: "var(--gray-500)" }}>Loading profile...</div>
+          ) : (
+            <>
+              <Field label="Full Name">
+                <input style={inputStyle} value={profileData.name} onChange={(e) => setProfileField("name")(e.target.value)} />
+              </Field>
+              <Field label="Email">
+                <input style={{ ...inputStyle, background: "#f2f2f2" }} value={profileData.email} disabled />
+              </Field>
+              <Field label="Phone">
+                <input style={inputStyle} value={profileData.phone} onChange={(e) => setProfileField("phone")(e.target.value)} />
+              </Field>
+              <Field label="Specialization">
+                <select
+                  style={{ ...inputStyle, cursor: "pointer" }}
+                  value={profileData.specialization}
+                  onChange={(e) => setProfileField("specialization")(e.target.value)}
+                >
+                  {SPECIALIZATION_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Credentials">
+                <textarea
+                  style={{ ...inputStyle, height: 90, paddingTop: 10, resize: "vertical" }}
+                  value={profileData.credentials}
+                  onChange={(e) => setProfileField("credentials")(e.target.value)}
+                />
+              </Field>
+              <Field label="Bio">
+                <textarea
+                  style={{ ...inputStyle, height: 110, paddingTop: 10, resize: "vertical" }}
+                  value={profileData.bio}
+                  onChange={(e) => setProfileField("bio")(e.target.value)}
+                />
+              </Field>
+
+              {profileMsg && (
+                <div style={{ marginBottom: 12, color: profileMsg.includes("successfully") ? "var(--green-dark)" : "#b42318" }}>
+                  {profileMsg}
+                </div>
+              )}
+
+              {isEditing ? (
+                <button
+                  type="button"
+                  onClick={onSaveProfile}
+                  disabled={profileSaving}
+                  style={{
+                    border: "none",
+                    borderRadius: "var(--r-md)",
+                    padding: "10px 16px",
+                    fontWeight: 700,
+                    color: "white",
+                    background: "var(--green)",
+                    cursor: profileSaving ? "not-allowed" : "pointer",
+                    opacity: profileSaving ? 0.7 : 1,
+                  }}
+                >
+                  <Save size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+                  {profileSaving ? "Saving..." : "Save Changes"}
+                </button>
+              ) : null}
+            </>
+          )}
+        </div>
+      )}
+
+      {tab === "security" && (
+        <div style={cardStyle}>
+          <Field label="Current Password">
+            <input
+              type="password"
+              style={inputStyle}
+              value={passwordData.oldPassword}
+              onChange={(e) => setPasswordData((prev) => ({ ...prev, oldPassword: e.target.value }))}
+            />
+          </Field>
+          <Field label="New Password">
+            <input
+              type="password"
+              style={inputStyle}
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))}
+            />
+          </Field>
+          <Field label="Confirm New Password">
+            <input
+              type="password"
+              style={inputStyle}
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+            />
+          </Field>
+
+          {passwordMsg && (
+            <div style={{ marginBottom: 12, color: passwordMsg.includes("successfully") ? "var(--green-dark)" : "#b42318" }}>
+              {passwordMsg}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={onChangePassword}
+            disabled={passwordSaving}
+            style={{
+              border: "none",
+              borderRadius: "var(--r-md)",
+              padding: "10px 16px",
+              fontWeight: 700,
+              color: "white",
+              background: "var(--green)",
+              cursor: passwordSaving ? "not-allowed" : "pointer",
+              opacity: passwordSaving ? 0.7 : 1,
+            }}
+          >
+            {passwordSaving ? "Updating..." : "Update Password"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

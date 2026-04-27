@@ -15,6 +15,11 @@ class CustomUser(AbstractUser):
         ('maintain', 'Maintain Weight'),
         ('gain', 'Gain Weight'),
     ]
+    PLAN_CHOICES = [
+        ("free", "Free"),
+        ("pro", "Pro"),
+        ("premium", "Premium"),
+    ]
 
     # ── Health profile ────────────────────────────────────────────────
     weight = models.FloatField(
@@ -63,6 +68,8 @@ class CustomUser(AbstractUser):
     email_verified = models.BooleanField(default=False)
     onboarding_complete = models.BooleanField(default=False)
     is_nutritionist = models.BooleanField(default=False, help_text="Can access nutritionist panel")
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default="free")
+    plan_started_at = models.DateTimeField(null=True, blank=True)
 
     # ── Timestamps ────────────────────────────────────────────────────
     created_at = models.DateTimeField(auto_now_add=True)

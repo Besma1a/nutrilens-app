@@ -10,7 +10,7 @@ export default function Header() {
   const [featOpen, setFeatOpen] = useState(false);
   const [scrolled, setScrolled]  = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -132,8 +132,9 @@ export default function Header() {
                
                 <button
                   onClick={() => {
+                    const wasNutritionist = !!user?.isNutritionist;
                     logout();
-                    navigate("/login");
+                    navigate(wasNutritionist ? "/" : "/login");
                   }}
                   style={{
                     background: C.tomato,

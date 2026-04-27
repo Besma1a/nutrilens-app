@@ -1,66 +1,104 @@
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import Header from "./Header";
 import Footer from "./Footer";
 import NutritionistCard from "../../components/NutritionistCard";
 import Newsletter from "./Newsletter";
+import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../components/layout/Toast";
+import { consultationsApi, patientsApi } from "../../services/api";
 
-const EXPERTS = [
-  {
-    id: 1,
-    name: "Dr. Sarah Mitchell",
-    specialty: "Clinical Nutrition",
-    description: "Specializes in therapeutic diets for chronic health conditions.",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
-    experience: "8 years",
-    rating: "4.9",
-  },
-  {
-    id: 2,
-    name: "Dr. Amir Hassan",
-    specialty: "Diabetes Care",
-    description: "Expert in blood sugar management and insulin-friendly meal plans.",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80",
-    experience: "12 years",
-    rating: "4.8",
-  },
-  {
-    id: 3,
-    name: "Lena Hoffmann",
-    specialty: "Weight Management",
-    description: "Helps clients achieve sustainable weight loss through balanced eating.",
-    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=600&q=80",
-    experience: "6 years",
-    rating: "4.7",
-  },
-  {
-    id: 4,
-    name: "Dr. Fatima Al-Rashid",
-    specialty: "Sports Nutrition",
-    description: "Designs performance-focused plans for athletes and active individuals.",
-    image: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=600&q=80",
-    experience: "9 years",
-    rating: "4.9",
-  },
-  {
-    id: 5,
-    name: "James Okafor",
-    specialty: "Plant-Based Nutrition",
-    description: "Guides clients toward whole-food, plant-based lifestyles with ease.",
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&q=80",
-    experience: "5 years",
-    rating: "4.8",
-  },
-  {
-    id: 6,
-    name: "Dr. Nour Khalil",
-    specialty: "Pediatric Nutrition",
-    description: "Supports healthy growth and development through child-focused nutrition.",
-    image: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=600&q=80",
-    experience: "10 years",
-    rating: "5.0",
-  },
-];
+function normalizeListPayload(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
+}
 
 const Nutritionists = () => {
+  const { user, updateUserState } = useAuth();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [nutritionists, setNutritionists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [assigningId, setAssigningId] = useState(null);
+
+  const fromSubscription = searchParams.get("from") === "subscription";
+
+  useEffect(() => {
+    consultationsApi
+      .listNutritionists()
+      .then((data) => {
+        const list = normalizeListPayload(data);
+        setNutritionists(list);
+      })
+      .catch(() => {
+        setNutritionists([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const cards = useMemo(
+    () =>
+      nutritionists.map((item) => ({
+        id: item.id,
+        name: item.name,
+        specialty: item.specialization_display || "Nutrition Specialist",
+        description: item.bio || "Personalized nutrition support for your goals.",
+        image: item.profile_picture
+          ? item.profile_picture.startsWith("http")
+            ? item.profile_picture
+            : `${window.location.protocol}//localhost:8000${item.profile_picture}`
+          : "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
+        experience: item.credentials ? "Certified" : "Experienced",
+        rating: "5.0",
+      })),
+    [nutritionists]
+  );
+
+  const canSelect = !!user?.isSubscribed && !user?.managedBy;
+
+  const handleCardClick = async (expert) => {
+    const selected = nutritionists.find((item) => item.id === expert.id);
+    if (!selected) return;
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (!user.isSubscribed) {
+      toast({ message: "Subscribe first to choose a nutritionist.", type: "info" });
+      navigate("/user/subscribe");
+      return;
+    }
+
+    if (user.managedBy) {
+      navigate("/user/dashboard");
+      return;
+    }
+
+    setAssigningId(selected.id);
+    try {
+      const response = await patientsApi.selectNutritionist(selected.id);
+      updateUserState((prev) => ({
+        ...prev,
+        managedBy: response.managedBy,
+        managedByUsername: response.nutritionistName,
+      }));
+      toast({ message: `${response.nutritionistName} selected successfully.`, type: "success" });
+      navigate("/user/dashboard");
+    } catch (error) {
+      toast({ message: error.message || "Failed to select nutritionist.", type: "error" });
+    } finally {
+      setAssigningId(null);
+    }
+  };
+
   return (
     <div style={{ display: "block", width: "100%", minHeight: "100vh" }}>
       <style>{`
@@ -91,15 +129,38 @@ const Nutritionists = () => {
             <p style={styles.heroSub}>
               Connect with certified nutritionists tailored to your health needs and goals.
             </p>
+            {fromSubscription ? (
+              <p style={{ ...styles.heroSub, color: "#2B5726", fontWeight: 700, marginTop: 8 }}>
+                Subscription active. Select your nutritionist to continue.
+              </p>
+            ) : null}
           </div>
         </div>
 
         <div style={styles.container}>
-          <div className="experts-grid">
-            {EXPERTS.map((expert) => (
-              <NutritionistCard key={expert.id} expert={expert} />
-            ))}
-          </div>
+          {loading ? (
+            <div style={{ textAlign: "center", color: "#6b7280", padding: "18px 0" }}>Loading experts...</div>
+          ) : (
+            <div className="experts-grid">
+              {cards.map((expert) => (
+                <NutritionistCard
+                  key={expert.id}
+                  expert={expert}
+                  buttonText={
+                    assigningId === expert.id
+                      ? "Assigning..."
+                      : canSelect
+                        ? "Select Nutritionist"
+                        : user?.managedBy
+                          ? "Already Assigned"
+                          : "Book Consultation"
+                  }
+                  buttonDisabled={assigningId === expert.id || !!user?.managedBy}
+                  onButtonClick={handleCardClick}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
        <Newsletter/>

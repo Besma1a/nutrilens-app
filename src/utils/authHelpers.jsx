@@ -107,11 +107,7 @@ export function getUserDisplayName(user) {
  */
 export function getUserInitials(user) {
   if (!user) return 'G';
-  
-  if (user.avatar && user.avatar.length <= 3) {
-    return user.avatar;
-  }
-  
+
   const name = user.name || user.firstName || user.email || '';
   const parts = name.trim().split(/\s+/);
   

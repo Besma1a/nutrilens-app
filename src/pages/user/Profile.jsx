@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/layout/Toast';
 import { profileApi, updateProfile, getMyProfile } from '../../services/api';
-import { Save, User, Activity, Heart, Lock, LogOut } from 'lucide-react';
+import { Save, User, Activity, Heart, Lock, LogOut, Camera } from 'lucide-react';
 
 const DIET_STYLES    = ['Mediterranean','Low-Carb','Keto','Vegan','Paleo','Balanced','High-Protein','Gluten-Free'];
 const ACTIVITY_LVLS  = ['Sedentary','Lightly Active','Moderately Active','Very Active','Extremely Active'];
@@ -155,6 +155,7 @@ export default function Profile() {
   const { user, updateUserState, updateWeight, logout } = useAuth();
   const toast    = useToast();
   const navigate = useNavigate();
+  const [photoSaving, setPhotoSaving] = useState(false);
 
   const handleLogout = () => { logout(); window.location.href = '/'; };
 
@@ -291,6 +292,27 @@ export default function Profile() {
     const n = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || 'U';
     return n.split(' ').map(x => x[0]).join('').toUpperCase().slice(0, 2);
   }, [user]);
+
+  const profilePictureUrl = useMemo(() => {
+    const raw = user?.profilePicture || '';
+    if (!raw) return '';
+    if (raw.startsWith('http') || raw.startsWith('data:')) return raw;
+    return `${window.location.protocol}//localhost:8000${raw}`;
+  }, [user?.profilePicture]);
+
+  const onPickProfilePhoto = async (file) => {
+    if (!file) return;
+    setPhotoSaving(true);
+    try {
+      const res = await updateProfile({ profile_picture: file });
+      updateUserState(res);
+      toast({ message: 'Profile photo updated!', type: 'success' });
+    } catch (err) {
+      toast({ message: err?.message || 'Could not upload profile photo', type: 'error' });
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
 
   const { bmi, bmiLbl, bmiColor } = useMemo(() => {
     const h   = parseFloat(form.height) / 100;
@@ -494,7 +516,56 @@ export default function Profile() {
 
       {/* Hero */}
       <div className="pf-hero">
-        <div className="pf-avatar">{initials}</div>
+        <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+          {profilePictureUrl ? (
+            <img
+              src={profilePictureUrl}
+              alt={user?.name || 'User'}
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1px solid rgba(0,0,0,.08)',
+                background: '#fff',
+              }}
+            />
+          ) : (
+            <div className="pf-avatar">{initials}</div>
+          )}
+
+          <input
+            id="user-photo-input"
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => onPickProfilePhoto(e.target.files?.[0] || null)}
+          />
+          <button
+            type="button"
+            disabled={photoSaving}
+            onClick={() => document.getElementById('user-photo-input')?.click()}
+            aria-label="Change profile photo"
+            style={{
+              position: 'absolute',
+              right: -4,
+              bottom: -4,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              border: '1px solid rgba(0,0,0,.10)',
+              background: 'white',
+              boxShadow: '0 6px 16px rgba(0,0,0,.10)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: photoSaving ? 'not-allowed' : 'pointer',
+              opacity: photoSaving ? 0.65 : 1,
+            }}
+          >
+            <Camera size={14} color="#64748b" />
+          </button>
+        </div>
         <div className="pf-hero-info">
           <div className="pf-hero-name">{form.firstName} {form.lastName}</div>
           <div className="pf-hero-sub">{form.gender}{form.location ? ` · ${form.location}` : ''}</div>

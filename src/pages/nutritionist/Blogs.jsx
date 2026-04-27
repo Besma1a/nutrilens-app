@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { blogsApi } from "../../services/api";
 
 const card = {
   background: 'white',
@@ -44,21 +45,36 @@ const button = {
 };
 
 export default function Blogs() {
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
-  const [message, setMessage] = useState('');
+  const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
+  const [content, setContent] = useState("");
+  const [image, setImage] = useState(null);
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!title.trim() || !content.trim()) {
-      setMessage('Please add a title and content before publishing.');
+      setMessage("Please add a title and content before publishing.");
       return;
     }
-
-    setMessage('Your blog post has been saved and is ready to publish.');
-    setTitle('');
-    setSummary('');
-    setContent('');
+    setSubmitting(true);
+    try {
+      await blogsApi.create({
+        title: title.trim(),
+        excerpt: summary.trim(),
+        content: content.trim(),
+        image,
+      });
+      setMessage("Post submitted for admin review. It will appear publicly after approval.");
+      setTitle("");
+      setSummary("");
+      setContent("");
+      setImage(null);
+    } catch (error) {
+      setMessage(error?.message || "Failed to submit blog post.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -98,11 +114,22 @@ export default function Blogs() {
               onChange={(e) => setContent(e.target.value)}
             />
 
+            <label style={label} htmlFor="blog-image">Featured Image</label>
+            <input
+              id="blog-image"
+              type="file"
+              accept="image/*"
+              style={input}
+              onChange={(e) => setImage(e.target.files?.[0] || null)}
+            />
+
             {message && (
               <div style={{ marginBottom: 14, color: 'var(--green-700)', fontWeight: 600 }}>{message}</div>
             )}
 
-            <button type="button" style={button} onClick={handlePublish}>Publish Post</button>
+            <button type="button" style={button} onClick={handlePublish} disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit for Review"}
+            </button>
           </div>
         </div>
       </div>

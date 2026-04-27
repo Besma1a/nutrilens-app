@@ -17,6 +17,7 @@ import DietPlans from "../pages/public/diet-plans/DietPlans";
 import DietPlanDetail from "../pages/public/diet-plans/DietPlanDetail";
 import Nutritionists from "../pages/public/Nutritionists";
 import PublicTestimonialsPage from "../pages/public/TestimonialsPage";
+import SupportTicketPage from "../pages/public/SupportTicketPage";
 
 // --- Nutritionist ---
 import NutritionistLayout from "../components/layout/NutritionistSidebar";
@@ -43,6 +44,7 @@ const UserMessages     = lazy(() => import("../pages/user/Messages"));
 const UserMealPlan     = lazy(() => import("../pages/user/MealPlan"));
 const UserConsultation = lazy(() => import("../pages/user/Consultation"));
 const UserSubscribe    = lazy(() => import("../pages/user/Subscribe"));
+const UserSelectNutritionist = lazy(() => import("../pages/user/SelectNutritionist"));
 const UserProgress     = lazy(() => import("../pages/user/Progress"));
 const UserNotifications = lazy(() => import("../pages/user/Notifications"));
 
@@ -120,7 +122,7 @@ export default function AppRoutes() {
               ) : isAuthenticated && !isNutritionist ? (
                 <Navigate to="/user/dashboard" replace />
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/" replace />
               )
             }
           >
@@ -156,6 +158,7 @@ export default function AppRoutes() {
             <Route path="tracker" element={<UserTracker />} />
             <Route path="profile" element={<UserProfile />} />
             <Route path="subscribe" element={<UserSubscribe />} />
+            <Route path="select-nutritionist" element={<UserSelectNutritionist />} />
             <Route path="progress" element={<UserProgress />} />
             <Route path="notifications" element={<UserNotifications />} />
 
@@ -195,6 +198,7 @@ export default function AppRoutes() {
           <Route path="/diet/:id" element={<DietPlanDetail />} />
           <Route path="/nutritionists" element={<Nutritionists />} />
           <Route path="/testimonials" element={<PublicTestimonialsPage />} />
+          <Route path="/support" element={<SupportTicketPage />} />
 
           {/* ── FALLBACK ──────────────────────────────── */}
           <Route path="*" element={<Navigate to="/" replace />} />

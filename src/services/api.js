@@ -151,7 +151,25 @@ export const getMyProfile = () =>
   request("/profile/me/", "GET");
 
 export const updateProfile = (data) =>
-  request("/profile/update_profile/", "PATCH", data);
+  (() => {
+    const hasFile =
+      data &&
+      typeof data === "object" &&
+      Object.values(data).some((v) => v instanceof File);
+
+    if (!hasFile) {
+      return request("/profile/update_profile/", "PATCH", data);
+    }
+
+    const form = new FormData();
+    for (const [key, value] of Object.entries(data)) {
+      if (value === undefined || value === null) continue;
+      // DRF expects snake_case field names (e.g. profile_picture)
+      form.append(key, value);
+    }
+
+    return requestMultipart(`${BASE_URL}/profile/update_profile/`, form, "PATCH");
+  })();
 
 export const logoutUser = () =>
   request("/auth/logout/", "POST");
@@ -192,14 +210,14 @@ export const profileApi = {
 // MEALS APP  →  /api/v1/meals/
 // ─────────────────────────────────────────────────────────────────────────────
 
-const requestMultipart = async (fullUrl, formData) => {
+const requestMultipart = async (fullUrl, formData, method = "POST") => {
   const token = getToken();
   const headers = {};
   if (token) headers["Authorization"] = `Token ${token}`;
 
   try {
     const response = await fetch(fullUrl, {
-      method: "POST",
+      method,
       headers,
       body: formData,
     });
@@ -264,12 +282,50 @@ export const mealsApi = {
   listFoods: () => request(`${MEALS_URL}/food-items/`),
 };
 
+const BLOGS_URL = getAPIBaseUrl() + "/blogs";
+const TESTIMONIALS_URL = getAPIBaseUrl() + "/testimonials";
+const SUPPORT_URL = getAPIBaseUrl() + "/support";
+
+export const blogsApi = {
+  list: () => request(`${BLOGS_URL}/`),
+  getOne: (id) => request(`${BLOGS_URL}/${id}/`),
+  create: ({ title, content, excerpt, image }) => {
+    const form = new FormData();
+    form.append("title", title);
+    form.append("content", content);
+    if (excerpt) form.append("excerpt", excerpt);
+    if (image) form.append("image", image);
+    return requestMultipart(`${BLOGS_URL}/`, form, "POST");
+  },
+  update: (id, { title, content, excerpt, image }) => {
+    const form = new FormData();
+    if (title !== undefined) form.append("title", title);
+    if (content !== undefined) form.append("content", content);
+    if (excerpt !== undefined) form.append("excerpt", excerpt);
+    if (image !== undefined && image !== null) form.append("image", image);
+    return requestMultipart(`${BLOGS_URL}/${id}/`, form, "PATCH");
+  },
+  remove: (id) => request(`${BLOGS_URL}/${id}/`, "DELETE"),
+};
+
+export const testimonialsApi = {
+  listApproved: () => request(`${TESTIMONIALS_URL}/`),
+  submit: ({ name, text, rating, plan }) =>
+    request(`${TESTIMONIALS_URL}/`, "POST", { name, text, rating, plan }),
+};
+
+export const supportApi = {
+  createTicket: ({ name, email, message }) =>
+    request(`${SUPPORT_URL}/tickets/`, "POST", { name, email, message }),
+};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSULTATIONS API  (user side)  →  /api/v1/consultations/consultations/
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CONSULTATIONS_URL = getAPIBaseUrl() + "/consultations";
+const USERS_URL = getAPIBaseUrl() + "/users";
 
 export const consultationsApi = {
 
@@ -304,6 +360,49 @@ export const consultationsApi = {
     request(`${CONSULTATIONS_URL}/nutritionists/${id}/`),
 };
 
+export const nutritionistProfileApi = {
+  getMyProfile: () =>
+    request(`${CONSULTATIONS_URL}/nutritionists/me/`),
+
+  updateMyProfile: (data) =>
+    (() => {
+      const hasFile =
+        data &&
+        typeof data === "object" &&
+        data.profile_picture instanceof File;
+
+      if (!hasFile) {
+        return request(`${CONSULTATIONS_URL}/nutritionists/me/`, "PATCH", data);
+      }
+
+      const form = new FormData();
+      const fields = [
+        "name",
+        "phone",
+        "specialization",
+        "bio",
+        "credentials",
+        "availability_url",
+        "zoom_meeting_link",
+      ];
+      for (const key of fields) {
+        if (data[key] !== undefined && data[key] !== null) {
+          form.append(key, data[key]);
+        }
+      }
+      form.append("profile_picture", data.profile_picture);
+
+      return requestMultipart(`${CONSULTATIONS_URL}/nutritionists/me/`, form, "PATCH");
+    })(),
+
+  changePassword: ({ oldPassword, newPassword, newPasswordConfirm }) =>
+    request(`${USERS_URL}/profile/change_password/`, "POST", {
+      old_password: oldPassword,
+      new_password: newPassword,
+      new_password_confirm: newPasswordConfirm,
+    }),
+};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NUTRITIONIST SESSIONS API  (Calendar.jsx)
@@ -334,8 +433,15 @@ export const nutritionistSessionsApi = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const subscriptionsApi = {
-  subscribe: (plan) =>
-    request(`${SUBSCRIPTIONS_URL}/subscribe/`, "POST", { plan }),
+  listPlans: () =>
+    request(`${SUBSCRIPTIONS_URL}/`, "GET"),
+
+  subscribe: (planOrPayload) =>
+    request(
+      `${SUBSCRIPTIONS_URL}/subscribe/`,
+      "POST",
+      typeof planOrPayload === "object" ? planOrPayload : { plan: planOrPayload }
+    ),
 
   unsubscribe: () =>
     request(`${SUBSCRIPTIONS_URL}/unsubscribe/`, "POST"),
@@ -377,6 +483,10 @@ export const patientsApi = {
    */
   assignPatient: (patientId) => {
     return request(`${PROFILES_URL}/assign-patient/`, "POST", { patient_id: patientId });
+  },
+
+  selectNutritionist: (nutritionistId) => {
+    return request(`${PROFILES_URL}/select-nutritionist/`, "POST", { nutritionist_id: nutritionistId });
   },
 
   /**

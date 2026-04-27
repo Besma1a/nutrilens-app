@@ -16,8 +16,6 @@ export default function NutritionistsPage() {
   const [statusF, setStatusF] = useState("All Status");
   const [selected, setSelected] = useState(null);
   const [addMode, setAddMode] = useState(false);
-  const [unassignedUsers, setUnassignedUsers] = useState([]);
-  const [assignTarget, setAssignTarget] = useState(null);
   const [newNutri, setNewNutri] = useState({ name: "", email: "", phone: "", specialty: "", credentials: "", bio: "" });
   const [formErrors, setFormErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState("");
@@ -46,18 +44,9 @@ export default function NutritionistsPage() {
     setTotalPages(data.totalPages || 1);
   };
 
-  const fetchAssignableUsers = async () => {
-    const data = await apiFetch("/assignable-users");
-    setUnassignedUsers(data.users || []);
-  };
-
   useEffect(() => {
     fetchNutritionists().catch(() => {});
   }, [debouncedSearch, statusF, currentPage]);
-
-  useEffect(() => {
-    fetchAssignableUsers().catch(() => {});
-  }, []);
 
   const pending = nutris.filter(n => n.status === "Pending").length;
   const active = nutris.filter(n => n.status === "Approved" || n.status === "Active").length;
@@ -85,20 +74,6 @@ export default function NutritionistsPage() {
     apiFetch(`/nutritionists/${n.id}/status`, { method: "PATCH", body: JSON.stringify({ status: "Suspended" }) }).then(fetchNutritionists);
     setSuccessMsg("Nutritionist suspended");
     setTimeout(() => setSuccessMsg(""), 2000);
-  };
-
-  const assignPatient = (nutritionist) => {
-    if (!nutritionist || !unassignedUsers.length) return;
-    const user = unassignedUsers[0];
-    apiFetch(`/nutritionists/${nutritionist.id}/assign-user`, {
-      method: "POST",
-      body: JSON.stringify({ userId: user.id }),
-    }).then(() => {
-      setUnassignedUsers((p) => p.filter((x) => x.id !== user.id));
-      fetchNutritionists();
-      setSuccessMsg(`Assigned ${user.name} to ${nutritionist.name}`);
-      setTimeout(() => setSuccessMsg(""), 2500);
-    });
   };
 
   const validateForm = (form) => {
@@ -201,9 +176,6 @@ export default function NutritionistsPage() {
                           <IBtn title="View" onClick={() => setSelected(n)}>
                             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                           </IBtn>
-                          <IBtn title="Assign patient" onClick={() => setAssignTarget(n)}>
-                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>
-                          </IBtn>
                           {n.status === "Pending" && (
                             <IBtn title="Approve" onClick={() => approve(n.email)}>
                               <svg width="14" height="14" fill="none" stroke={T.greenTx} strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -250,26 +222,6 @@ export default function NutritionistsPage() {
             <DrawerField label="Active Patients" value={selected.patients} />
             <DrawerField label="Joined" value={selected.joined} />
             {selected.bio && <DrawerField label="Bio" value={selected.bio} />}
-            {unassignedUsers.length > 0 && (
-              <div style={{ marginTop: 14, marginBottom: 14 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: T.gray, textTransform: "uppercase", display: "block", marginBottom: 5 }}>Assign Unassigned User</label>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <select style={{ flex: 1, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 12px", fontSize: 13, color: T.text, background: T.white, outline: "none", cursor: "pointer", minWidth: 260 }}>
-                    {unassignedUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                  </select>
-                  <button
-                    style={css.btn(T.greenLight, T.greenTx)}
-                    onClick={() => {
-                      assignPatient(selected);
-                      setSuccessMsg("Patient assigned");
-                      setTimeout(() => setSuccessMsg(""), 2000);
-                    }}
-                  >
-                    Assign
-                  </button>
-                </div>
-              </div>
-            )}
             {selected.status === "Pending" && (
               <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
                 <button style={css.btn(T.greenLight, T.greenTx)} onClick={() => approve(selected.email)}>
@@ -308,43 +260,6 @@ export default function NutritionistsPage() {
         </div>
       </Drawer>
 
-      <Drawer open={!!assignTarget} onClose={() => setAssignTarget(null)} title={assignTarget ? `Assign Patient · ${assignTarget.name}` : "Assign Patient"} width={560}>
-        {assignTarget && (
-          <>
-            <div style={{ fontSize: 13, color: T.gray, marginBottom: 12 }}>Select an unassigned patient to assign to this nutritionist.</div>
-            {unassignedUsers.length ? (
-              <div style={{ maxHeight: 360, overflowY: "auto", border: `1px solid ${T.border}`, borderRadius: 10, padding: 10 }}>
-                {unassignedUsers.map(u => (
-                  <div key={u.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderBottom: `1px solid ${T.grayLt}`, padding: "10px 4px" }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{u.name}</div>
-                      <div style={{ fontSize: 12, color: T.gray }}>{u.email}</div>
-                    </div>
-                    <button
-                      style={css.btn(T.greenLight, T.greenTx)}
-                      onClick={() => {
-                        apiFetch(`/nutritionists/${assignTarget.id}/assign-user`, {
-                          method: "POST",
-                          body: JSON.stringify({ userId: u.id }),
-                        }).then(() => {
-                          setUnassignedUsers(p => p.filter(x => x.id !== u.id));
-                          fetchNutritionists();
-                          setSuccessMsg("Patient assigned");
-                          setTimeout(() => setSuccessMsg(""), 2000);
-                        });
-                      }}
-                    >
-                      Assign
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ fontSize: 13, color: T.gray }}>No unassigned users.</div>
-            )}
-          </>
-        )}
-      </Drawer>
     </>
   );
 }

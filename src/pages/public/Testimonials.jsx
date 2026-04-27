@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { Star, TrendingDown } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { C, TESTIMONIALS } from "./constants/tokens";
+import { testimonialsApi } from "../../services/api";
+import { C } from "./constants/tokens";
 import FadeUp from "./FadeUp";
 
 const AVATAR_COLORS = [C.tomato, C.forest, C.ochre, "#4a8040", "#7c6ba0", C.tomato];
@@ -68,7 +70,44 @@ function TestimonialCard({ t, index }) {
 }
 
 export default function Testimonials() {
-  const doubled = [...TESTIMONIALS, ...TESTIMONIALS];
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    testimonialsApi
+      .listApproved()
+      .then((data) => {
+        if (!active) return;
+        const normalized = (data?.testimonials || []).map((t) => ({
+          ...t,
+          avatar: String(t.name || "A")
+            .split(" ")
+            .slice(0, 2)
+            .map((part) => part[0] || "")
+            .join("")
+            .toUpperCase(),
+          role: t.plan || "Member",
+          result: t.featured ? "Featured Story" : "Member Story",
+        }));
+        setItems(normalized);
+      })
+      .catch(() => {
+        if (active) setItems([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const source = useMemo(() => {
+    if (!items.length) return [];
+    const featured = items.filter((item) => item.featured);
+    return (featured.length ? featured : items).slice(0, 8);
+  }, [items]);
+
+  const doubled = [...source, ...source];
+
+  if (!source.length) return null;
 
   return (
     /* warm neutral bg — NOT lime */
@@ -140,7 +179,7 @@ export default function Testimonials() {
           style={{ display: "flex", padding: "8px 0 16px" }}
         >
           {doubled.map((t, i) => (
-            <TestimonialCard key={i} t={t} index={i % TESTIMONIALS.length} />
+            <TestimonialCard key={i} t={t} index={i % source.length} />
           ))}
         </motion.div>
       </div>

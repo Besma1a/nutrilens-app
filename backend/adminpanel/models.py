@@ -40,6 +40,9 @@ class SupportTicket(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
     )
+    contact_name = models.CharField(max_length=120, blank=True, default="")
+    contact_email = models.EmailField(blank=True, default="")
+    message = models.TextField(blank=True, default="")
     subject = models.CharField(max_length=255)
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default="Medium")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="Open")
@@ -139,3 +142,60 @@ class NutritionistAdminProfile(models.Model):
 
     class Meta:
         ordering = ["-id"]
+
+
+class AdminNotification(models.Model):
+    """
+    Admin-only notifications (separate from user/nutritionist Notification).
+    """
+
+    TYPE_SUPPORT = "support"
+    TYPE_CONTENT = "content"
+    TYPE_TESTIMONIAL = "testimonial"
+    TYPE_SYSTEM = "system"
+
+    TYPE_CHOICES = [
+        (TYPE_SUPPORT, "Support"),
+        (TYPE_CONTENT, "Content"),
+        (TYPE_TESTIMONIAL, "Testimonial"),
+        (TYPE_SYSTEM, "System"),
+    ]
+
+    recipient = models.ForeignKey(
+        AdminAccount,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+        help_text="If empty, notification is visible to all admins.",
+    )
+    notification_type = models.CharField(
+        max_length=30, choices=TYPE_CHOICES, default=TYPE_SYSTEM
+    )
+    title = models.CharField(max_length=255)
+    message = models.TextField(blank=True, default="")
+    link = models.CharField(max_length=500, blank=True, default="")
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["recipient", "is_read", "-created_at"]),
+            models.Index(fields=["is_read", "-created_at"]),
+        ]
+
+    def __str__(self):
+        who = self.recipient.email if self.recipient_id else "ALL"
+        return f"[{self.notification_type}] → {who}: {self.title}"
+
+    @classmethod
+    def create(cls, title, message="", notification_type=TYPE_SYSTEM, link="", recipient=None):
+        return cls.objects.create(
+            recipient=recipient,
+            title=title,
+            message=message,
+            notification_type=notification_type,
+            link=link,
+        )

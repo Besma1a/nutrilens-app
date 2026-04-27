@@ -1,44 +1,30 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import FadeUp from '../../pages/public/FadeUp';
 import { C } from '../../pages/public/constants/tokens';
+import { subscriptionsApi } from '../../services/api';
 
-const PLANS = [
-  {
-    id: 'monthly',
-    icon: '🌙',
-    name: 'Monthly',
-    price: 29,
-    period: 'month',
-    features: ['Unlimited AI meal scans', 'Personalized meal plans', '2 consultations/month', 'Direct nutritionist messaging', 'Progress tracking & reports', 'Cancel anytime'],
-    popular: false,
-  },
-  {
-    id: 'quarterly',
-    icon: '⭐',
-    name: 'Quarterly',
-    price: 69,
-    period: '3 months',
-    savings: 'Save $18',
-    features: ['All Monthly features', '8 consultations total', 'Priority support', 'Seasonal meal plans', 'Recipe library access', '20% savings'],
-    popular: true,
-  },
-  {
-    id: 'annual',
-    icon: '🚀',
-    name: 'Annual',
-    price: 199,
-    period: 'year',
-    savings: 'Save $149',
-    monthlyEquivalent: '~$16.58/month',
-    features: ['All Quarterly features', 'Unlimited consultations', 'Personal health coach', 'Custom meal planning', 'Premium analytics', 'Best value'],
-    popular: false,
-  },
-];
+const PLAN_ICONS = ['🌙', '⭐', '🚀', '🥗', '💪', '✨'];
+
+function formatPlanPeriod(durationDays) {
+  if (!durationDays) return 'cycle';
+  if (durationDays === 30) return 'month';
+  if (durationDays === 90) return '3 months';
+  if (durationDays === 365) return 'year';
+  return `${durationDays} days`;
+}
 
 export default function PricingSection() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    subscriptionsApi.listPlans()
+      .then((data) => setPlans(Array.isArray(data) ? data : []))
+      .catch(() => setPlans([]));
+  }, []);
 
   const getButtonText = () => {
     if (!user) return 'Get Started';
@@ -48,9 +34,10 @@ export default function PricingSection() {
 
   const handlePlanClick = (plan) => {
     if (!user) {
+      localStorage.setItem('pendingSubscriptionPlanId', String(plan.id));
       navigate('/register');
     } else {
-      navigate('/user/subscribe');
+      navigate(`/user/subscribe?planId=${plan.id}`);
     }
   };
 
@@ -107,23 +94,23 @@ export default function PricingSection() {
           className="pricing-grid"
           style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28, marginBottom: 48 }}
         >
-          {PLANS.map((plan, i) => (
+          {plans.map((plan, i) => (
             <FadeUp key={plan.id} delay={i * 0.1}>
               <div
                 style={{
                   background: C.bg,
-                  border: plan.popular ? `2px solid ${C.tomato}` : `1px solid ${C.cream}`,
+                  border: plan.is_featured ? `2px solid ${C.tomato}` : `1px solid ${C.cream}`,
                   borderRadius: 20,
                   padding: '36px 28px',
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   position: 'relative',
-                  transform: plan.popular ? 'scale(1.02)' : 'scale(1)',
-                  boxShadow: plan.popular ? '0 10px 30px rgba(165, 12, 5, 0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
+                  transform: plan.is_featured ? 'scale(1.02)' : 'scale(1)',
+                  boxShadow: plan.is_featured ? '0 10px 30px rgba(165, 12, 5, 0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
                 }}
               >
-                {plan.popular && (
+                {plan.is_featured && (
                   <div
                     style={{
                       position: 'absolute',
@@ -145,7 +132,7 @@ export default function PricingSection() {
                 )}
 
                 <div style={{ textAlign: 'center', marginBottom: 28 }}>
-                  <div style={{ fontSize: 48, marginBottom: 16 }}>{plan.icon}</div>
+                  <div style={{ fontSize: 48, marginBottom: 16 }}>{PLAN_ICONS[i % PLAN_ICONS.length]}</div>
                   <h3
                     style={{
                       fontFamily: "'Outfit', sans-serif",
@@ -176,43 +163,13 @@ export default function PricingSection() {
                         color: 'rgba(43, 87, 38, 0.65)',
                       }}
                     >
-                      /{plan.period}
+                      /{formatPlanPeriod(plan.duration_days)}
                     </span>
                   </div>
-                  {plan.monthlyEquivalent && (
-                    <div
-                      style={{
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: 12,
-                        color: C.tomato,
-                        fontWeight: 600,
-                        marginTop: 6,
-                      }}
-                    >
-                      {plan.monthlyEquivalent}
-                    </div>
-                  )}
-                  {plan.savings && (
-                    <div
-                      style={{
-                        display: 'inline-block',
-                        background: 'rgba(165, 12, 5, 0.1)',
-                        border: `1px solid ${C.tomato}`,
-                        color: C.tomato,
-                        padding: '4px 12px',
-                        borderRadius: 999,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        marginTop: 10,
-                      }}
-                    >
-                      {plan.savings}
-                    </div>
-                  )}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28, flex: 1 }}>
-                  {plan.features.map((feature, idx) => (
+                  {(plan.features || []).map((feature, idx) => (
                     <div
                       key={idx}
                       style={{
@@ -243,9 +200,9 @@ export default function PricingSection() {
 
                 <button
                   style={{
-                    background: plan.popular ? C.tomato : 'white',
-                    color: plan.popular ? C.white : C.tomato,
-                    border: plan.popular ? 'none' : `2px solid ${C.tomato}`,
+                    background: plan.is_featured ? C.tomato : 'white',
+                    color: plan.is_featured ? C.white : C.tomato,
+                    border: plan.is_featured ? 'none' : `2px solid ${C.tomato}`,
                     borderRadius: 12,
                     padding: '13px 24px',
                     fontSize: 14,
@@ -257,14 +214,14 @@ export default function PricingSection() {
                   }}
                   onClick={() => handlePlanClick(plan)}
                   onMouseEnter={(e) => {
-                    if (plan.popular) {
+                    if (plan.is_featured) {
                       e.target.style.background = 'rgba(165, 12, 5, 0.9)';
                     } else {
                       e.target.style.background = 'rgba(165, 12, 5, 0.05)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (plan.popular) {
+                    if (plan.is_featured) {
                       e.target.style.background = C.tomato;
                     } else {
                       e.target.style.background = 'white';
@@ -277,6 +234,11 @@ export default function PricingSection() {
             </FadeUp>
           ))}
         </div>
+        {plans.length === 0 && (
+          <div style={{ textAlign: 'center', color: 'rgba(43, 87, 38, 0.7)', fontFamily: "'Inter', sans-serif" }}>
+            Subscription plans will appear here once the admin publishes them.
+          </div>
+        )}
       </div>
     </section>
   );

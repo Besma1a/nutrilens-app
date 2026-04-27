@@ -32,9 +32,34 @@ class NutritionistListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Nutritionist
-        fields = ['id', 'name', 'email', 'specialization', 'specialization_display',
-                  'profile_picture', 'is_active']
+        fields = [
+            'id', 'name', 'email', 'specialization', 'specialization_display',
+            'bio', 'credentials', 'profile_picture', 'availability_url', 'is_active'
+        ]
         read_only_fields = ['id']
+
+
+class NutritionistSelfUpdateSerializer(serializers.ModelSerializer):
+    """
+    Editable profile fields for the authenticated nutritionist.
+    Keeps admin-controlled/system fields read-only.
+    """
+
+    class Meta:
+        model = Nutritionist
+        fields = [
+            'id',
+            'name',
+            'email',
+            'phone',
+            'specialization',
+            'bio',
+            'credentials',
+            'availability_url',
+            'zoom_meeting_link',
+            'profile_picture',
+        ]
+        read_only_fields = ['id', 'email']
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -13,11 +13,21 @@ def _uploads_url(request, image_name: str) -> str:
 class BlogReadSerializer(serializers.ModelSerializer):
     imageUrl = serializers.SerializerMethodField()
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
+    status = serializers.CharField(source="moderation_status", read_only=True)
     author = serializers.SerializerMethodField()
 
     class Meta:
         model = Blog
-        fields = ("id", "title", "content", "excerpt", "imageUrl", "author", "createdAt")
+        fields = (
+            "id",
+            "title",
+            "content",
+            "excerpt",
+            "imageUrl",
+            "author",
+            "createdAt",
+            "status",
+        )
 
     def get_imageUrl(self, obj):
         if not obj.image:
@@ -40,11 +50,15 @@ class BlogWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["author"] = self.context["request"].user
-        validated_data.setdefault("is_published", True)
+        validated_data["is_published"] = False
+        validated_data["moderation_status"] = Blog.STATUS_PENDING
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         old_image = instance.image if instance.image else None
+        if any(field in validated_data for field in ("title", "content", "excerpt", "image")):
+            validated_data["is_published"] = False
+            validated_data["moderation_status"] = Blog.STATUS_PENDING
         instance = super().update(instance, validated_data)
         if old_image and old_image != instance.image:
             old_image.delete(save=False)

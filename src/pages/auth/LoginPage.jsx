@@ -35,6 +35,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const pendingPlanId = localStorage.getItem("pendingSubscriptionPlanId");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,6 +61,8 @@ export default function LoginPage() {
         navigate("/nutritionist/dashboard");
       } else if (!data.user.onboarding_complete) {
         navigate("/health-setup");
+      } else if (pendingPlanId && !data.user.is_subscribed) {
+        navigate(`/user/subscribe?planId=${pendingPlanId}`);
       } else {
         navigate("/user/dashboard");
       }

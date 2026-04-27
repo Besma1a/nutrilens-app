@@ -86,6 +86,9 @@ export default function AdminDashboard() {
   });
 
   const [open, setOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifItems, setNotifItems] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { title, sub } = META[page] || { title: "Admin", sub: "" };
   const initials = useMemo(() => {
     const name = admin?.name || "Admin User";
@@ -111,6 +114,36 @@ export default function AdminDashboard() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    const fetchNotifs = () =>
+      adminApi
+        .notifications({ limit: 10 })
+        .then((data) => {
+          if (!alive) return;
+          setNotifItems(data.items || []);
+          setUnreadCount(Number(data.unreadCount || 0));
+        })
+        .catch(() => {});
+
+    fetchNotifs();
+    const t = setInterval(fetchNotifs, 8000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    if (!unreadCount) return;
+    adminApi
+      .markAllNotificationsRead()
+      .then(() => setUnreadCount(0))
+      .catch(() => {});
+  }, [notifOpen, unreadCount]);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "white" }}>
@@ -205,13 +238,146 @@ export default function AdminDashboard() {
             />
           </div>
 
-          <button type="button" className="hdr-btn" aria-label="Notifications">
-            <svg viewBox="0 0 24 24">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            <span className="hdr-notif-dot" aria-hidden />
-          </button>
+          {notifOpen ? (
+            <div
+              role="presentation"
+              onClick={() => setNotifOpen(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 50 }}
+            />
+          ) : null}
+
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              className="hdr-btn"
+              aria-label="Notifications"
+              onClick={() => setNotifOpen((v) => !v)}
+              style={{ position: "relative" }}
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {unreadCount > 0 ? (
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    width: 10,
+                    height: 10,
+                    borderRadius: 999,
+                    background: "#ef4444",
+                    boxShadow: "0 0 0 2px white",
+                  }}
+                />
+              ) : null}
+            </button>
+
+            {notifOpen ? (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "calc(100% + 10px)",
+                  width: 360,
+                  maxWidth: "min(360px, 90vw)",
+                  background: "white",
+                  border: "1px solid rgba(15, 23, 42, 0.12)",
+                  borderRadius: 14,
+                  boxShadow: "0 12px 40px rgba(2,6,23,0.18)",
+                  zIndex: 60,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "12px 14px",
+                    borderBottom: "1px solid rgba(15, 23, 42, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 10,
+                  }}
+                >
+                  <div style={{ fontWeight: 800, color: "#0f172a" }}>Notifications</div>
+                  <button
+                    type="button"
+                    onClick={() => adminApi.markAllNotificationsRead().then(() => setUnreadCount(0)).catch(() => {})}
+                    style={{
+                      border: "1px solid rgba(15, 23, 42, 0.12)",
+                      background: "white",
+                      padding: "6px 10px",
+                      borderRadius: 10,
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Mark all read
+                  </button>
+                </div>
+
+                <div style={{ maxHeight: 360, overflow: "auto" }}>
+                  {notifItems.length === 0 ? (
+                    <div style={{ padding: 14, color: "#64748b" }}>No notifications yet.</div>
+                  ) : (
+                    notifItems.map((n) => (
+                      <button
+                        key={n.id}
+                        type="button"
+                        onClick={() => {
+                          setNotifOpen(false);
+                          const link = (n.link || "").trim();
+                          if (link.startsWith("/admin#")) {
+                            const hash = link.replace("/admin", "");
+                            if (hash === "#support") setPage("support");
+                            else if (hash === "#content") setPage("content");
+                            else if (hash === "#testimonials") setPage("testimonials");
+                            else setPage("dashboard");
+                          }
+                        }}
+                        style={{
+                          width: "100%",
+                          textAlign: "left",
+                          border: "none",
+                          background: "transparent",
+                          padding: "12px 14px",
+                          cursor: "pointer",
+                          borderBottom: "1px solid rgba(15, 23, 42, 0.06)",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                          <div
+                            style={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: 999,
+                              marginTop: 6,
+                              background: n.isRead ? "rgba(148,163,184,0.7)" : "#ef4444",
+                              flex: "0 0 auto",
+                            }}
+                            aria-hidden
+                          />
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 13 }}>
+                              {n.title}
+                            </div>
+                            {n.message ? (
+                              <div style={{ color: "#475569", fontSize: 12, marginTop: 2, lineHeight: 1.35 }}>
+                                {n.message}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
 
           <div className="hdr-av" role="button" tabIndex={0} title={admin?.name || "Admin User"} onClick={() => setPage("profile")} aria-label="Your profile">
             {initials}

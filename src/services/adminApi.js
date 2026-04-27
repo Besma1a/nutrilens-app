@@ -25,7 +25,7 @@ export async function apiFetch(path, options = {}) {
     let detail = "Request failed.";
     try {
       const payload = await response.json();
-      detail = payload.detail || detail;
+      detail = payload.detail || Object.entries(payload).map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`).join(" | ") || detail;
     } catch {
       // no-op
     }
@@ -49,6 +49,17 @@ export const adminApi = {
     apiFetch("/profile", { method: "PUT", body: JSON.stringify(payload) }),
   changePassword: (payload) =>
     apiFetch("/password", { method: "PUT", body: JSON.stringify(payload) }),
+  notifications: ({ unreadOnly = false, limit = 20 } = {}) => {
+    const params = new URLSearchParams();
+    if (unreadOnly) params.set("unread_only", "true");
+    if (limit) params.set("limit", String(limit));
+    const qs = params.toString();
+    return apiFetch(`/notifications${qs ? `?${qs}` : ""}`);
+  },
+  markAllNotificationsRead: () =>
+    apiFetch("/notifications/mark-all-read", { method: "POST" }),
+  markNotificationRead: (id) =>
+    apiFetch(`/notifications/${id}/read`, { method: "PATCH" }),
 };
 
 export function saveAdminSession(token, admin) {

@@ -6,8 +6,10 @@ const ADMIN_INIT = { name: "", email: "", phone: "", role: "", timezone: "", bio
 
 export default function AdminProfilePage() {
   const [profile, setProfile] = useState(ADMIN_INIT);
+  const [initialProfile, setInitialProfile] = useState(ADMIN_INIT);
   const [saved, setSaved] = useState(false);
   const [tab, setTab] = useState("profile");
+  const [isEditing, setIsEditing] = useState(false);
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [pwMsg, setPwMsg] = useState(null);
   const [pwErrors, setPwErrors] = useState({});
@@ -19,7 +21,13 @@ export default function AdminProfilePage() {
   };
 
   useEffect(() => {
-    adminApi.profile().then(setProfile).catch(() => {});
+    adminApi
+      .profile()
+      .then((data) => {
+        setProfile(data);
+        setInitialProfile(data);
+      })
+      .catch(() => {});
   }, []);
 
   const validatePassword = () => {
@@ -47,13 +55,30 @@ export default function AdminProfilePage() {
   };
 
   const handleSaveProfile = () => {
-    adminApi.updateProfile({ name: profile.name, phone: profile.phone, timezone: profile.timezone, bio: profile.bio })
+    adminApi
+      .updateProfile({
+        name: profile.name,
+        phone: profile.phone,
+        timezone: profile.timezone,
+      })
       .then((res) => {
         setProfile(res);
+        setInitialProfile(res);
         setSaved(true);
         setSuccessMsg("Profile updated successfully");
+        setIsEditing(false);
         setTimeout(() => setSuccessMsg(""), 2000);
       });
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
+    } catch {
+      // ignore
+    }
+    window.location.href = "/";
   };
 
   return (
@@ -71,18 +96,24 @@ export default function AdminProfilePage() {
             {profile.role} • {profile.timezone}
           </p>
         </div>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            background: T.greenLight,
-            color: T.greenTx,
-            padding: "6px 12px",
-            borderRadius: 20,
-          }}
-        >
-          Active
-        </span>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button
+            style={css.btn(T.white, T.text, `1px solid ${T.border}`)}
+            onClick={() => {
+              if (tab !== "profile") setTab("profile");
+              setIsEditing(true);
+              setSaved(false);
+            }}
+          >
+            Edit Profile
+          </button>
+          <button
+            style={css.btn(T.red, "#fff")}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* TAB NAVIGATION */}
@@ -119,28 +150,67 @@ export default function AdminProfilePage() {
               <h3 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: 0, marginBottom: 16 }}>
                 Personal Information
               </h3>
-              <FormInput
-                label="Full Name"
-                value={profile.name}
-                onChange={e => update("name", e.target.value)}
-              />
-              <FormInput
-                label="Email Address"
-                type="email"
-                value={profile.email}
-                onChange={() => {}}
-              />
-              <FormInput
-                label="Phone Number"
-                type="tel"
-                value={profile.phone}
-                onChange={e => update("phone", e.target.value)}
-              />
-              <FormInput
-                label="Time Zone"
-                value={profile.timezone}
-                onChange={e => update("timezone", e.target.value)}
-              />
+              {isEditing ? (
+                <>
+                  <FormInput
+                    label="Full Name"
+                    value={profile.name}
+                    onChange={e => update("name", e.target.value)}
+                  />
+                  <FormInput
+                    label="Email Address"
+                    type="email"
+                    value={profile.email}
+                    onChange={() => {}}
+                  />
+                  <FormInput
+                    label="Phone Number"
+                    type="tel"
+                    value={profile.phone}
+                    onChange={e => update("phone", e.target.value)}
+                  />
+                  <FormInput
+                    label="Time Zone"
+                    value={profile.timezone}
+                    onChange={e => update("timezone", e.target.value)}
+                  />
+                </>
+              ) : (
+                <>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray, display: "block", marginBottom: 5 }}>
+                      Full Name
+                    </label>
+                    <div style={{ fontSize: 14, color: T.text, padding: "10px 12px", background: T.bg, borderRadius: 8 }}>
+                      {profile.name || "—"}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray, display: "block", marginBottom: 5 }}>
+                      Email Address
+                    </label>
+                    <div style={{ fontSize: 14, color: T.text, padding: "10px 12px", background: T.bg, borderRadius: 8 }}>
+                      {profile.email || "—"}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray, display: "block", marginBottom: 5 }}>
+                      Phone Number
+                    </label>
+                    <div style={{ fontSize: 14, color: T.text, padding: "10px 12px", background: T.bg, borderRadius: 8 }}>
+                      {profile.phone || "—"}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray, display: "block", marginBottom: 5 }}>
+                      Time Zone
+                    </label>
+                    <div style={{ fontSize: 14, color: T.text, padding: "10px 12px", background: T.bg, borderRadius: 8 }}>
+                      {profile.timezone || "—"}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div style={css.cardPad}>
@@ -169,33 +239,26 @@ export default function AdminProfilePage() {
             </div>
           </div>
 
-          <div style={css.cardPad}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: 0, marginBottom: 16 }}>
-              About
-            </h3>
-            <FormTextarea
-              label="Bio"
-              value={profile.bio}
-              onChange={e => update("bio", e.target.value)}
-              rows={3}
-            />
-
-            <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 20 }}>
-              <button style={css.btn(T.green, "#fff")} onClick={handleSaveProfile}>
-                Save Changes
-              </button>
-              <button
-                style={css.btn(T.white, T.text, `1px solid ${T.border}`)}
-                onClick={() => {
-                  setProfile(ADMIN_INIT);
-                  setSaved(false);
-                }}
-              >
-                Reset
-              </button>
-              {saved && <span style={{ fontSize: 12, color: T.greenTx, fontWeight: 600 }}>Saved</span>}
+          {isEditing && (
+            <div style={css.cardPad}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <button style={css.btn(T.green, "#fff")} onClick={handleSaveProfile}>
+                  Save Changes
+                </button>
+                <button
+                  style={css.btn(T.white, T.text, `1px solid ${T.border}`)}
+                  onClick={() => {
+                    setProfile(initialProfile);
+                    setIsEditing(false);
+                    setSaved(false);
+                  }}
+                >
+                  Cancel
+                </button>
+                {saved && <span style={{ fontSize: 12, color: T.greenTx, fontWeight: 600 }}>Saved</span>}
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
