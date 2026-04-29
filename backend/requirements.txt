@@ -3,17 +3,18 @@ Django==4.2.11
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
 django-filter==24.1
-Pillow==10.1.0
+Pillow  # Removed strict version for compatibility
 python-dotenv==1.0.0
 python-decouple==3.8
 drf-yasg==1.21.7
 bcrypt==4.2.0
 # Additional useful packages
-psycopg2-binary==2.9.9  # PostgreSQL adapter (optional)
-gunicorn==21.2.0  # Production server
-whitenoise==6.6.0  # Static files serving
-celery==5.3.4  # Task queue (for async tasks)
-redis==5.0.1  # Cache/message broker
+psycopg2-binary  # Removed strict version for compatibility
+gunicorn==21.2.0
+whitenoise==6.6.0
+celery==5.3.4
+redis==5.0.1
+
 
 # AI/ML packages (add as needed)
 # tensorflow==2.14.0
