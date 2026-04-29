@@ -1,11 +1,47 @@
+import { useEffect, useState } from "react";
 import { ArrowRight, Star, TrendingDown, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { C } from "./constants/tokens";
 import FadeUp from "./FadeUp";
 import PhoneMockup from "./PhoneMockup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { publicApi } from "../../services/api";
+
+const FALLBACK_AVATARS = [
+  { initial: "A", color: C.tomato },
+  { initial: "B", color: "#F19335" },
+  { initial: "C", color: "#2B5726" },
+  { initial: "D", color: "#4a8040" },
+];
 
 export default function Hero() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [memberCount, setMemberCount] = useState(null);
+  const [avatars, setAvatars] = useState(FALLBACK_AVATARS);
+
+  useEffect(() => {
+    publicApi.stats().then((data) => {
+      if (!data) return;
+      if (typeof data.member_count === "number") setMemberCount(data.member_count);
+      if (Array.isArray(data.recent_avatars) && data.recent_avatars.length > 0) {
+        setAvatars(data.recent_avatars);
+      }
+    });
+  }, []);
+
+  const formatCount = (n) => {
+    if (n === null) return "12,000+";
+    if (n >= 1000) return `${(n / 1000).toFixed(0)}k+`;
+    return `${n}+`;
+  };
+
+  const handleGetStarted = (e) => {
+    e.preventDefault();
+    navigate(user ? "/user/dashboard" : "/register");
+  };
+
   return (
     <section
       className="hero-section"
@@ -41,7 +77,7 @@ export default function Hero() {
         className="hero-grid"
         style={{
           maxWidth: 1200, margin: "0 auto",
-          padding: "40px 24px", width: "100%",
+          padding: "15px 24px", width: "100%",
           display: "grid", gridTemplateColumns: "1fr 1fr",
           gap: 48, alignItems: "center",
         }}
@@ -74,7 +110,6 @@ export default function Hero() {
             >
               Global Expertise.
               <br />
-              {/* Version 2 exact: "AI Precision." is RED, plain — no bg highlight */}
               <span style={{ color: C.tomato }}>AI Precision.</span>
               <br />
               Your Best Self.
@@ -89,25 +124,26 @@ export default function Hero() {
                 marginBottom: 32, maxWidth: 440,
               }}
             >
-              Connect with world-class dietitians and let our AI do the heavy
-              lifting—track every meal with a single snap.
+              Connect with world class dietitians and let our AI do the heavy
+              lifting — track every meal with a single snap.
             </p>
           </FadeUp>
 
           <FadeUp delay={0.3}>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Link
-                to="/register"
+              <a
+                href={user ? "/user/dashboard" : "/register"}
+                onClick={handleGetStarted}
                 style={{
                   background: C.tomato, color: C.white, border: "none",
                   borderRadius: 20, padding: "14px 28px",
                   fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 600,
                   display: "flex", alignItems: "center", gap: 8,
-                  textDecoration: "none",
+                  textDecoration: "none", cursor: "pointer",
                 }}
               >
                 Get Started Free <ArrowRight size={16} />
-              </Link>
+              </a>
               <Link
                 to="/nutritionists"
                 style={{
@@ -129,15 +165,20 @@ export default function Hero() {
           <FadeUp delay={0.4}>
             <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 32 }}>
               <div style={{ display: "flex" }}>
-                {[C.tomato, C.ochre, C.forest, "#4a8040"].map((color, i) => (
+                {avatars.slice(0, 4).map((av, i) => (
                   <div
                     key={i}
                     style={{
                       width: 32, height: 32, borderRadius: "50%",
-                      background: color, border: `2px solid ${C.bg}`,
+                      background: av.color, border: `2px solid ${C.bg}`,
                       marginLeft: i > 0 ? -10 : 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
                     }}
-                  />
+                  >
+                    <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 11, color: "#fff" }}>
+                      {av.initial}
+                    </span>
+                  </div>
                 ))}
               </div>
               <div>
@@ -145,7 +186,7 @@ export default function Hero() {
                   {[1,2,3,4,5].map((s) => <Star key={s} size={12} fill={C.ochre} color={C.ochre} />)}
                 </div>
                 <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: "rgba(43,87,38,0.65)" }}>
-                  12,000+ happy members
+                  {formatCount(memberCount)} happy members
                 </div>
               </div>
             </div>
@@ -214,7 +255,7 @@ export default function Hero() {
             >
               <TrendingDown size={14} color={C.forest} />
               <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: C.forest }}>
-                −12 lbs in 60 days
+                −5.4 kg in 60 days
               </span>
             </motion.div>
           </div>

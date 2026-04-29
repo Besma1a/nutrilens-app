@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { AdminUiContext } from "./adminUtils";
 import DashboardOverview  from "./DashboardOverview";
 import UsersPage          from "./UsersPage";
@@ -76,6 +77,7 @@ function Icon({ children, className = "si" }) {
 
 // ─── Root Shell ───────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [page, setPage] = useState("dashboard");
   const [admin, setAdmin] = useState(() => {
     try {
@@ -148,7 +150,14 @@ export default function AdminDashboard() {
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "white" }}>
       <aside className={`sb${open ? " open" : ""}`}>
-        <div className="sb-brand">
+        <div
+          className="sb-brand"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate("/")}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate("/"); } }}
+          style={{ cursor: "pointer" }}
+        >
           <div className="sb-mark">
             <svg viewBox="0 0 24 24">
               <path d="M12 3c.5 5-3 8-6 9 1.5 3 4 5 6 6 2-1 4.5-3 6-6-3-1-6.5-4-6-9z" />

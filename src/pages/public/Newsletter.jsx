@@ -47,7 +47,7 @@ export default function Newsletter() {
             <div
               style={{
                 display: "inline-block",
-                background: C.lime,
+                background: C.ochre,
                 borderRadius: 999, padding: "4px 16px",
                 fontFamily: "'Outfit', sans-serif",
                 fontWeight: 700, fontSize: 12,
@@ -63,7 +63,7 @@ export default function Newsletter() {
                 fontFamily: "'Outfit', sans-serif", fontWeight: 800,
                 fontSize: "clamp(26px, 3vw, 42px)",
                 /* green on red = bold, fun, high contrast */
-                color: C.forest,
+                color: C.lime,
                 margin: "0 0 14px", lineHeight: 1.15,
               }}
             >

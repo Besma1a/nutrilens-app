@@ -136,7 +136,7 @@ function TrackerPhone() {
 export default function AITracker() {
   return (
     /* warm neutral bg — NOT lime */
-    <section style={{ background: C.bg, padding: "80px 24px" }}>
+    <section id="ai-tracker" style={{ background: C.bg, padding: "80px 24px" }}>
       <div
         className="ai-grid"
         style={{

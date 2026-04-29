@@ -16,7 +16,6 @@ class UserProfile(models.Model):
     
     SUBSCRIPTION_PLAN_CHOICES = [
         ('free', 'Free'),
-        ('premium', 'Premium'),
         ('pro', 'Pro'),
     ]
     

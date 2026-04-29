@@ -25,7 +25,7 @@ function getInitials(name) {
    TODO: replace with WebSocket or polling against your notifications endpoint.
 ────────────────────────────────────────────────────────────────────────── */
 function useUnreadCounts() {
-  const [counts, setCounts] = useState({ messages: 5, calendar: 3, notifications: 2 });
+  const [counts, setCounts] = useState({ calendar: 3, notifications: 2 });
   // useEffect(() => {
   //   const ws = new WebSocket(API_CONFIG.wsUrl);
   //   ws.onmessage = e => setCounts(JSON.parse(e.data).unread);
@@ -74,7 +74,6 @@ const SECTIONS = [
       { path: '/nutritionist/calendar',    icon: 'Consultation', label: 'Calendar',           badgeKey: 'calendar'  },
       { path: '/nutritionist/progress',    icon: 'Progress',     label: 'Progress Monitoring' },
       { path: '/nutritionist/adjustments', icon: 'Sliders',      label: 'Plan Adjustments'    },
-      { path: '/nutritionist/messaging',   icon: 'Messages',     label: 'Messaging',          badgeKey: 'messages'  },
       { path: '/nutritionist/blogs',       icon: 'Blog',         label: 'Blog Posts'          },
     ],
   },
@@ -88,7 +87,6 @@ const META = {
   '/nutritionist/calendar':     { title: 'Calendar',            sub: 'Appointments and follow-ups'       },
   '/nutritionist/progress':     { title: 'Progress Monitoring', sub: 'Track outcomes over time'          },
   '/nutritionist/adjustments':  { title: 'Plan Adjustments',    sub: 'Fine-tune assigned plans'          },
-  '/nutritionist/messaging':    { title: 'Messaging',           sub: 'Secure patient communication'      },
   '/nutritionist/profile':      { title: 'Profile',             sub: 'Account and credentials'           },
   '/nutritionist/notifications':{ title: 'Notifications',       sub: 'Alerts and updates'                },
   '/nutritionist/blogs':        { title: 'Blog Posts',         sub: 'Write and publish nutrition articles' },

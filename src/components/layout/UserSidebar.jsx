@@ -35,8 +35,7 @@ const SECTIONS = [
   {
     label: 'Care',
     items: [
-      { path: '/user/consultation', icon: 'Consultation', label: 'Consultations', premium: true, badge: 2 },
-      { path: '/user/messages',     icon: 'Messages',     label: 'Messages',      premium: true, badge: 3 },
+      { path: '/user/consultation', icon: 'Consultation', label: 'Consultations', premium: true },
       { path: '/user/meal-plan',    icon: 'MealPlan',     label: 'Meal Plan',     premium: true },
     ],
   },
@@ -51,6 +50,7 @@ const SECTIONS = [
 export default function UserSidebar({ user, open, onClose }) {
   const navigate = useNavigate();
   const toast = useToast();
+  const isPro = user.planName === 'Pro' && user.subscriptionStatus === 'active';
 
   return (
     <>
@@ -87,7 +87,7 @@ export default function UserSidebar({ user, open, onClose }) {
               </svg>
             </div>
             <div>
-              <div className="sb-plan-name">Premium Plan</div>
+              <div className="sb-plan-name">{user.planName} Plan</div>
               <div className="sb-plan-days">Active · Renews Apr 13</div>
             </div>
           </div>
@@ -114,8 +114,18 @@ export default function UserSidebar({ user, open, onClose }) {
           {SECTIONS.map(section => (
             <div key={section.label}>
               <div className="sb-section">{section.label}</div>
+              {section.label === 'Care' && isPro && !user.managedBy && !user.nutritionistId && (
+                <NavLink
+                  to="/user/select-nutritionist"
+                  onClick={onClose}
+                  className={({ isActive }) => `sb-item${isActive ? ' active' : ''}`}
+                >
+                  <Icon>{ICONS.Star}</Icon>
+                  <span style={{ flex: 1, lineHeight: 1.2 }}>Choose your nutritionist</span>
+                </NavLink>
+              )}
               {section.items.map(item => {
-                const isLocked = item.premium && !user.isSubscribed;
+                const isLocked = item.premium && !isPro;
                 const to = isLocked ? '/user/subscribe' : item.path;
 
                 return (
@@ -181,7 +191,7 @@ export default function UserSidebar({ user, open, onClose }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="sb-user-name">{user.name}</div>
               <div className="sb-user-plan">
-                {user.isSubscribed ? 'Premium · View Profile →' : 'Free plan · View Profile →'}
+                {user.planName ? `${user.planName} · View Profile →` : 'Free plan · View Profile →'}
               </div>
             </div>
             <svg viewBox="0 0 24 24" className="si" style={{ width: 13, height: 13, color: 'var(--ink-5)', fill: 'none', stroke: 'currentColor', strokeLinecap: 'round', strokeLinejoin: 'round' }}>

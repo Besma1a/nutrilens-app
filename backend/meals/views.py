@@ -47,7 +47,7 @@ class MealViewSet(viewsets.ModelViewSet):
         Keep read endpoints (today/summary/history/list) unthrottled by ai_upload.
         """
         is_create_action = getattr(self, "action", None) == "create"
-        has_image_upload = bool(getattr(self.request, "FILES", None) and self.request.FILES.get("meal_image"))
+        has_image_upload = bool(getattr(self.request, "FILES", None) and self.request.FILES.get("image"))
         if is_create_action and has_image_upload:
             return [AiUploadThrottle()]
         return []

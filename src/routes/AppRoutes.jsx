@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useLayoutEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // ✅ ADDED
 
 import LoginPage from "../pages/auth/LoginPage";
@@ -18,6 +18,8 @@ import DietPlanDetail from "../pages/public/diet-plans/DietPlanDetail";
 import Nutritionists from "../pages/public/Nutritionists";
 import PublicTestimonialsPage from "../pages/public/TestimonialsPage";
 import SupportTicketPage from "../pages/public/SupportTicketPage";
+import AboutPage from "../pages/public/AboutPage";
+import PlansPage from "../pages/public/PlansPage";
 
 // --- Nutritionist ---
 import NutritionistLayout from "../components/layout/NutritionistSidebar";
@@ -28,7 +30,6 @@ import AssignPlan from "../pages/nutritionist/AssignPlan";
 import Calendar from "../pages/nutritionist/Calendar";
 import Progress from "../pages/nutritionist/Progress";
 import Adjustments from "../pages/nutritionist/Adjustments";
-import Messaging from "../pages/nutritionist/Messaging";
 import Profile from "../pages/nutritionist/Profile";
 import Notifications from "../pages/nutritionist/Notifications";
 import NutritionistBlog from "../pages/nutritionist/Blogs";
@@ -40,7 +41,6 @@ import SubscriptionGuard from "../components/subscription/SubscriptionGuard";
 const UserDashboard    = lazy(() => import("../pages/user/Dashboard"));
 const UserTracker      = lazy(() => import("../pages/user/Tracker"));
 const UserProfile      = lazy(() => import("../pages/user/Profile"));
-const UserMessages     = lazy(() => import("../pages/user/Messages"));
 const UserMealPlan     = lazy(() => import("../pages/user/MealPlan"));
 const UserConsultation = lazy(() => import("../pages/user/Consultation"));
 const UserSubscribe    = lazy(() => import("../pages/user/Subscribe"));
@@ -76,6 +76,24 @@ const PageLoader = () => (
   </div>
 );
 
+// Disable browser scroll restoration before React renders anything
+if (typeof window !== 'undefined') {
+  window.history.scrollRestoration = 'manual';
+}
+
+function ScrollToTop() {
+  const { pathname, state } = useLocation();
+  useLayoutEffect(() => {
+    if (!state?.scrollTo) {
+      const root = document.getElementById('root');
+      if (root) root.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [pathname]);
+  return null;
+}
+
 export default function AppRoutes() {
   // ✅ AUTH STATE
   const { isAuthenticated, loading, user } = useAuth();
@@ -88,6 +106,7 @@ export default function AppRoutes() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
 
@@ -134,7 +153,6 @@ export default function AppRoutes() {
             <Route path="calendar" element={<Calendar />} />
             <Route path="progress" element={<Progress />} />
             <Route path="adjustments" element={<Adjustments />} />
-            <Route path="messaging" element={<Messaging />} />
             <Route path="profile" element={<Profile />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="blogs" element={<NutritionistBlog />} />
@@ -162,16 +180,7 @@ export default function AppRoutes() {
             <Route path="progress" element={<UserProgress />} />
             <Route path="notifications" element={<UserNotifications />} />
 
-            <Route
-              path="messages"
-              element={
-                <SubscriptionGuard title="Messaging is Premium">
-                  <UserMessages />
-                </SubscriptionGuard>
-              }
-            />
-
-            <Route
+<Route
               path="meal-plan"
               element={
                 <SubscriptionGuard title="Meal Plans are Premium">
@@ -199,6 +208,8 @@ export default function AppRoutes() {
           <Route path="/nutritionists" element={<Nutritionists />} />
           <Route path="/testimonials" element={<PublicTestimonialsPage />} />
           <Route path="/support" element={<SupportTicketPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/plans" element={<PlansPage />} />
 
           {/* ── FALLBACK ──────────────────────────────── */}
           <Route path="*" element={<Navigate to="/" replace />} />

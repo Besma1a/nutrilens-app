@@ -147,12 +147,17 @@ def notify_consultation_events(sender, instance, created, **kwargs):
     if created:
         if not nutritionist:
             return
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        nutritionist_user = User.objects.filter(email=nutritionist.email).first()
+        if not nutritionist_user:
+            return
         patient_name = (
             f"{patient.first_name} {patient.last_name}".strip() or patient.username
             if patient else "A patient"
         )
         _create(
-            recipient=nutritionist,
+            recipient=nutritionist_user,
             title="New appointment request",
             message=f"{patient_name} booked a consultation.",
             notification_type=Notification.TYPE_APPOINTMENT,
@@ -166,8 +171,7 @@ def notify_consultation_events(sender, instance, created, **kwargs):
         return
 
     STATUS_MAP = {
-        "approved":  ("Appointment approved",  "Your consultation has been confirmed."),
-        "rejected":  ("Appointment declined",  "Your consultation request was declined."),
+        "confirmed": ("Appointment confirmed",  "Your consultation has been confirmed."),
         "cancelled": ("Appointment cancelled", "Your consultation has been cancelled."),
     }
 

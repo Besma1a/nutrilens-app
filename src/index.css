@@ -1557,4 +1557,15 @@ body:has(.hs),
   .ai-grid { grid-template-columns: 1fr !important; }
   .plans-grid { grid-template-columns: 1fr !important; }
   .footer-grid { grid-template-columns: 1fr 1fr !important; }
+  .about-team-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ─── About page overrides ──────────────────────────────────────── */
+@media (min-width: 600px) and (max-width: 900px) {
+  .about-team-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ─── Pricing pages: prevent overflow on narrow phones ─────────── */
+@media (max-width: 600px) {
+  .public-page section { padding-left: 16px !important; padding-right: 16px !important; }
 }

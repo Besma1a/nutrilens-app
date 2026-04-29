@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { C } from "./constants/tokens";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../hooks/useAuth';
 
 export default function Header() {
@@ -10,7 +10,24 @@ export default function Header() {
   const [featOpen, setFeatOpen] = useState(false);
   const [scrolled, setScrolled]  = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
+
+  const getDashboardPath = () => {
+    if (user?.isStaff || user?.isSuperuser) return "/admin/dashboard";
+    if (user?.isNutritionist) return "/nutritionist/dashboard";
+    return "/user/dashboard";
+  };
+
+  const scrollToSection = (id) => {
+    setFeatOpen(false);
+    setMenuOpen(false);
+    if (location.pathname === "/") {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/", { state: { scrollTo: id } });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -75,15 +92,13 @@ export default function Header() {
                     boxShadow: "0 8px 24px rgba(43,87,38,0.10)",
                   }}
                 >
-                  {["AI Calorie Tracking", "Online Consultation"].map((item) => (
+                  {[
+                    { label: "AI Calorie Tracking", id: "ai-tracker" },
+                    { label: "Online Consultation", id: "consultation" },
+                  ].map(({ label, id }) => (
                     <button
-                      key={item}
-                      onClick={() => {
-                        setFeatOpen(false);
-                        if (item === "Online Consultation") {
-                          navigate("/register");
-                        }
-                      }}
+                      key={id}
+                      onClick={() => scrollToSection(id)}
                       style={{
                         display: "block", width: "100%", textAlign: "left",
                         padding: "10px 20px", background: "none", border: "none",
@@ -91,13 +106,13 @@ export default function Header() {
                         color: C.forest, fontWeight: 500, cursor: "pointer",
                       }}
                     >
-                      {item}
+                      {label}
                     </button>
                   ))}
                 </motion.div>
               )}
             </div>
-{/* Plans */}
+{/* Diet Plans */}
             <Link
               to="/diet"
               style={{
@@ -108,10 +123,23 @@ export default function Header() {
                 textDecoration: "none",
               }}
             >
-              Plans
+              Diet Plans
             </Link>
 
             
+
+            <Link
+              to="/plans"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 15,
+                color: C.forest,
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              Pricing
+            </Link>
             <Link
               to="/blog"
               style={{
@@ -128,29 +156,44 @@ export default function Header() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isAuthenticated ? (
-              <>
-               
-                <button
-                  onClick={() => {
-                    const wasNutritionist = !!user?.isNutritionist;
-                    logout();
-                    navigate(wasNutritionist ? "/" : "/login");
-                  }}
-                  style={{
-                    background: C.tomato,
-                    color: C.white,
-                    border: "none",
-                    borderRadius: 999,
-                    padding: "10px 18px",
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={() => navigate(getDashboardPath())}
+                title="Go to dashboard"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  overflow: "hidden",
+                  background: C.forest,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt="profile"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: C.white,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {(user?.firstName?.[0] ?? user?.username?.[0] ?? "?").toUpperCase()}
+                  </span>
+                )}
+              </button>
             ) : (
               <Link
                 to="/register"
@@ -184,19 +227,23 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             style={{ paddingBottom: 16 }}
           >
-            {["AI Calorie Tracking", "Online Consultation"].map((item) => (
-              <a
-                key={item}
-                href="#"
+            {[
+              { label: "AI Calorie Tracking", id: "ai-tracker" },
+              { label: "Online Consultation", id: "consultation" },
+            ].map(({ label, id }) => (
+              <button
+                key={id}
+                onClick={() => scrollToSection(id)}
                 style={{
-                  display: "block", padding: "12px 0",
+                  display: "block", width: "100%", textAlign: "left",
+                  padding: "12px 0", background: "none", border: "none",
+                  borderBottom: `1px solid ${C.cream}`,
                   fontFamily: "'Inter', sans-serif", fontSize: 15,
-                  color: C.forest, borderBottom: `1px solid ${C.cream}`,
-                  fontWeight: 500,
+                  color: C.forest, fontWeight: 500, cursor: "pointer",
                 }}
               >
-                {item}
-              </a>
+                {label}
+              </button>
             ))}
             <Link
               to="/diet"
@@ -208,7 +255,7 @@ export default function Header() {
                 textDecoration: "none",
               }}
             >
-              Plans
+              Diet Plans
             </Link>
 
          
@@ -226,6 +273,22 @@ export default function Header() {
               }}
             >
               Blog
+            </Link>
+
+            <Link
+              to="/plans"
+              style={{
+                display: "block",
+                padding: "12px 0",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 15,
+                color: C.forest,
+                borderBottom: `1px solid ${C.cream}`,
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              Pricing
             </Link>
           </motion.div>
         )}

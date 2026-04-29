@@ -7,21 +7,13 @@ import { subscriptionsApi } from '../../services/api';
 const PLAN_ICONS = ['🌙', '⭐', '🚀', '🥗', '💪', '✨'];
 
 const TABLE_ROWS = [
-  { feature: 'AI Meal Scans',              free: '3/day',   premium: 'Unlimited' },
-  { feature: 'Personalized Meal Plans',    free: '✗',       premium: '✓' },
-  { feature: 'Nutritionist Consultations', free: '✗',       premium: '2–8/month' },
-  { feature: 'Direct Messaging',           free: '✗',       premium: '✓' },
-  { feature: 'Progress Reports',           free: 'Basic',   premium: 'Advanced' },
-  { feature: 'Recipe Library',             free: '✗',       premium: '✓' },
-  { feature: 'AI Weekly Check-ins',        free: '✗',       premium: '✓' },
+  { feature: 'AI Meal Scans',              free: '3/day',  premium: 'Unlimited' },
+  { feature: 'Personalized Meal Plans',    free: '✗',      premium: '✓' },
+  { feature: 'Nutritionist Consultations', free: '✗',      premium: '4/week' },
+  { feature: 'Direct Messaging',           free: '✗',      premium: '✓' },
+  { feature: 'Progress Reports',           free: 'Basic',  premium: 'Advanced' },
 ];
 
-const PAYMENT_HISTORY = [
-  { date: 'Mar 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
-  { date: 'Feb 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
-  { date: 'Jan 13, 2026', desc: 'NutriLens Premium · Monthly',                    amount: '$79.00', method: '•••• 4242', status: 'Paid' },
-  { date: 'Jan 3, 2026',  desc: 'NutriLens Premium · First Month (20% off)',       amount: '$63.20', method: '•••• 4242', status: 'Paid' },
-];
 
 export default function Subscribe() {
   const { user, subscribe, unsubscribe } = useAuth();
@@ -49,7 +41,7 @@ export default function Subscribe() {
   );
 
   const formatPlanPeriod = (durationDays) => {
-    if (!durationDays) return 'cycle';
+    if (!durationDays || durationDays >= 3650) return '';
     if (durationDays === 30) return 'month';
     if (durationDays === 90) return '3 months';
     if (durationDays === 365) return 'year';
@@ -58,6 +50,7 @@ export default function Subscribe() {
 
   // ── Subscribe to a plan (calls real backend) ───────────────────────────────
   const handleSubscribe = async (plan) => {
+    if (!plan.is_featured) return;
     setProcessing(plan.id);
     try {
       await subscribe({ planId: plan.id });   // AuthContext → subscriptionsApi.subscribe()
@@ -67,7 +60,7 @@ export default function Subscribe() {
         type:     'success',
         duration: 5000,
       });
-      navigate('/nutritionists?from=subscription');
+      navigate(plan.is_featured ? '/user/select-nutritionist' : '/user/dashboard');
     } catch (err) {
       toast({
         message: err.message || 'Subscription failed. Please try again.',
@@ -117,7 +110,7 @@ export default function Subscribe() {
   };
 
   /* ── Active subscriber view ─────────────────────────────────────────────── */
-  if (user.isSubscribed) {
+  if (user.planName === 'Pro' && user.subscriptionStatus === 'active') {
     const endDate = formatEndDate(user.subscriptionEndDate);
 
     return (
@@ -135,9 +128,9 @@ export default function Subscribe() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 11, opacity: .65, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 4 }}>Current Plan</div>
-                <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-.5px' }}>NutriLens Premium</div>
+                <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-.5px' }}>NutriLens {user.planName}</div>
                 <div style={{ fontSize: 13, opacity: .8, marginTop: 4 }}>
-                  {user.planName || 'Monthly'} · {user.subscriptionDaysRemaining} days remaining
+                  {user.planName || 'Pro'} · {user.subscriptionDaysRemaining} days remaining
                 </div>
               </div>
               <div style={{
@@ -155,7 +148,7 @@ export default function Subscribe() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 12, marginBottom: 20 }}>
               {[
-                { label: 'Plan',       val: user.planName || 'Monthly' },
+                { label: 'Plan',       val: user.planName || 'Pro' },
                 { label: 'Expires',    val: endDate },
                 { label: 'Status',     val: user.subscriptionStatus || 'Active' },
               ].map(s => (
@@ -195,28 +188,8 @@ export default function Subscribe() {
           </div>
         </div>
 
-        {/* Payment History */}
+        {/* Cancel Zone */}
         <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Payment History</div>
-          <div style={{ overflowX: 'auto' }}>
-            <table className="tbl" style={{ minWidth: 700, width: '100%' }}>
-              <thead>
-                <tr><th>Date</th><th>Description</th><th>Amount</th><th>Method</th><th>Status</th></tr>
-              </thead>
-              <tbody>
-                {PAYMENT_HISTORY.map((row, i) => (
-                  <tr key={i}>
-                    <td>{row.date}</td>
-                    <td>{row.desc}</td>
-                    <td style={{ fontWeight: 700 }}>{row.amount}</td>
-                    <td style={{ color: 'var(--ink-5)' }}>{row.method}</td>
-                    <td><span className="badge badge-green">{row.status}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
           {/* Cancel Zone */}
           <div style={{ marginTop: 28, padding: '18px 22px', background: 'var(--red-bg)', border: '1px solid #fecaca', borderRadius: 'var(--r)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
             <div>
@@ -285,7 +258,7 @@ export default function Subscribe() {
                 <div style={{ fontSize: 42, marginBottom: 12 }}>{PLAN_ICONS[idx % PLAN_ICONS.length]}</div>
                 <div style={{ fontSize: 17, fontWeight: 700 }}>{plan.name}</div>
                 <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-1px', margin: '10px 0 6px' }}>
-                  ${plan.price}<span style={{ fontSize: 14, fontWeight: 500, opacity: .75 }}>/{formatPlanPeriod(plan.duration_days)}</span>
+                  ${plan.price}{formatPlanPeriod(plan.duration_days) && <span style={{ fontSize: 14, fontWeight: 500, opacity: .75 }}>/{formatPlanPeriod(plan.duration_days)}</span>}
                 </div>
                 {String(plan.id) === highlightedPlanId && <span className="badge badge-green" style={{ marginTop: 8 }}>Selected from homepage</span>}
               </div>
@@ -305,14 +278,14 @@ export default function Subscribe() {
                 className={`btn ${plan.is_featured ? 'btn-prim' : 'btn-sec'}`}
                 style={{ width: '100%', padding: '13px', fontSize: 15, fontWeight: 700 }}
                 onClick={() => handleSubscribe(plan)}
-                disabled={!!processing}
+                disabled={!plan.is_featured || !!processing}
               >
                 {processing === plan.id ? (
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                     <div style={{ width: 16, height: 16, border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
                     Processing…
                   </span>
-                ) : 'Get Started'}
+                ) : plan.is_featured ? 'Upgrade to Pro' : 'Your current plan'}
               </button>
             </div>
           </div>
@@ -333,14 +306,14 @@ export default function Subscribe() {
 
       {/* Feature Comparison Table */}
       <div style={{ background: 'var(--surf)', borderRadius: 'var(--r-xl)', padding: 24, border: '1px solid var(--border)', marginBottom: 32 }}>
-        <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Free vs Premium</div>
+        <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Free vs Pro</div>
         <div style={{ overflowX: 'auto' }}>
           <table className="tbl" style={{ width: '100%' }}>
             <thead>
               <tr>
                 <th style={{ textAlign: 'left' }}>Feature</th>
                 <th style={{ textAlign: 'center' }}>Free</th>
-                <th style={{ textAlign: 'center', color: 'var(--g2)' }}>Premium</th>
+                <th style={{ textAlign: 'center', color: 'var(--g2)' }}>Pro</th>
               </tr>
             </thead>
             <tbody>

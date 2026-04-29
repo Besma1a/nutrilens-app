@@ -1,13 +1,22 @@
 import { Users, Video, MessageCircle, ArrowRight } from "lucide-react";
 import { C, CONSULTATION_CARDS } from "./constants/tokens";
 import FadeUp from "./FadeUp";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const ICON_MAP = [Users, Video, MessageCircle];
 
 export default function Consultation() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBookSession = () => {
+    navigate(user ? "/user/dashboard" : "/login");
+  };
+
   return (
     /* Forest green bg — stays the same, lime used only for eyebrow label */
-    <section style={{ background: C.forest, padding: "80px 24px" }}>
+    <section id="consultation" style={{ background: C.forest, padding: "80px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
         <FadeUp>
@@ -97,6 +106,7 @@ export default function Consultation() {
         <FadeUp delay={0.3}>
           <div style={{ textAlign: "center", marginTop: 48 }}>
             <button
+              onClick={handleBookSession}
               style={{
                 background: C.tomato, color: C.white, border: "none",
                 borderRadius: 20, padding: "15px 36px",

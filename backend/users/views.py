@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 
 from .models import UserPreferences, EmailVerificationToken, PasswordResetToken
@@ -393,3 +394,32 @@ class UserProfileViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PUBLIC STATS — no auth required
+# GET /api/v1/users/public-stats/
+# Returns { member_count, recent_avatars: [{initial, color}] }
+# ─────────────────────────────────────────────────────────────────────────────
+
+AVATAR_COLORS = ['#2B5726', '#A50C05', '#F19335', '#4a8040']
+
+class PublicStatsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        User = get_user_model()
+        count = User.objects.filter(is_active=True, is_staff=False, is_superuser=False).count()
+        recent = (
+            User.objects
+            .filter(is_active=True, is_staff=False, is_superuser=False)
+            .order_by('-date_joined')[:4]
+        )
+        avatars = [
+            {
+                'initial': (u.first_name[:1] or u.username[:1]).upper(),
+                'color': AVATAR_COLORS[i % len(AVATAR_COLORS)],
+            }
+            for i, u in enumerate(recent)
+        ]
+        return Response({'member_count': count, 'recent_avatars': avatars})

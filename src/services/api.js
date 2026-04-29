@@ -260,7 +260,7 @@ export const mealsApi = {
 
   create: ({ meal_image, meal_type, consumed_at, notes }) => {
     const form = new FormData();
-    form.append("meal_image", meal_image);
+    form.append("image", meal_image);
     form.append("meal_type",  meal_type);
     if (consumed_at) form.append("consumed_at", consumed_at);
     if (notes)       form.append("notes",       notes);
@@ -555,6 +555,13 @@ export const patientsApi = {
       ...planData,
     });
   },
+
+  /**
+   * POST /api/v1/profiles/feedback/mark_as_read/
+   * Patient marks a received feedback note as read.
+   */
+  markFeedbackAsRead: (feedbackId) =>
+    request(`${PROFILES_URL}/feedback/mark_as_read/`, "POST", { feedback_id: feedbackId }),
 };
 
 export const dietPlansApi = {
@@ -638,4 +645,19 @@ export const notificationsApi = {
    */
   delete: (id) =>
     request(`${NOTIFICATIONS_URL}/${id}/delete/`, "DELETE"),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC STATS  →  /api/v1/users/public-stats/  (no auth required)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const publicApi = {
+  /**
+   * GET /api/v1/users/public-stats/
+   * Returns { member_count: number, recent_avatars: [{initial, color}] }
+   */
+  stats: () =>
+    fetch(`${BASE_URL}/public-stats/`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .catch(() => null),
 };

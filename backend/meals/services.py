@@ -15,6 +15,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils import timezone
+from rest_framework.exceptions import PermissionDenied
 
 from .models import FoodItem, Meal, MealFoodItem
 
@@ -400,6 +402,26 @@ class MealProcessingService:
         Returns:
             The DetectionResult (callers can inspect `.success` / `.error`).
         """
+        user = meal.user
+        subscription = getattr(user, 'subscription', None)
+        is_free = (
+            subscription is None
+            or not subscription.is_active
+            or subscription.plan != 'Pro'
+        )
+        if is_free:
+            today = timezone.now().date()
+            scan_count = Meal.objects.filter(
+                user=user,
+                logged_at__date=today,
+                ai_confidence_score__isnull=False,
+            ).count()
+            if scan_count >= 3:
+                raise PermissionDenied(
+                    "Free plan limit reached. You can perform 3 AI scans per day. "
+                    "Upgrade to Pro for unlimited scans."
+                )
+
         result = self._detector.detect(meal.image)
 
         if not result.success:

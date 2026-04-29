@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Hero from "./Hero";
 import AITracker from "./AITracker";
@@ -9,8 +11,19 @@ import Newsletter from "./Newsletter";
 import Footer from "./Footer";
 import PricingSection from "../../components/pricing/PricingSection";
 
-
 export default function Home() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const id = location.state?.scrollTo;
+    if (!id) return;
+    // Clear via React Router so both native history and RR internal state are wiped
+    navigate(location.pathname, { replace: true, state: null });
+    const el = document.getElementById(id);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 100);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="public-page">
       <Header />
@@ -19,11 +32,11 @@ export default function Home() {
         <Hero />
         <Consultation />
         <AITracker />
-        <DietPlans />
         <PricingSection />
+        <DietPlans />
         <Testimonials />
         <FAQ />
-        
+
         <Newsletter />
         <Footer />
       </main>

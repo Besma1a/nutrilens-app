@@ -1,11 +1,13 @@
 # consultations/views.py
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from django.utils import timezone
 from django.db.models import Q
+from datetime import timedelta
 
 from .models import Nutritionist, Consultation, NutritionistFeedback, ConsultationFeedback
 from .serializers import (
@@ -143,10 +145,17 @@ class ConsultationViewSet(viewsets.ModelViewSet):
             except UserProfile.DoesNotExist:
                 pass
         
-        # Fallback: use first active nutritionist
         if not nutritionist:
-            nutritionist = Nutritionist.objects.filter(is_active=True).first()
-        
+            raise ValidationError("Please select a nutritionist before booking a consultation.")
+
+        week_start = timezone.now().date() - timedelta(days=timezone.now().weekday())
+        bookings_this_week = Consultation.objects.filter(
+            user=self.request.user,
+            requested_at__date__gte=week_start,
+        ).count()
+        if bookings_this_week >= 4:
+            raise ValidationError("You have reached the limit of 4 consultations per week on the Pro plan.")
+
         serializer.save(user=self.request.user, nutritionist=nutritionist)
 
     @action(detail=False, methods=['get'])
@@ -300,9 +309,29 @@ class NutritionistConsultationViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        old_zoom_link = consultation.zoom_link or ''
+        new_zoom_link = request.data.get('zoom_link', old_zoom_link)
+
         consultation.status    = 'confirmed'
-        consultation.zoom_link = request.data.get('zoom_link', consultation.zoom_link or '')
+        consultation.zoom_link = new_zoom_link
         consultation.save()
+
+        # Notify patient when a Zoom link is added or updated
+        if new_zoom_link and new_zoom_link != old_zoom_link:
+            try:
+                from notifications.signals import _create
+                from notifications.models import Notification
+                nutritionist_user = getattr(consultation.nutritionist, 'user', None)
+                _create(
+                    recipient=consultation.user,
+                    title="Meeting link ready",
+                    message="Your nutritionist has attached a meeting link to your appointment.",
+                    notification_type=Notification.TYPE_APPOINTMENT,
+                    actor=nutritionist_user,
+                    link="/appointments/",
+                )
+            except Exception:
+                pass  # Notification failure must never break the approve action
 
         return Response(NutritionistConsultationSerializer(consultation).data)
 

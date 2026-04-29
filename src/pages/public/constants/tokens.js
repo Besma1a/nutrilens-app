@@ -156,18 +156,14 @@ export const FAQS = [
 export const FOOTER_COLS = [
   {
     title: "Product",
-    links: ["AI Calorie Tracker", "Online Consultation", "Diet Plans", "Progress Reports", "Mobile App"],
+    links: ["AI Calorie Tracker", "Online Consultation", "Diet Plans", "Progress Reports"],
   },
   {
     title: "Company",
-    links: ["About Us", "Careers", "Blog", "Partnerships"],
+    links: ["About Us", "Blog"],
   },
   {
     title: "Legal",
-    links: ["Privacy Policy", "Terms of Service", "Cookie Policy", "Refund Policy"],
-  },
-  {
-    title: "Connect",
-    links: ["Instagram", "Twitter / X", "Facebook", "LinkedIn", "YouTube"],
+    links: ["Privacy Policy", "Terms of Service", "Cookie Policy", "Contact Support"],
   },
 ];

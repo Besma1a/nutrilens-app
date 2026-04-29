@@ -53,21 +53,29 @@ function PlanCard({ plan }) {
 
 export default function DietPlans() {
   return (
-    /* Clean near-white gradient — no yellow/beige */
-    <section style={{ background: "linear-gradient(to bottom, #ffffff, #f8fafc)", padding: "80px 24px" }}>
+    <section style={{ background: C.bg, padding: "80px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <FadeUp>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <div style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: C.tomato, letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>
               Evidence-Based
             </div>
-            <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+              <div style={{ flex: 1, minWidth: 0 }} />
               <h2 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4vw, 44px)", color: C.forest, margin: 0 }}>
                 Diet Plans
               </h2>
-              <Link to="/diet" style={{ position: "absolute", right: 80, bottom: -5, fontFamily: "'Inter', sans-serif", fontSize: 16, fontWeight: 600, color: C.tomato, textDecoration: "none" }}>
-                See more →
-              </Link>
+              <div style={{ flex: 1, minWidth: 0, display: "flex", justifyContent: "flex-end", paddingLeft: 12 }}>
+                <Link
+                  to="/diet"
+                  style={{
+                    fontFamily: "'Inter', sans-serif", fontSize: 15, fontWeight: 600,
+                    color: C.tomato, textDecoration: "none", whiteSpace: "nowrap",
+                  }}
+                >
+                  See more →
+                </Link>
+              </div>
             </div>
             
           </div>

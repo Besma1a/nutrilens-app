@@ -34,6 +34,8 @@ class Meal(models.Model):
     logged_at = models.DateTimeField(auto_now_add=True)
     consumed_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
+    is_confirmed = models.BooleanField(default=False)
+    ai_confidence_score = models.FloatField(default=0)
     
     class Meta:
         ordering = ['-logged_at']
@@ -56,6 +58,12 @@ class FoodItem(models.Model):
     carbs_g = models.FloatField(default=0)
     fat_g = models.FloatField(default=0)
     confidence = models.FloatField(default=0.95)
+    calories_per_100g = models.FloatField(default=0)
+    protein_per_100g = models.FloatField(default=0)
+    carbs_per_100g = models.FloatField(default=0)
+    fat_per_100g = models.FloatField(default=0)
+    fiber_per_100g = models.FloatField(default=0)
+    category = models.CharField(max_length=50, default='other')
     
     class Meta:
         ordering = ['name']
@@ -78,6 +86,15 @@ class MealFoodItem(models.Model):
         blank=True,
     )
     quantity = models.FloatField(default=0)
-    
+    unit = models.CharField(max_length=20, default='g')
+    calories = models.FloatField(default=0)
+    protein_g = models.FloatField(default=0)
+    carbs_g = models.FloatField(default=0)
+    fat_g = models.FloatField(default=0)
+    fiber_g = models.FloatField(default=0)
+    ai_detected = models.BooleanField(default=True)
+    user_edited = models.BooleanField(default=False)
+    confidence_score = models.FloatField(default=0)
+
     class Meta:
         unique_together = ['meal', 'food_item']

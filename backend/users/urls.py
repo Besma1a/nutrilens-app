@@ -1,7 +1,7 @@
 # users/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserRegistrationViewSet, AuthViewSet, UserProfileViewSet
+from .views import UserRegistrationViewSet, AuthViewSet, UserProfileViewSet, PublicStatsView
 
 router = DefaultRouter()
 router.register(r'register', UserRegistrationViewSet, basename='user-register')
@@ -10,6 +10,7 @@ router.register(r'profile',  UserProfileViewSet,      basename='user-profile')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('public-stats/', PublicStatsView.as_view(), name='public-stats'),
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
