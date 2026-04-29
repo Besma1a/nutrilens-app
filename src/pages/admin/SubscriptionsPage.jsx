@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { T, css, StatusBadge, PageHead, EmptyState, SuccessMsg, SearchBar, Select, Pagination } from "./adminUtils";
+import { T, css, StatusBadge, PageHead, EmptyState, SuccessMsg, SearchBar, Select, Pagination, Modal } from "./adminUtils";
 import { apiFetch } from "../../services/adminApi";
 import useDebouncedValue from "../../hooks/useDebouncedValue";
 
@@ -17,6 +17,7 @@ export default function SubscriptionsPage() {
   const [plans, setPlans] = useState([]);
   const [editingPlanId, setEditingPlanId] = useState(null);
   const [planForm, setPlanForm] = useState(EMPTY_FORM);
+  const [showModal, setShowModal] = useState(false);
   const [savingPlan, setSavingPlan] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [search, setSearch] = useState("");
@@ -59,6 +60,7 @@ export default function SubscriptionsPage() {
   const resetForm = () => {
     setEditingPlanId(null);
     setPlanForm(EMPTY_FORM);
+    setShowModal(false);
   };
 
   const handleEditPlan = (item) => {
@@ -72,6 +74,7 @@ export default function SubscriptionsPage() {
       is_featured: item.is_featured,
       sort_order: item.sort_order,
     });
+    setShowModal(true);
   };
 
   const handleSavePlan = async (e) => {
@@ -118,75 +121,110 @@ export default function SubscriptionsPage() {
       <PageHead title="Subscription Plans & Promotions" sub="Manage pricing, features, and promotional campaigns." />
       <SuccessMsg message={successMsg} show={!!successMsg} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(320px, 420px) 1fr", gap: 20, marginBottom: 24 }}>
-        <form onSubmit={handleSavePlan} style={{ ...css.cardPad, alignSelf: "start" }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 16 }}>
-            {editingPlanId ? "Edit plan" : "Create plan"}
-          </div>
-          <div style={{ display: "grid", gap: 12 }}>
-            <input value={planForm.name} onChange={(e) => setPlanForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="Plan name" style={inputStyle} required />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <input value={planForm.price} onChange={(e) => setPlanForm((prev) => ({ ...prev, price: e.target.value }))} placeholder="Price" type="number" min="0" step="0.01" style={inputStyle} required />
-              <input value={planForm.duration_days} onChange={(e) => setPlanForm((prev) => ({ ...prev, duration_days: e.target.value }))} placeholder="Duration days" type="number" min="1" style={inputStyle} required />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 12, flex: 1, alignItems: "center" }}>
+          <SearchBar value={search} onChange={setSearch} placeholder="Search subscriptions..." />
+          <Select value={plan} onChange={setPlan} opts={availablePlans} />
+        </div>
+        <button style={css.btn(T.forest, T.white)} onClick={() => { resetForm(); setShowModal(true); }}>
+          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginRight: 6 }}>
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Create New Plan
+        </button>
+      </div>
+
+      <Modal open={showModal} onClose={resetForm} title={editingPlanId ? "Edit Subscription Plan" : "Create New Plan"} width={520}>
+        <form onSubmit={handleSavePlan}>
+          <div style={{ display: "grid", gap: 16 }}>
+            <div>
+              <label style={labelStyle}>Plan Name</label>
+              <input value={planForm.name} onChange={(e) => setPlanForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="e.g. Premium Monthly" style={inputStyle} required />
             </div>
-            <input value={planForm.sort_order} onChange={(e) => setPlanForm((prev) => ({ ...prev, sort_order: e.target.value }))} placeholder="Display order" type="number" min="0" style={inputStyle} />
-            <textarea value={planForm.featuresText} onChange={(e) => setPlanForm((prev) => ({ ...prev, featuresText: e.target.value }))} placeholder="One feature per line" rows={7} style={{ ...inputStyle, resize: "vertical" }} />
-            <label style={checkRowStyle}>
-              <input type="checkbox" checked={planForm.is_active} onChange={(e) => setPlanForm((prev) => ({ ...prev, is_active: e.target.checked }))} />
-              Active on public site
-            </label>
-            <label style={checkRowStyle}>
-              <input type="checkbox" checked={planForm.is_featured} onChange={(e) => setPlanForm((prev) => ({ ...prev, is_featured: e.target.checked }))} />
-              Mark as featured
-            </label>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button type="submit" style={css.btn(T.forest, T.white)} disabled={savingPlan}>
-                {savingPlan ? "Saving..." : editingPlanId ? "Update plan" : "Create plan"}
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Price ($)</label>
+                <input value={planForm.price} onChange={(e) => setPlanForm((prev) => ({ ...prev, price: e.target.value }))} placeholder="0.00" type="number" min="0" step="0.01" style={inputStyle} required />
+              </div>
+              <div>
+                <label style={labelStyle}>Duration (Days)</label>
+                <input value={planForm.duration_days} onChange={(e) => setPlanForm((prev) => ({ ...prev, duration_days: e.target.value }))} placeholder="30" type="number" min="1" style={inputStyle} required />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Display Order</label>
+              <input value={planForm.sort_order} onChange={(e) => setPlanForm((prev) => ({ ...prev, sort_order: e.target.value }))} placeholder="0" type="number" min="0" style={inputStyle} />
+            </div>
+
+            <div>
+              <label style={labelStyle}>Features (One per line)</label>
+              <textarea value={planForm.featuresText} onChange={(e) => setPlanForm((prev) => ({ ...prev, featuresText: e.target.value }))} placeholder="Personalized meal plans&#10;24/7 Support&#10;Progress tracking" rows={5} style={{ ...inputStyle, resize: "vertical" }} />
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, background: T.grayLt, padding: 12, borderRadius: 12 }}>
+              <label style={checkRowStyle}>
+                <input type="checkbox" checked={planForm.is_active} onChange={(e) => setPlanForm((prev) => ({ ...prev, is_active: e.target.checked }))} />
+                Visible on public site
+              </label>
+              <label style={checkRowStyle}>
+                <input type="checkbox" checked={planForm.is_featured} onChange={(e) => setPlanForm((prev) => ({ ...prev, is_featured: e.target.checked }))} />
+                Highlight as "Recommended"
+              </label>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button type="submit" style={{ ...css.btn(T.forest, T.white), flex: 1, justifyContent: "center", padding: "12px" }} disabled={savingPlan}>
+                {savingPlan ? "Saving..." : editingPlanId ? "Update Plan" : "Create Plan"}
               </button>
-              {editingPlanId ? (
-                <button type="button" style={css.btn(T.grayLt, T.text, `1px solid ${T.border}`)} onClick={resetForm}>
-                  Cancel
-                </button>
-              ) : null}
+              <button type="button" style={{ ...css.btn(T.white, T.text, `1px solid ${T.border}`), padding: "12px 20px" }} onClick={resetForm}>
+                Cancel
+              </button>
             </div>
           </div>
         </form>
+      </Modal>
 
-        <div style={{ ...css.card, overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>{["Plan", "Price", "Duration", "Visibility", "Featured", "Features", "Actions"].map((h) => <th key={h} style={css.th}>{h}</th>)}</tr>
-            </thead>
-            <tbody>
-              {plans.map((item) => (
-                <tr key={item.id}>
-                  <td style={css.td}>{item.name}</td>
-                  <td style={css.td}>${item.price}</td>
-                  <td style={css.td}>{item.duration_days} days</td>
-                  <td style={css.td}><StatusBadge status={item.is_active ? "Active" : "Closed"} /></td>
-                  <td style={css.td}>{item.is_featured ? "Yes" : "No"}</td>
-                  <td style={{ ...css.td, maxWidth: 320 }}>{(item.features || []).slice(0, 3).join(", ") || "No features"}</td>
-                  <td style={css.td}>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button style={css.btn(T.blueLt, T.blue)} onClick={() => handleEditPlan(item)}>Edit</button>
-                      <button style={css.btn(T.redLt, T.redTx)} onClick={() => handleDeletePlan(item.id)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {plans.length === 0 ? (
-                <tr>
-                  <td style={css.td} colSpan={7}>No plans created yet.</td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
+      <div style={{ ...css.card, overflowX: "auto", marginBottom: 32 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>{["Plan", "Price", "Duration", "Visibility", "Featured", "Features", "Actions"].map((h) => <th key={h} style={css.th}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {plans.map((item) => (
+              <tr key={item.id}>
+                <td style={css.td}><div style={{ fontWeight: 600, color: T.text }}>{item.name}</div></td>
+                <td style={css.td}>${item.price}</td>
+                <td style={css.td}>{item.duration_days} days</td>
+                <td style={css.td}><StatusBadge status={item.is_active ? "Active" : "Closed"} /></td>
+                <td style={css.td}>{item.is_featured ? <span style={{ color: T.amberTx, fontWeight: 600 }}>★ Yes</span> : "No"}</td>
+                <td style={{ ...css.td, maxWidth: 320, color: T.textSm }}>{(item.features || []).slice(0, 3).join(", ") || "No features"}</td>
+                <td style={css.td}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button style={css.btn(T.blueLt, T.blue)} onClick={() => handleEditPlan(item)}>Edit</button>
+                    <button style={css.btn(T.redLt, T.redTx)} onClick={() => handleDeletePlan(item.id)}>Delete</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {plans.length === 0 ? (
+              <tr>
+                <td style={css.td} colSpan={7}>
+                  <div style={{ textAlign: "center", padding: "40px 0", color: T.gray }}>
+                    No subscription plans found. Click "Create New Plan" to get started.
+                  </div>
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
       </div>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
-        <SearchBar value={search} onChange={setSearch} placeholder="Search subscriptions..." />
-        <Select value={plan} onChange={setPlan} opts={availablePlans} />
+      <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 32, marginTop: 12 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 16 }}>
+          Subscription Transactions
+        </div>
       </div>
 
       {subscriptions.length === 0 ? (
@@ -225,13 +263,24 @@ export default function SubscriptionsPage() {
   );
 }
 
+const labelStyle = {
+  display: "block",
+  fontSize: 12,
+  fontWeight: 600,
+  color: T.gray,
+  marginBottom: 6,
+};
+
 const inputStyle = {
   width: "100%",
   border: `1px solid ${T.border}`,
   borderRadius: 10,
-  padding: "12px 14px",
+  padding: "11px 14px",
   fontSize: 14,
+  color: T.text,
   outline: "none",
+  background: T.white,
+  boxSizing: "border-box",
 };
 
 const checkRowStyle = {

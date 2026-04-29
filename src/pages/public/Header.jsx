@@ -4,6 +4,7 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { C } from "./constants/tokens";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../hooks/useAuth';
+import Avatar from "../../components/common/Avatar";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -54,17 +55,19 @@ export default function Header() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
 
           {/* Logo */}
-          <span
+          <Link
+            to="/"
             style={{
               fontFamily: "'Outfit', sans-serif",
               fontWeight: 800,
               fontSize: 26,
               color: C.forest,
               letterSpacing: "-0.5px",
+              textDecoration: "none",
             }}
           >
             Nutri<span style={{ color: C.tomato }}>lens</span>
-          </span>
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 36 }}>
@@ -174,25 +177,11 @@ export default function Header() {
                   flexShrink: 0,
                 }}
               >
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt="profile"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: C.white,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {(user?.firstName?.[0] ?? user?.username?.[0] ?? "?").toUpperCase()}
-                  </span>
-                )}
+                <Avatar
+                  user={user}
+                  size={38}
+                  style={{ width: "100%", height: "100%" }}
+                />
               </button>
             ) : (
               <Link

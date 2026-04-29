@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { setGlobalToken, clearGlobalToken, subscriptionsApi, profileApi } from "../services/api";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { setGlobalToken, clearGlobalToken, subscriptionsApi, profileApi, onUnauthorized } from "../services/api";
 
 export const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -29,7 +29,12 @@ function normalizeUser(raw) {
     gender:    raw.gender    ?? "",
     dob:       raw.dob       ?? raw.date_of_birth ?? "",
     location:  raw.location  ?? "",
-    profilePicture: raw.profilePicture ?? raw.profile_picture ?? "",
+    profilePicture: (() => {
+      const pic = raw.profilePicture ?? raw.profile_picture ?? "";
+      if (!pic) return "";
+      if (pic.startsWith("http") || pic.startsWith("data:")) return pic;
+      return `${window.location.protocol}//${window.location.hostname}:8000${pic}`;
+    })(),
 
     // Goals & nutrition
     goalType:         raw.goalType         ?? raw.goal_type          ?? "",
@@ -168,6 +173,12 @@ export function AuthProvider({ children }) {
             });
           } catch (subError) {
             console.warn('Could not fetch subscription status on init:', subError);
+            
+            // FIX: If the token is invalid or unauthorized, clear the session entirely
+            const errMsg = subError?.message || "";
+            if (errMsg.toLowerCase().includes('invalid token') || errMsg.includes('401')) {
+              logout();
+            }
           }
         }
       } catch (error) {
@@ -262,12 +273,20 @@ export function AuthProvider({ children }) {
     storage.setUser(normalized); // FIX: store normalized (not raw) so page refresh works
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
+    console.warn("Logging out due to session expiration or user action.");
     clearGlobalToken();
     setToken(null);
     setUser(null);
     storage.clear();
-  };
+  }, []);
+
+  // Register global 401 handler
+  useEffect(() => {
+    onUnauthorized(() => {
+      logout();
+    });
+  }, [logout]);
 
   // ── Update helpers ─────────────────────────────────────────────────────────
 

@@ -281,6 +281,117 @@ class DietPlan(models.Model):
         return f"{self.title} for {self.user.username}"
 
 
+class DietPlanTemplate(models.Model):
+    """
+    Nutritionist-owned plan template (not assigned to a patient).
+    Used as a reusable library when authoring plans.
+    """
+
+    PLAN_TYPES = DietPlan.PLAN_TYPES
+
+    STATUS_PENDING = "Pending"
+    STATUS_APPROVED = "Approved"
+    STATUS_REJECTED = "Rejected"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_APPROVED, "Approved"),
+        (STATUS_REJECTED, "Rejected"),
+    ]
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="diet_plan_templates",
+        help_text="Nutritionist who created the template",
+    )
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    overview = models.TextField(
+        blank=True,
+        default="",
+        help_text="Long-form overview shown on the public diet plan detail page.",
+    )
+    plan_type = models.CharField(
+        max_length=20,
+        choices=PLAN_TYPES,
+        default="standard",
+    )
+
+    category = models.CharField(
+        max_length=100,
+        default="Lifestyle & Occasions",
+        choices=[
+            ("Lifestyle & Occasions", "Lifestyle & Occasions"),
+            ("For Health Conditions", "For Health Conditions"),
+        ],
+        help_text="Category of the diet plan",
+    )
+
+    daily_calorie_target = models.IntegerField(null=True, blank=True)
+    protein_target_g = models.FloatField(null=True, blank=True)
+    carbs_target_g = models.FloatField(null=True, blank=True)
+    fat_target_g = models.FloatField(null=True, blank=True)
+
+    meals_data = models.JSONField(default=dict, blank=True)
+
+    key_guidelines = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of key guideline strings shown on the public detail page.",
+    )
+
+    example_meals = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of example meal strings shown on the public detail page.",
+    )
+
+    image_url = models.URLField(
+        blank=True,
+        default="",
+        help_text="Optional cover image URL shown on the diet plan card",
+    )
+    image = models.ImageField(
+        upload_to="diet_plans/",
+        blank=True,
+        null=True,
+        help_text="Optional cover image file",
+    )
+
+    is_published = models.BooleanField(
+        default=False,
+        help_text="Whether the template is visible in the public catalog (admin-controlled).",
+    )
+
+    moderation_status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        help_text="Admin moderation state for public listing.",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Diet Plan Template"
+        verbose_name_plural = "Diet Plan Templates"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["created_by", "-created_at"]),
+            models.Index(fields=["plan_type", "-created_at"]),
+            models.Index(fields=["moderation_status", "-created_at"]),
+            models.Index(fields=["is_published", "-created_at"]),
+        ]
+
+    def __str__(self):
+        who = self.created_by.username if self.created_by else "system"
+        return f"Template: {self.title} ({who})"
+
+
 class PlanAssignment(models.Model):
     """
     One row per meal slot on a given day of a diet plan (P3 adjustments).

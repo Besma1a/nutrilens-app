@@ -51,37 +51,6 @@ export const AI_FEATURES = [
   },
 ];
 
-// ─── Diet Plans ───────────────────────────────────────────────────
-export const DIET_PLANS = [
-  {
-    id: "mediterranean",
-    name: "Mediterranean",
-    tag: "Heart-Healthy",
-    color: "#4a7c6a",
-    emoji: "🫒",
-    desc: "Rich in olive oil, fish & fresh vegetables.",
-    badges: ["Anti-inflammatory", "Longevity", "Heart Health"],
-  },
-  {
-    id: "keto",
-    name: "Keto",
-    tag: "Fat-Burning",
-    color: "#8b4513",
-    emoji: "🥑",
-    desc: "High-fat, low-carb protocol for rapid fat adaptation.",
-    badges: ["Energy", "Weight Loss", "Mental Clarity"],
-  },
-  {
-    id: "plant-based",
-    name: "Plant-Based",
-    tag: "Eco-Conscious",
-    color: "#2d6a4f",
-    emoji: "🌿",
-    desc: "100% whole-food plant protocol, rich in fiber & phytonutrients.",
-    badges: ["Gut Health", "Sustainable", "Antioxidants"],
-  },
-];
-
 // ─── Testimonials ─────────────────────────────────────────────────
 export const TESTIMONIALS = [
   {

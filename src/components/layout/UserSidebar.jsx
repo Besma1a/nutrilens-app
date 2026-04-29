@@ -116,7 +116,7 @@ export default function UserSidebar({ user, open, onClose }) {
               <div className="sb-section">{section.label}</div>
               {section.label === 'Care' && isPro && !user.managedBy && !user.nutritionistId && (
                 <NavLink
-                  to="/user/select-nutritionist"
+                  to="/nutritionists?from=subscription"
                   onClick={onClose}
                   className={({ isActive }) => `sb-item${isActive ? ' active' : ''}`}
                 >

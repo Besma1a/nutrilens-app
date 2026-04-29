@@ -2,7 +2,7 @@
 import logging
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.db.models import Q
@@ -11,7 +11,15 @@ from django.db.utils import OperationalError, ProgrammingError
 from django.contrib.auth import get_user_model
 from django.utils.dateparse import parse_date
 
-from .models import UserProfile, WeightEntry, BodyMeasurement, NutritionistFeedback, DietPlan, PlanAssignment
+from .models import (
+    UserProfile,
+    WeightEntry,
+    BodyMeasurement,
+    NutritionistFeedback,
+    DietPlan,
+    DietPlanTemplate,
+    PlanAssignment,
+)
 from .plan_assignments import ensure_plan_assignments_for_diet_plan
 from .serializers import (
     UserProfileSerializer,
@@ -20,6 +28,7 @@ from .serializers import (
     NutritionistFeedbackSerializer,
     NutritionistPatientSerializer,
     DietPlanSerializer,
+    DietPlanTemplateSerializer,
     plan_assignment_to_camel,
 )
 from adminpanel.models import NutritionistAdminProfile
@@ -571,6 +580,130 @@ class DietPlanViewSet(viewsets.ModelViewSet):
         ordered = plan.plan_assignments.all().order_by("day_index", "slot_key")
         data["assignments"] = [plan_assignment_to_camel(a) for a in ordered]
         return Response(data)
+
+
+class DietPlanTemplateViewSet(viewsets.ModelViewSet):
+    """
+    Diet plan templates (blog-like workflow).
+
+    GET /api/v1/profiles/diet-plan-templates/
+      - Public: lists only approved + published templates (home/catalog)
+      - Nutritionist: pass ?scope=mine to list their own templates (incl pending) + system templates
+
+    POST /api/v1/profiles/diet-plan-templates/
+      - Nutritionist only: create a template (created_by=current user).
+    """
+
+    serializer_class = DietPlanTemplateSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering = ["-created_at"]
+
+    def get_permissions(self):
+        # Mirror blogs API: GET is public, write actions require auth + nutritionist.
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def _require_nutritionist(self):
+        return getattr(self.request.user, "is_nutritionist", False)
+
+    def get_queryset(self):
+        scope = (self.request.query_params.get("scope") or "").strip().lower()
+
+        # Nutritionist library view
+        if scope == "mine" and self.request.user.is_authenticated and self._require_nutritionist():
+            return DietPlanTemplate.objects.filter(
+                Q(created_by=self.request.user) | Q(created_by__isnull=True)
+            ).order_by("-created_at")
+
+        # Public catalog view
+        return DietPlanTemplate.objects.filter(
+            is_published=True,
+            moderation_status=DietPlanTemplate.STATUS_APPROVED,
+        ).order_by("-created_at")
+
+    def create(self, request, *args, **kwargs):
+        if not self._require_nutritionist():
+            return Response(
+                {"detail": "Only nutritionists can create diet plan templates."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            created_by=self.request.user,
+            is_published=False,
+            moderation_status=DietPlanTemplate.STATUS_PENDING,
+        )
+
+        # Admin notification for new content awaiting moderation (best-effort)
+        try:
+            from adminpanel.models import AdminNotification
+
+            author = self.request.user
+            author_name = (
+                f"{author.first_name} {author.last_name}".strip() or getattr(author, "username", "Nutritionist")
+            )
+            AdminNotification.create(
+                title="New diet plan submitted",
+                message=f"{author_name} submitted a diet plan: “{instance.title}”.",
+                notification_type=AdminNotification.TYPE_CONTENT,
+                link="/admin#content",
+            )
+        except Exception:
+            pass
+
+    def perform_update(self, serializer):
+        if not self._require_nutritionist():
+            raise PermissionError("Only nutritionists can update diet plan templates.")
+        instance = self.get_object()
+        # Allow editing system templates by copying to user's library.
+        if instance.created_by_id is None:
+            serializer.save(
+                created_by=self.request.user,
+                is_published=False,
+                moderation_status=DietPlanTemplate.STATUS_PENDING,
+            )
+        else:
+            serializer.save(
+                is_published=False,
+                moderation_status=DietPlanTemplate.STATUS_PENDING,
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        if not self._require_nutritionist():
+            return Response(
+                {"detail": "Only nutritionists can delete diet plan templates."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        instance = self.get_object()
+        if instance.created_by_id is None:
+            return Response(
+                {"detail": "System templates cannot be deleted."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
+
+
+class PublicDietPlanTemplateViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Public catalog of published DietPlanTemplate cards.
+
+    GET /api/v1/profiles/public-diet-plan-templates/
+    GET /api/v1/profiles/public-diet-plan-templates/{id}/
+    """
+
+    serializer_class = DietPlanTemplateSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [filters.OrderingFilter]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        return DietPlanTemplate.objects.filter(
+            is_published=True,
+            moderation_status=DietPlanTemplate.STATUS_APPROVED,
+        ).order_by("-created_at")
 
 
 def _normalize_plan_assignment_patch_payload(raw):

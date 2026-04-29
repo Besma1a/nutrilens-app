@@ -1,6 +1,6 @@
 // ContentPage.jsx - FIXED VERSION (Same pattern for all pages)
 import { useEffect, useState } from "react";
-import { T, css, IBtn, StatusBadge, SearchBar, Select, PageHead, Drawer, DrawerField, EmptyState, SuccessMsg, Pagination } from "./adminUtils";
+import { T, css, IBtn, StatusBadge, SearchBar, Select, PageHead, Drawer, DrawerField, EmptyState, SuccessMsg, ErrorMsg, Pagination } from "./adminUtils";
 import { apiFetch } from "../../services/adminApi";
 import useDebouncedValue from "../../hooks/useDebouncedValue";
 
@@ -21,17 +21,16 @@ export default function ContentPage() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
-  const [typeF, setTypeF] = useState("All Types");
   const [statusF, setStatusF] = useState("All Status");
   const [preview, setPreview] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const params = new URLSearchParams({
       search: debouncedSearch,
-      type: typeF,
       status: statusF,
       page: String(currentPage),
       limit: "8",
@@ -39,35 +38,46 @@ export default function ContentPage() {
     apiFetch(`/content?${params.toString()}`).then((data) => {
       setItems(data.items || []);
       setTotalPages(data.totalPages || 1);
-    }).catch(() => {});
-  }, [debouncedSearch, typeF, statusF, currentPage]);
+      setErrorMsg("");
+    }).catch((err) => setErrorMsg(err?.message || "Failed to load content."));
+  }, [debouncedSearch, statusF, currentPage]);
 
   const pending = items.filter(c => c.status === "Pending").length;
 
   const approve = (id) => {
-    apiFetch(`/content/${id}/approve`, { method: "PATCH" }).then(() => setItems((p) => p.map((c) => c.id === id ? { ...c, status: "Approved" } : c)));
-    setPreview(prev => prev?.id === id ? { ...prev, status: "Approved" } : prev);
-    setSuccessMsg("Content approved");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    setErrorMsg("");
+    apiFetch(`/content/${id}/approve`, { method: "PATCH" })
+      .then(() => {
+        setItems((p) => p.map((c) => (c.id === id ? { ...c, status: "Approved" } : c)));
+        setPreview((prev) => (prev?.id === id ? { ...prev, status: "Approved" } : prev));
+        setSuccessMsg("Content approved");
+        setTimeout(() => setSuccessMsg(""), 2000);
+      })
+      .catch((err) => setErrorMsg(err?.message || "Failed to approve content."));
   };
 
   const reject = (id) => {
-    apiFetch(`/content/${id}/reject`, { method: "PATCH" }).then(() => setItems((p) => p.map((c) => c.id === id ? { ...c, status: "Rejected" } : c)));
-    setPreview(prev => prev?.id === id ? { ...prev, status: "Rejected" } : prev);
-    setSuccessMsg("Content rejected");
-    setTimeout(() => setSuccessMsg(""), 2000);
+    setErrorMsg("");
+    apiFetch(`/content/${id}/reject`, { method: "PATCH" })
+      .then(() => {
+        setItems((p) => p.map((c) => (c.id === id ? { ...c, status: "Rejected" } : c)));
+        setPreview((prev) => (prev?.id === id ? { ...prev, status: "Rejected" } : prev));
+        setSuccessMsg("Content rejected");
+        setTimeout(() => setSuccessMsg(""), 2000);
+      })
+      .catch((err) => setErrorMsg(err?.message || "Failed to reject content."));
   };
 
   return (
     <>
       <PageHead title="Content Moderation" sub="Review, approve, and reject submitted content." />
       <SuccessMsg message={successMsg} show={!!successMsg} />
+      <ErrorMsg error={errorMsg} show={!!errorMsg} />
 
       <div style={{ marginBottom: 12, fontSize: 13, color: T.gray }}>Pending Review ({pending})</div>
 
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <SearchBar value={search} onChange={setSearch} placeholder="Search content..." />
-        <Select value={typeF} onChange={setTypeF} opts={["All Types", "Article", "Guide", "Video", "Newsletter"]} />
         <Select value={statusF} onChange={setStatusF} opts={["All Status", "Pending", "Approved", "Rejected"]} />
       </div>
 

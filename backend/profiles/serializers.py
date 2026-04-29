@@ -1,7 +1,7 @@
 # profiles/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import UserProfile, WeightEntry, BodyMeasurement, NutritionistFeedback, DietPlan
+from .models import UserProfile, WeightEntry, BodyMeasurement, NutritionistFeedback, DietPlan, DietPlanTemplate
 
 User = get_user_model()
 
@@ -122,6 +122,51 @@ class DietPlanSerializer(serializers.ModelSerializer):
             'fat_target_g', 'meals_data', 'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+
+class DietPlanTemplateSerializer(serializers.ModelSerializer):
+    created_by_username = serializers.CharField(source="created_by.username", read_only=True, allow_null=True)
+
+    class Meta:
+        model = DietPlanTemplate
+        fields = [
+            "id",
+            "created_by",
+            "created_by_username",
+            "title",
+            "description",
+            "overview",
+            "plan_type",
+            "category",
+            "daily_calorie_target",
+            "protein_target_g",
+            "carbs_target_g",
+            "fat_target_g",
+            "meals_data",
+            "key_guidelines",
+            "example_meals",
+            "image_url",
+            "image",
+            "is_published",
+            "moderation_status",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "created_at",
+            "updated_at",
+            "created_by",
+            "created_by_username",
+            "is_published",
+            "moderation_status",
+        ]
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get("request")
+        if instance.image:
+            ret["image_url"] = request.build_absolute_uri(instance.image.url) if request else instance.image.url
+        return ret
 
 
 def plan_assignment_to_camel(instance):

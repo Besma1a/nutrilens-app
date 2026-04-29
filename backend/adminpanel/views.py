@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 from blogs.models import Blog
 from consultations.models import Consultation, ConsultationFeedback, Nutritionist
 from profiles.models import UserProfile
+from profiles.models import DietPlanTemplate
 from subscriptions.models import Subscription, SubscriptionPlan
 from subscriptions.serializers import SubscriptionPlanSerializer
 
@@ -509,19 +510,21 @@ class AdminContentView(APIView):
     permission_classes = [AdminAuth]
 
     def get(self, request):
-        qs = Blog.objects.select_related("author").order_by("-created_at")
+        # Get search and filter params
         search = (request.query_params.get("search") or "").strip()
         type_q = request.query_params.get("type")
         status_q = request.query_params.get("status")
-        if search:
-            qs = qs.filter(Q(title__icontains=search) | Q(author__username__icontains=search))
-        if type_q and type_q != "All Types":
-            pass
-        if status_q and status_q != "All Status":
-            qs = qs.filter(moderation_status=status_q)
-        rows, total, total_pages = paginate_queryset(request, qs, default_limit=8)
+        
         items = []
-        for b in rows:
+        
+        # Get blogs
+        blog_qs = Blog.objects.select_related("author").order_by("-created_at")
+        if search:
+            blog_qs = blog_qs.filter(Q(title__icontains=search) | Q(author__username__icontains=search))
+        if status_q and status_q != "All Status":
+            blog_qs = blog_qs.filter(moderation_status=status_q)
+        
+        for b in blog_qs:
             author = (
                 f"{b.author.first_name} {b.author.last_name}".strip() or b.author.username
             )
@@ -533,27 +536,87 @@ class AdminContentView(APIView):
                 risk = "Medium"
             items.append(
                 {
-                    "id": b.id,
+                    "id": f"blog_{b.id}",
                     "title": b.title,
-                    "type": "Article",
+                    "type": "Blog Article",
                     "author": author,
                     "date": b.created_at.strftime("%b %d"),
                     "status": b.moderation_status,
                     "risk": risk,
                     "body": b.excerpt or b.content[:280],
+                    "content_type": "blog",
                 }
             )
-        return Response({"items": items, "total": total, "totalPages": total_pages})
+        
+        # Get diet plans
+        diet_qs = DietPlanTemplate.objects.select_related("created_by").order_by("-created_at")
+        if search:
+            diet_qs = diet_qs.filter(Q(title__icontains=search) | Q(created_by__username__icontains=search))
+        if status_q and status_q != "All Status":
+            diet_qs = diet_qs.filter(moderation_status=status_q)
+        
+        for d in diet_qs:
+            author = "System"
+            if d.created_by:
+                author = (
+                    f"{d.created_by.first_name} {d.created_by.last_name}".strip()
+                    or d.created_by.username
+                )
+            risk = "Low"  # Diet plans are generally low risk
+            items.append(
+                {
+                    "id": f"diet_{d.id}",
+                    "title": d.title,
+                    "type": "Diet Plan",
+                    "author": author,
+                    "date": d.created_at.strftime("%b %d"),
+                    "status": d.moderation_status,
+                    "risk": risk,
+                    "body": d.overview[:280] if d.overview else d.description[:280],
+                    "content_type": "diet_plan",
+                }
+            )
+        
+        # Sort by date descending
+        items.sort(key=lambda x: x["date"], reverse=True)
+        
+        # Filter by type if specified
+        if type_q and type_q != "All Types":
+            if type_q == "Blog Article":
+                items = [i for i in items if i["type"] == "Blog Article"]
+            elif type_q == "Diet Plan":
+                items = [i for i in items if i["type"] == "Diet Plan"]
+        
+        # Paginate
+        rows, total, total_pages = _paginate_list(request, items, default_limit=8)
+        
+        return Response({"items": rows, "total": total, "totalPages": total_pages})
 
 
 class AdminContentApproveView(APIView):
     permission_classes = [AdminAuth]
 
     def patch(self, request, content_id):
-        blog = Blog.objects.get(id=content_id)
-        blog.moderation_status = Blog.STATUS_APPROVED
-        blog.is_published = True
-        blog.save(update_fields=["moderation_status", "is_published"])
+        # Parse content_type and ID from content_id (format: "blog_1" or "diet_1")
+        parts = content_id.split("_", 1)
+        if len(parts) != 2:
+            return Response({"error": "Invalid content ID"}, status=400)
+        
+        content_type, obj_id = parts
+        
+        if content_type == "blog":
+            blog = Blog.objects.get(id=obj_id)
+            blog.moderation_status = Blog.STATUS_APPROVED
+            blog.is_published = True
+            blog.save(update_fields=["moderation_status", "is_published"])
+        elif content_type == "diet":
+            diet = DietPlanTemplate.objects.get(id=obj_id)
+            diet.moderation_status = DietPlanTemplate.STATUS_APPROVED
+            diet.is_published = True
+            diet.save(update_fields=["moderation_status", "is_published"])
+        else:
+            return Response({"error": "Unknown content type"}, status=400)
+        
         return Response({"status": "Approved"})
 
 
@@ -561,10 +624,92 @@ class AdminContentRejectView(APIView):
     permission_classes = [AdminAuth]
 
     def patch(self, request, content_id):
-        blog = Blog.objects.get(id=content_id)
-        blog.moderation_status = Blog.STATUS_REJECTED
-        blog.is_published = False
-        blog.save(update_fields=["moderation_status", "is_published"])
+        # Parse content_type and ID from content_id
+        parts = content_id.split("_", 1)
+        if len(parts) != 2:
+            return Response({"error": "Invalid content ID"}, status=400)
+        
+        content_type, obj_id = parts
+        
+        if content_type == "blog":
+            blog = Blog.objects.get(id=obj_id)
+            blog.moderation_status = Blog.STATUS_REJECTED
+            blog.is_published = False
+            blog.save(update_fields=["moderation_status", "is_published"])
+        elif content_type == "diet":
+            diet = DietPlanTemplate.objects.get(id=obj_id)
+            diet.moderation_status = DietPlanTemplate.STATUS_REJECTED
+            diet.is_published = False
+            diet.save(update_fields=["moderation_status", "is_published"])
+        else:
+            return Response({"error": "Unknown content type"}, status=400)
+        
+        return Response({"status": "Rejected"})
+
+
+class AdminDietPlansView(APIView):
+    """
+    Admin moderation queue for diet plan templates.
+    GET /api/admin/diet-plans?search=&status=
+    """
+
+    permission_classes = [AdminAuth]
+
+    def get(self, request):
+        qs = DietPlanTemplate.objects.select_related("created_by").order_by("-created_at")
+        search = (request.query_params.get("search") or "").strip()
+        status_q = request.query_params.get("status")
+        if search:
+            qs = qs.filter(
+                Q(title__icontains=search) | Q(created_by__username__icontains=search)
+            )
+        if status_q and status_q != "All Status":
+            qs = qs.filter(moderation_status=status_q)
+
+        rows, total, total_pages = paginate_queryset(request, qs, default_limit=8)
+        items = []
+        for t in rows:
+            author = "System"
+            if t.created_by:
+                author = (
+                    f"{t.created_by.first_name} {t.created_by.last_name}".strip()
+                    or t.created_by.username
+                )
+            items.append(
+                {
+                    "id": t.id,
+                    "title": t.title,
+                    "type": "Diet Plan",
+                    "author": author,
+                    "date": t.created_at.strftime("%b %d"),
+                    "status": t.moderation_status,
+                    "risk": "Low",
+                    "body": (t.description or "")[:280],
+                }
+            )
+
+        return Response({"items": items, "total": total, "totalPages": total_pages})
+
+
+class AdminDietPlanApproveView(APIView):
+    permission_classes = [AdminAuth]
+
+    def patch(self, request, template_id):
+        t = DietPlanTemplate.objects.get(id=template_id)
+        t.moderation_status = DietPlanTemplate.STATUS_APPROVED
+        t.is_published = True
+        t.save(update_fields=["moderation_status", "is_published"])
+        return Response({"status": "Approved"})
+
+
+class AdminDietPlanRejectView(APIView):
+    permission_classes = [AdminAuth]
+
+    def patch(self, request, template_id):
+        t = DietPlanTemplate.objects.get(id=template_id)
+        t.moderation_status = DietPlanTemplate.STATUS_REJECTED
+        t.is_published = False
+        t.save(update_fields=["moderation_status", "is_published"])
         return Response({"status": "Rejected"})
 
 

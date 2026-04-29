@@ -1,57 +1,56 @@
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { C, DIET_PLANS } from "./constants/tokens";
+import { C } from "./constants/tokens";
 import FadeUp from "./FadeUp";
+import { publicDietPlanTemplatesApi } from "../../services/api";
+import DietCard from "../../components/diet-plans/DietCard";
 
-function PlanCard({ plan }) {
-  return (
-    <div style={{ borderRadius: 20, overflow: "hidden", background: plan.color, position: "relative", minHeight: 400 }}>
-      <div style={{ fontSize: 110, textAlign: "center", paddingTop: 44, lineHeight: 1, filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.2))" }}>
-        {plan.emoji}
-      </div>
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 28%, rgba(0,0,0,0.85) 100%)" }} />
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 24px 24px" }}>
-        <div
-          style={{
-            display: "inline-block", background: C.lime,
-            borderRadius: 999, padding: "3px 12px",
-            fontFamily: "'Inter', sans-serif", fontSize: 11,
-            fontWeight: 700, color: C.forest, marginBottom: 10,
-          }}
-        >
-          {plan.tag}
-        </div>
-        <h3 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: 26, color: C.white, margin: "0 0 8px", lineHeight: 1.1 }}>
-          {plan.name}
-        </h3>
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.72)", margin: "0 0 14px", lineHeight: 1.55 }}>
-          {plan.desc}
-        </p>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 18 }}>
-          {plan.badges.map((badge) => (
-            <span key={badge} style={{ background: "rgba(255,255,255,0.14)", borderRadius: 999, padding: "3px 10px", fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
-              {badge}
-            </span>
-          ))}
-        </div>
-        <Link
-          to={`/diet/${plan.id}`}
-          style={{
-            background: C.tomato, color: C.white, border: "none",
-            borderRadius: 20, padding: "10px 22px",
-            fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600,
-            display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
-            textDecoration: "none",
-          }}
-        >
-          Explore Plan <ArrowRight size={13} />
-        </Link>
-      </div>
-    </div>
-  );
+const TYPE_IMAGES = {
+  standard: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80",
+  seasonal: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80",
+  medical:  "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&q=80",
+  ramadan:  "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80",
+  custom:   "https://images.unsplash.com/photo-1547496502-affa22e38b2d?w=600&q=80",
+};
+
+const TYPE_LABELS = {
+  standard: "Standard",
+  seasonal: "Seasonal",
+  medical:  "Medical",
+  ramadan:  "Ramadan",
+  custom:   "Custom",
+};
+
+function toCardShape(t) {
+  return {
+    id:          `template-${t.id}`,
+    name:         t.title || "Untitled Plan",
+    description:  t.description || "",
+    image:        t.image_url || TYPE_IMAGES[t.plan_type] || TYPE_IMAGES.standard,
+    tag:          TYPE_LABELS[t.plan_type] || t.plan_type || "Plan",
+  };
 }
 
 export default function DietPlans() {
+  const [state, setState] = useState({ loading: true, items: [] });
+
+  useEffect(() => {
+    publicDietPlanTemplatesApi.list()
+      .then((rows) => {
+        const raw = (Array.isArray(rows) ? rows : rows?.results || [])
+          .filter((t) => t && t.is_published)
+          .slice(0, 3);
+        
+        setState({ loading: false, items: raw.map(toCardShape) });
+      })
+      .catch(() => {
+        setState({ loading: false, items: [] });
+      });
+  }, []);
+
+  if (!state.loading && state.items.length === 0) return null;
+
   return (
     <section style={{ background: C.bg, padding: "80px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -77,16 +76,20 @@ export default function DietPlans() {
                 </Link>
               </div>
             </div>
-            
           </div>
         </FadeUp>
-        <div className="plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-          {DIET_PLANS.map((plan, i) => (
-            <FadeUp key={i} delay={i * 0.1}>
-              <PlanCard plan={plan} />
-            </FadeUp>
-          ))}
-        </div>
+
+        {state.loading ? (
+          <div style={{ textAlign: "center", color: C.forest, opacity: 0.7 }}>Loading plans...</div>
+        ) : (
+          <div className="plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+            {state.items.map((plan, i) => (
+              <FadeUp key={plan.id} delay={i * 0.1}>
+                <DietCard plan={plan} />
+              </FadeUp>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

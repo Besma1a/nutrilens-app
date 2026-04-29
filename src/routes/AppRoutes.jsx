@@ -27,6 +27,7 @@ import Dashboard from "../pages/nutritionist/Dashboard";
 import Clients from "../pages/nutritionist/Clients";
 import CreatePlan from "../pages/nutritionist/CreatePlan";
 import AssignPlan from "../pages/nutritionist/AssignPlan";
+import NutritionistDietPlans from "../pages/nutritionist/DietPlans";
 import Calendar from "../pages/nutritionist/Calendar";
 import Progress from "../pages/nutritionist/Progress";
 import Adjustments from "../pages/nutritionist/Adjustments";
@@ -44,7 +45,6 @@ const UserProfile      = lazy(() => import("../pages/user/Profile"));
 const UserMealPlan     = lazy(() => import("../pages/user/MealPlan"));
 const UserConsultation = lazy(() => import("../pages/user/Consultation"));
 const UserSubscribe    = lazy(() => import("../pages/user/Subscribe"));
-const UserSelectNutritionist = lazy(() => import("../pages/user/SelectNutritionist"));
 const UserProgress     = lazy(() => import("../pages/user/Progress"));
 const UserNotifications = lazy(() => import("../pages/user/Notifications"));
 
@@ -150,6 +150,7 @@ export default function AppRoutes() {
             <Route path="clients" element={<Clients />} />
             <Route path="create-plan" element={<CreatePlan />} />
             <Route path="assign-plan" element={<AssignPlan />} />
+            <Route path="diet-plans" element={<NutritionistDietPlans />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="progress" element={<Progress />} />
             <Route path="adjustments" element={<Adjustments />} />
@@ -176,7 +177,6 @@ export default function AppRoutes() {
             <Route path="tracker" element={<UserTracker />} />
             <Route path="profile" element={<UserProfile />} />
             <Route path="subscribe" element={<UserSubscribe />} />
-            <Route path="select-nutritionist" element={<UserSelectNutritionist />} />
             <Route path="progress" element={<UserProgress />} />
             <Route path="notifications" element={<UserNotifications />} />
 

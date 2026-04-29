@@ -266,7 +266,7 @@ export function Drawer({ open, onClose, title, width = 460, children }) {
 
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.25)", zIndex: 200 }} />}
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.25)", zIndex: 200, backdropFilter: "blur(2px)" }} />}
       <div
         style={{
           position: "fixed",
@@ -312,6 +312,77 @@ export function Drawer({ open, onClose, title, width = 460, children }) {
         <div style={{ padding: isMobile ? "16px" : "20px 24px", flex: 1 }}>{children}</div>
       </div>
     </>
+  );
+}
+
+export function Modal({ open, onClose, title, width = 500, children }) {
+  if (!open) return null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        style={{
+          background: T.white,
+          borderRadius: 20,
+          width: "100%",
+          maxWidth: width,
+          maxHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+          animation: "modalAppear 0.3s ease-out",
+        }}
+      >
+        <style>
+          {`@keyframes modalAppear { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }`}
+        </style>
+        <div
+          style={{
+            padding: "20px 24px",
+            borderBottom: `1px solid ${T.border}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{title}</div>
+          <button
+            onClick={onClose}
+            style={{
+              background: T.grayLt,
+              border: "none",
+              borderRadius: "50%",
+              width: 32,
+              height: 32,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: T.gray,
+              transition: "all 0.2s",
+            }}
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div style={{ padding: 24, overflowY: "auto", flex: 1 }}>{children}</div>
+      </div>
+    </div>
   );
 }
 

@@ -18,6 +18,7 @@ const NOTIFICATIONS_URL = getAPIBaseUrl() + "/notifications";
 // ─── Global token storage ─────────────────────────────────────────────────────
 
 let globalToken = null;
+let onUnauthorizedCallback = null;
 
 const extractRawToken = (tokenLike) => {
   if (!tokenLike) return null;
@@ -42,6 +43,13 @@ export const clearGlobalToken = () => {
   globalToken = null;
 };
 export const getToken = () => globalToken;
+
+/**
+ * Register a callback to be invoked whenever a 401 Unauthorized response is received.
+ */
+export const onUnauthorized = (callback) => {
+  onUnauthorizedCallback = callback;
+};
 
 
 // ─── Core request helper ──────────────────────────────────────────────────────
@@ -74,6 +82,9 @@ const request = async (url, method = "GET", body = null) => {
 
     if (!response.ok) {
       const errorMessage = extractErrorMessage(data);
+      if (response.status === 401 && onUnauthorizedCallback) {
+        onUnauthorizedCallback();
+      }
       throw new Error(errorMessage);
     }
 
@@ -236,7 +247,11 @@ const requestMultipart = async (fullUrl, formData, method = "POST") => {
     }
 
     if (!response.ok) {
-      throw new Error(extractErrorMessage(data));
+      const errorMessage = extractErrorMessage(data);
+      if (response.status === 401 && onUnauthorizedCallback) {
+        onUnauthorizedCallback();
+      }
+      throw new Error(errorMessage);
     }
     return data;
   } catch (error) {
@@ -588,6 +603,58 @@ export const dietPlansApi = {
   getAll: () => {
     return request(`${PROFILES_URL}/diet-plans/`);
   },
+};
+
+export const dietPlanTemplatesApi = {
+  /**
+   * Public catalog (blog-like GET)
+   * GET /api/v1/profiles/diet-plan-templates/
+   */
+  list: () => request(`${PROFILES_URL}/diet-plan-templates/`),
+
+  /**
+   * Nutritionist library (own + system templates)
+   * GET /api/v1/profiles/diet-plan-templates/?scope=mine
+   */
+  listMine: () => request(`${PROFILES_URL}/diet-plan-templates/?scope=mine`),
+
+  /**
+   * POST /api/v1/profiles/diet-plan-templates/
+   */
+  create: (payload) => {
+    if (payload instanceof FormData) {
+      return requestMultipart(`${PROFILES_URL}/diet-plan-templates/`, payload, "POST");
+    }
+    return request(`${PROFILES_URL}/diet-plan-templates/`, "POST", payload);
+  },
+
+  /**
+   * PATCH /api/v1/profiles/diet-plan-templates/:id/
+   */
+  update: (id, payload) => {
+    if (payload instanceof FormData) {
+      return requestMultipart(`${PROFILES_URL}/diet-plan-templates/${id}/`, payload, "PATCH");
+    }
+    return request(`${PROFILES_URL}/diet-plan-templates/${id}/`, "PATCH", payload);
+  },
+
+  /**
+   * DELETE /api/v1/profiles/diet-plan-templates/:id/
+   */
+  remove: (id) => request(`${PROFILES_URL}/diet-plan-templates/${id}/`, "DELETE"),
+};
+
+export const publicDietPlanTemplatesApi = {
+  /**
+   * Public catalog (no auth required)
+   * GET /api/v1/profiles/public-diet-plan-templates/
+   */
+  list: () => request(`${PROFILES_URL}/public-diet-plan-templates/`),
+
+  /**
+   * GET /api/v1/profiles/public-diet-plan-templates/:id/
+   */
+  getOne: (id) => request(`${PROFILES_URL}/public-diet-plan-templates/${id}/`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

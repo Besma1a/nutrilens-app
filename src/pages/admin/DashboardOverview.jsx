@@ -39,8 +39,6 @@ export default function DashboardOverview() {
     {
       label: "Total Users",
       value: stats.totalUsers.toLocaleString(),
-      delta: "↑ +12.5% this month",
-      up: true,
       icon: (
         <>
           <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -52,8 +50,6 @@ export default function DashboardOverview() {
     {
       label: "Nutritionists",
       value: stats.totalNutritionists.toLocaleString(),
-      delta: "↑ +5.2% this month",
-      up: true,
       icon: (
         <>
           <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
@@ -66,8 +62,6 @@ export default function DashboardOverview() {
     {
       label: "Active Subs",
       value: stats.activeSubscriptions.toLocaleString(),
-      delta: "↑ +8.3% this month",
-      up: true,
       icon: (
         <>
           <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -78,8 +72,6 @@ export default function DashboardOverview() {
     {
       label: "Open Tickets",
       value: stats.openTickets.toLocaleString(),
-      delta: "5 urgent · needs attention",
-      up: false,
       icon: <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />,
     },
   ];

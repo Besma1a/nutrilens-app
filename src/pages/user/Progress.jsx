@@ -431,163 +431,160 @@ export default function Progress() {
         </div>
       </div>
 
-      {/* Premium or Free Section */}
-      {isPremium ? (
-        <div className="g2">
-
-          {/* Body Measurements — real data */}
-          <div className="card">
+      {/* Unified Advanced Insights Section (Body Measurements & Feedback) */}
+      <div style={{ position: 'relative', marginBottom: 24, borderRadius: 'var(--r-lg)', overflow: 'hidden' }}>
+        
+        {/* Content Container (Blurred for free users) */}
+        <div className="g2" style={{ 
+          filter: isPremium ? 'none' : 'blur(10px)', 
+          pointerEvents: isPremium ? 'auto' : 'none',
+          userSelect: isPremium ? 'auto' : 'none',
+          transition: 'filter 0.4s ease'
+        }}>
+          
+          {/* Body Measurements Card */}
+          <div className="card" style={{ height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <div className="card-title">Body Measurements</div>
-              <button type="button" className="btn btn-prim btn-xs" onClick={() => setUpdateModal(true)}>+ Update</button>
+              {isPremium && (
+                <button type="button" className="btn btn-prim btn-xs" onClick={() => setUpdateModal(true)}>+ Update</button>
+              )}
             </div>
 
-            {measurementDisplay.length === 0 ? (
-              <div style={{ color: 'var(--ink-5)', fontSize: 13, padding: '12px 0' }}>
-                No measurements logged yet. Click "+ Update" to add your first entry.
-              </div>
-            ) : (
-              measurementDisplay.map(m => (
-                <div className="mtag" key={m.label}>
-                  <div className="mtag-l">{m.label}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div className="mtag-v">{m.val} {m.val !== '—' ? m.unit : ''}</div>
-                    <div className="mtag-d">{m.delta}</div>
-                  </div>
+            {isPremium ? (
+              measurementDisplay.length === 0 ? (
+                <div style={{ color: 'var(--ink-5)', fontSize: 13, padding: '12px 0' }}>
+                  No measurements logged yet. Click "+ Update" to add your first entry.
                 </div>
-              ))
+              ) : (
+                measurementDisplay.map(m => (
+                  <div className="mtag" key={m.label}>
+                    <div className="mtag-l">{m.label}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="mtag-v">{m.val} {m.val !== '—' ? m.unit : ''}</div>
+                      <div className="mtag-d">{m.delta}</div>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : (
+              /* Mock data for blur effect */
+              <>
+                {[
+                  { label: 'Waist', val: '78.5 cm', delta: '↓ 1.2cm' },
+                  { label: 'Hips',  val: '94.2 cm', delta: '↓ 0.8cm' },
+                  { label: 'Chest', val: '102.0 cm', delta: '—' },
+                  { label: 'Arms',  val: '32.4 cm', delta: '↑ 0.5cm' }
+                ].map(m => (
+                  <div className="mtag" key={m.label}>
+                    <div className="mtag-l">{m.label}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="mtag-v">{m.val}</div>
+                      <div className="mtag-d">{m.delta}</div>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
 
-            {/* BMI */}
-            {currentWeight && profileData?.height_cm && (
-              <div className="mtag" style={{ marginBottom: 0 }}>
-                <div className="mtag-l">BMI</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div className="mtag-v">
-                    {(currentWeight / ((profileData.height_cm / 100) ** 2)).toFixed(1)}
-                  </div>
-                  <span className="badge badge-amber" style={{ fontSize: 10 }}>
-                    {(() => {
-                      const bmi = currentWeight / ((profileData.height_cm / 100) ** 2);
-                      if (bmi < 18.5) return 'Underweight';
-                      if (bmi < 25)   return 'Normal';
-                      if (bmi < 30)   return 'Overweight';
-                      return 'Obese';
-                    })()}
-                  </span>
+            {/* BMI (Premium or Mock) */}
+            <div className="mtag" style={{ marginBottom: 0 }}>
+              <div className="mtag-l">BMI</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div className="mtag-v">
+                  {isPremium ? (currentWeight && profileData?.height_cm ? (currentWeight / ((profileData.height_cm / 100) ** 2)).toFixed(1) : '—') : '24.2'}
                 </div>
+                <span className="badge badge-amber" style={{ fontSize: 10 }}>
+                  {isPremium ? (() => {
+                    if (!currentWeight || !profileData?.height_cm) return '—';
+                    const bmi = currentWeight / ((profileData.height_cm / 100) ** 2);
+                    if (bmi < 18.5) return 'Underweight';
+                    if (bmi < 25)   return 'Normal';
+                    if (bmi < 30)   return 'Overweight';
+                    return 'Obese';
+                  })() : 'Normal'}
+                </span>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Nutritionist Feedback — from profiles feedback API */}
-          <div className="card">
+          {/* Nutritionist Feedback Card */}
+          <div className="card" style={{ height: '100%' }}>
             <div className="card-title" style={{ marginBottom: 14 }}>Nutritionist Feedback</div>
-            {feedback.length === 0 ? (
-              <div style={{ fontSize: 13, color: 'var(--ink-5)', padding: '12px 0' }}>
-                No feedback yet. Your nutritionist notes will appear here.
-              </div>
-            ) : (
-              feedback.map((f) => (
-  <div key={f.id || f.created_at} className="tl">
-                  <div className="tl-dot">{f.icon || '💬'}</div>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-2)', fontFamily: 'var(--font)' }}>
-                      {f.created_at ? new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'} · {f.nutritionist_username || 'Nutritionist'}
-                    </div>
-                    {f.title ? (
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginTop: 6 }}>
-                        {f.title}
+            
+            {isPremium ? (
+              feedback.length === 0 ? (
+                <div style={{ fontSize: 13, color: 'var(--ink-5)', padding: '12px 0' }}>
+                  No feedback yet. Your nutritionist notes will appear here.
+                </div>
+              ) : (
+                feedback.map((f) => (
+                  <div key={f.id || f.created_at} className="tl">
+                    <div className="tl-dot">{f.icon || '💬'}</div>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-2)', fontFamily: 'var(--font)' }}>
+                        {f.created_at ? new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'} · {f.nutritionist_username || 'Nutritionist'}
                       </div>
-                    ) : null}
-                    <div style={{ fontSize: 13, color: 'var(--ink-4)', marginTop: 4, lineHeight: 1.6 }}>{f.message || 'No message provided.'}</div>
+                      {f.title ? (
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginTop: 6 }}>
+                          {f.title}
+                        </div>
+                      ) : null}
+                      <div style={{ fontSize: 13, color: 'var(--ink-4)', marginTop: 4, lineHeight: 1.6 }}>{f.message || 'No message provided.'}</div>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : (
+              /* Mock data for feedback */
+              <>
+                <div className="tl">
+                  <div className="tl-dot">🥗</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-2)' }}>Apr 25, 2026 · Dr. Sarah</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginTop: 6 }}>Protein Intake</div>
+                    <div style={{ fontSize: 13, color: 'var(--ink-4)', marginTop: 4 }}>Great job reaching your protein targets this week...</div>
                   </div>
                 </div>
-              ))
+                <div className="tl">
+                  <div className="tl-dot">💧</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-2)' }}>Apr 22, 2026 · Dr. Sarah</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginTop: 6 }}>Hydration Levels</div>
+                    <div style={{ fontSize: 13, color: 'var(--ink-4)', marginTop: 4 }}>You seem to be falling slightly short on water intake...</div>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
 
-      ) : (
-        /* FREE USER — blurred decorative content + lock overlay */
-        <div style={{ position: 'relative', borderRadius: 'var(--r-lg)', overflow: 'hidden' }}>
-          <div style={{ filter: 'blur(4px)', pointerEvents: 'none', userSelect: 'none' }}>
-            <div className="g2">
-              <div className="card">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div className="card-title">Body Measurements</div>
-                  <button type="button" className="btn btn-prim btn-xs" tabIndex={-1}>+ Log Entry</button>
-                </div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                  <thead>
-                    <tr>
-                      {['Date', 'Waist', 'Chest', 'Hips'].map(h => (
-                        <th key={h} style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-5)', padding: '0 6px 10px 0', textAlign: h === 'Date' ? 'left' : 'right' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {measurements.slice(0, 3).map((m, i) => (
-                      <tr key={i}>
-                        <td style={{ padding: '9px 6px 9px 0', borderTop: '1px solid var(--border)', fontWeight: 600, color: 'var(--ink-2)' }}>
-                          {new Date(m.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </td>
-                        <td style={{ padding: '9px 6px 9px 0', borderTop: '1px solid var(--border)', textAlign: 'right', color: 'var(--ink-3)' }}>{m.waist_cm ? `${m.waist_cm} cm` : '—'}</td>
-                        <td style={{ padding: '9px 6px 9px 0', borderTop: '1px solid var(--border)', textAlign: 'right', color: 'var(--ink-3)' }}>{m.chest_cm ? `${m.chest_cm} cm` : '—'}</td>
-                        <td style={{ padding: '9px 6px 9px 0', borderTop: '1px solid var(--border)', textAlign: 'right', color: 'var(--ink-3)' }}>{m.hips_cm ? `${m.hips_cm} cm` : '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="card">
-                <div className="card-title" style={{ marginBottom: 14 }}>Nutritionist Feedback</div>
-                {feedback.length === 0 ? (
-                  <div style={{ fontSize: 13, color: 'var(--ink-5)', padding: '12px 0' }}>
-                    No feedback yet.
-                  </div>
-                ) : (
-                  feedback.map((f, i) => (
-  <div key={f.id || f.created_at} className="tl" style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: i < feedback.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                      <div className="tl-dot">{f.icon || '💬'}</div>
-                      <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-2)', fontFamily: 'var(--font)' }}>
-                          {f.created_at ? new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Recent'}
-                        </div>
-                        {f.title ? (
-                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-2)', marginTop: 6 }}>
-                            {f.title}
-                          </div>
-                        ) : null}
-                        <div style={{ fontSize: 13, color: 'var(--ink-4)', marginTop: 4, lineHeight: 1.6 }}>{f.message || 'Feedback'}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Lock overlay */}
+        {/* Single Global Lock Overlay (Free users only) */}
+        {!isPremium && (
           <div style={{
-            position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.72)',
+            position: 'absolute', inset: 0, 
+            background: 'rgba(255,255,255,0.2)',
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', gap: 10, zIndex: 3, borderRadius: 'var(--r-lg)',
+            justifyContent: 'center', zIndex: 10, padding: 32, textAlign: 'center',
+            backdropFilter: 'blur(2px)'
           }}>
-            <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--g2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M18 10h-1V7c0-2.76-2.24-5-5-5S7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V12c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V7c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v3z"/></svg>
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink-2)', fontFamily: 'var(--font)' }}>Unlock Your Full Potential</div>
-            <button type="button" onClick={() => navigate('/user/Subscribe')} style={{
-              marginTop: 4, padding: '10px 28px', background: 'var(--g2)', color: '#fff',
-              border: 'none', borderRadius: 'var(--r-md)', fontSize: 14, fontWeight: 700,
-              cursor: 'pointer', fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', gap: 6,
+            <div style={{ 
+              width: 64, height: 64, borderRadius: '50%', background: 'var(--g2)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              marginBottom: 16, boxShadow: '0 8px 24px rgba(34,160,90,0.4)' 
             }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M18 10h-1V7c0-2.76-2.24-5-5-5S7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V12c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V7c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v3z"/></svg>
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ink-2)', marginBottom: 8, fontFamily: 'var(--font)' }}>Unlock Advanced Insights</div>
+            <div style={{ fontSize: 14, color: 'var(--ink-3)', maxWidth: 320, marginBottom: 24, lineHeight: 1.5 }}>
+              Upgrade to Premium to track body measurements, calculate BMI, and get direct feedback from our nutritionists.
+            </div>
+            <button type="button" onClick={() => navigate('/user/Subscribe')} className="btn btn-prim" style={{ padding: '12px 32px', fontSize: 15 }}>
               Upgrade to Premium →
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Update Progress Modal (Premium only) */}
       {isPremium && updateModal && (

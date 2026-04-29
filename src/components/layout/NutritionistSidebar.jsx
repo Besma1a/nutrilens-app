@@ -25,7 +25,7 @@ function getInitials(name) {
    TODO: replace with WebSocket or polling against your notifications endpoint.
 ────────────────────────────────────────────────────────────────────────── */
 function useUnreadCounts() {
-  const [counts, setCounts] = useState({ calendar: 3, notifications: 2 });
+  const [counts, setCounts] = useState({ notifications: 2 });
   // useEffect(() => {
   //   const ws = new WebSocket(API_CONFIG.wsUrl);
   //   ws.onmessage = e => setCounts(JSON.parse(e.data).unread);
@@ -53,6 +53,7 @@ const ICONS = {
   Sliders:      <><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></>,
   Messages:     <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></>,
   Blog:         <><path d="M4 4h16v16H4z" /><path d="M7 8h10M7 12h6M7 16h6" strokeWidth="1.5" /></>,
+  DietPlans:    <><path d="M4 19c4-3 12-3 16 0" /><path d="M8 7h8" /><path d="M6 3h12v14H6z" /></>,
   Chevron:      <polyline points="9 18 15 12 9 6" />,
   Menu:         <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>,
 };
@@ -66,12 +67,13 @@ const SECTIONS = [
       { path: '/nutritionist/clients',     icon: 'Patients',     label: 'Patients'         },
       { path: '/nutritionist/create-plan', icon: 'CreatePlan',   label: 'Create Diet Plan' },
       { path: '/nutritionist/assign-plan', icon: 'Assign',       label: 'Assign Plan'      },
+      { path: '/nutritionist/diet-plans',  icon: 'DietPlans',    label: 'Diet Plans'       },
     ],
   },
   {
     label: 'Tools',
     items: [
-      { path: '/nutritionist/calendar',    icon: 'Consultation', label: 'Calendar',           badgeKey: 'calendar'  },
+      { path: '/nutritionist/calendar',    icon: 'Consultation', label: 'Calendar'           },
       { path: '/nutritionist/progress',    icon: 'Progress',     label: 'Progress Monitoring' },
       { path: '/nutritionist/adjustments', icon: 'Sliders',      label: 'Plan Adjustments'    },
       { path: '/nutritionist/blogs',       icon: 'Blog',         label: 'Blog Posts'          },
@@ -84,6 +86,7 @@ const META = {
   '/nutritionist/clients':      { title: 'Patients',            sub: 'Active caseload and engagement'    },
   '/nutritionist/create-plan':  { title: 'Create Diet Plan',    sub: 'Build personalized meal plans'     },
   '/nutritionist/assign-plan':  { title: 'Assign Plan',         sub: 'Send plans to patients'            },
+  '/nutritionist/diet-plans':   { title: 'Diet Plans',         sub: 'Build your reusable plan library'   },
   '/nutritionist/calendar':     { title: 'Calendar',            sub: 'Appointments and follow-ups'       },
   '/nutritionist/progress':     { title: 'Progress Monitoring', sub: 'Track outcomes over time'          },
   '/nutritionist/adjustments':  { title: 'Plan Adjustments',    sub: 'Fine-tune assigned plans'          },

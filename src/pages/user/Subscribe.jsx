@@ -60,7 +60,7 @@ export default function Subscribe() {
         type:     'success',
         duration: 5000,
       });
-      navigate(plan.is_featured ? '/user/select-nutritionist' : '/user/dashboard');
+      navigate('/nutritionists?from=subscription');
     } catch (err) {
       toast({
         message: err.message || 'Subscription failed. Please try again.',
