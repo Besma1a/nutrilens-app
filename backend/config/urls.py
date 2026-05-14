@@ -8,7 +8,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from profiles.views import NutritionistPatientsView, PlanAssignmentPatchView
-from adminpanel.views import PublicSupportTicketCreateView, PublicTestimonialsView
+from adminpanel.views import PublicSupportTicketCreateView, PublicTestimonialsView, NewsletterSubscribeView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -52,6 +52,7 @@ urlpatterns = [
     path("api/v1/blogs/", include("blogs.urls")),
     path("api/v1/testimonials/", PublicTestimonialsView.as_view(), name="public-testimonials"),
     path("api/v1/support/tickets/", PublicSupportTicketCreateView.as_view(), name="public-support-ticket-create"),
+    path("api/v1/newsletter/subscribe/", NewsletterSubscribeView.as_view(), name="newsletter-subscribe"),
     path("api/admin/", include("adminpanel.urls")),
 
     # DRF browsable API login (dev only)
@@ -61,9 +62,4 @@ urlpatterns = [
 # Serve uploaded media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(
-        "/uploads/",
-        document_root=settings.MEDIA_ROOT,
-        show_indexes=False,
-    )
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

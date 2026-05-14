@@ -376,54 +376,7 @@ export default function AssignPlan() {
         </button>
       </div>
 
-      {/* Recently Assigned - Kept as secondary card */}
-      <div style={{ ...card, marginTop: 20 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--gray-600)", marginBottom: 16 }}>
-          Recently Assigned Plans
-        </div>
-        {[
-          { init: "NA", name: "Nour Abdalla", detail: "Mediterranean · 1500 kcal — Assigned Mar 1, 2026", bg: "linear-gradient(135deg,#4E9A78,#3D8363)" },
-          { init: "KA", name: "Karim Al-Hassan", detail: "Standard Weight Loss · 1600 kcal — Assigned Feb 20, 2026", bg: "linear-gradient(135deg,#5A8FBF,#4A7AAF)" },
-        ].map((item) => (
-          <div key={item.name} style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            padding: "13px 0",
-            borderBottom: "1px solid var(--border-light)"
-          }}>
-            <div style={{
-              width: 38,
-              height: 38,
-              borderRadius: "50%",
-              background: item.bg,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 12.5,
-              fontWeight: 700,
-              color: "white",
-              flexShrink: 0
-            }}>
-              {item.init}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--gray-800)" }}>{item.name}</div>
-              <div style={{ fontSize: 12.5, color: "var(--gray-500)" }}>{item.detail}</div>
-            </div>
-            <span style={{
-              padding: "4px 11px",
-              borderRadius: 20,
-              fontSize: 11.5,
-              fontWeight: 600,
-              background: "var(--green-light)",
-              color: "var(--green-dark)"
-            }}>
-              Active
-            </span>
-          </div>
-        ))}
-      </div>
+
     </>
   );
 }

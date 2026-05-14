@@ -87,7 +87,7 @@ const styles = {
     fontSize: "13px",
     fontWeight: "600",
     color: "#ffffff",
-    backgroundColor: "#F19335",
+    backgroundColor: "#A50C05",
     padding: "8px 18px",
     borderRadius: "50px",
     fontFamily: "'DM Sans', sans-serif",

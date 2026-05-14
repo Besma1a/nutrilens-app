@@ -82,9 +82,7 @@ export default function RevenuePage() {
         <div style={css.cardPad}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: T.text }}>Monthly Revenue</span>
-            <select style={{ border: `1px solid ${T.border}`, borderRadius: 7, padding: "5px 10px", fontSize: 12, color: T.text, background: T.white, outline: "none" }}>
-              <option>2024</option>
-            </select>
+      
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={statsPayload.monthlyRevenue}>
@@ -194,15 +192,9 @@ export default function RevenuePage() {
             <DrawerField label="Plan" value={selected.plan} />
             <DrawerField label="Amount" value={selected.amount} />
             <DrawerField label="Date" value={selected.date} />
-            <DrawerField label="Payment Method" value={`${selected.method} ending in ····4242`} />
+            <DrawerField label="Payment Method" value="No payment gateway" />
             <DrawerField label="Transaction ID" value={selected.txnId} />
-            {selected.status === "Failed" && (
-              <div style={{ background: T.redLt, borderRadius: 8, padding: "12px 14px", marginTop: 12, fontSize: 13, color: T.redTx }}>
-                <strong>Payment failed.</strong> Card declined — insufficient funds.
-              </div>
-            )}
             <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
-              <button style={css.btn(T.white, T.text, `1px solid ${T.border}`)}>Download Invoice</button>
               {selected.status === "Paid" && isRealTransactionId(selected.id) && (
                 <button style={css.btn(T.redLt, T.redTx)} onClick={() => apiFetch(`/transactions/${selected.id}/refund`, { method: "POST" }).then(() => { setSuccessMsg("Refund issued"); setTimeout(() => setSuccessMsg(""), 1500); setSelected(null); })}>
                   Issue Refund

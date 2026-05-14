@@ -1,0 +1,188 @@
+<svg viewBox="0 0 1400 1000" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif" role="img">
+<title>NutriLens Use Case Diagram</title>
+<desc>UML Use Case Diagram for NutriLens showing actors Guest, Patient, Nutritionist, and System Admin with their use cases grouped by functional area</desc>
+<rect width="1400" height="1000" fill="#ffffff"/>
+<text x="700" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#111">NutriLens — Use Case Diagram</text>
+<rect x="148" y="38" width="1240" height="944" rx="4" fill="none" stroke="#556" stroke-width="1.8"/>
+<text x="768" y="32" text-anchor="middle" font-size="10.5" fill="#556" font-style="italic">«system»  NutriLens</text>
+<rect x="152" y="43" width="294" height="934" rx="5" fill="#e8eeff" stroke="#7090cc" stroke-width="1"/>
+<text x="299" y="60" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a3580">Authentication &amp; Public Access</text>
+<rect x="456" y="43" width="294" height="934" rx="5" fill="#e8fff0" stroke="#60a878" stroke-width="1"/>
+<text x="603" y="60" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a5c30">Patient Features</text>
+<rect x="762" y="43" width="294" height="934" rx="5" fill="#fff5e8" stroke="#c09050" stroke-width="1"/>
+<text x="909" y="60" text-anchor="middle" font-size="9.5" font-weight="700" fill="#804000">Nutritionist Features</text>
+<rect x="1068" y="43" width="294" height="934" rx="5" fill="#fff0f0" stroke="#cc8090" stroke-width="1"/>
+<text x="1215" y="60" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a1020">Administration</text>
+<ellipse cx="299" cy="128" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="132" text-anchor="middle" font-size="9.5" fill="#111">Register Account</text>
+<ellipse cx="299" cy="207" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="211" text-anchor="middle" font-size="9.5" fill="#111">Login / Logout</text>
+<ellipse cx="299" cy="286" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="290" text-anchor="middle" font-size="9.5" fill="#111">Verify Email</text>
+<ellipse cx="299" cy="365" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="358" text-anchor="middle" font-size="9.5" fill="#111">Complete Health</text>
+<text x="299" y="372" text-anchor="middle" font-size="9.5" fill="#111">Onboarding</text>
+<ellipse cx="299" cy="444" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="448" text-anchor="middle" font-size="9.5" fill="#111">View Blog Posts</text>
+<ellipse cx="299" cy="523" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="516" text-anchor="middle" font-size="9.5" fill="#111">View Public Diet</text>
+<text x="299" y="530" text-anchor="middle" font-size="9.5" fill="#111">Catalog</text>
+<ellipse cx="299" cy="602" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="606" text-anchor="middle" font-size="9.5" fill="#111">View Testimonials</text>
+<ellipse cx="299" cy="681" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="674" text-anchor="middle" font-size="9.5" fill="#111">Submit Support</text>
+<text x="299" y="688" text-anchor="middle" font-size="9.5" fill="#111">Ticket</text>
+<ellipse cx="299" cy="760" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="299" y="764" text-anchor="middle" font-size="9.5" fill="#111">Subscribe Newsletter</text>
+<ellipse cx="603" cy="128" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="121" text-anchor="middle" font-size="9.5" fill="#111">Scan Meal</text>
+<text x="603" y="135" text-anchor="middle" font-size="9.5" fill="#111">AI Food Detection</text>
+<ellipse cx="603" cy="207" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="200" text-anchor="middle" font-size="9.5" fill="#111">Log Meal</text>
+<text x="603" y="214" text-anchor="middle" font-size="9.5" fill="#111">Manually</text>
+<ellipse cx="603" cy="286" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="290" text-anchor="middle" font-size="9.5" fill="#111">View Meal History</text>
+<ellipse cx="603" cy="365" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="369" text-anchor="middle" font-size="9.5" fill="#111">Track Daily Nutrition</text>
+<ellipse cx="603" cy="444" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="448" text-anchor="middle" font-size="9.5" fill="#111">Log Weight Entry</text>
+<ellipse cx="603" cy="523" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="516" text-anchor="middle" font-size="9.5" fill="#111">Track Body</text>
+<text x="603" y="530" text-anchor="middle" font-size="9.5" fill="#111">Measurements</text>
+<ellipse cx="603" cy="602" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="606" text-anchor="middle" font-size="9.5" fill="#111">View Dashboard</text>
+<ellipse cx="603" cy="681" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="685" text-anchor="middle" font-size="9.5" fill="#111">Book Consultation</text>
+<ellipse cx="603" cy="760" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="753" text-anchor="middle" font-size="9.5" fill="#111">View Assigned</text>
+<text x="603" y="767" text-anchor="middle" font-size="9.5" fill="#111">Diet Plan</text>
+<ellipse cx="603" cy="839" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="843" text-anchor="middle" font-size="9.5" fill="#111">Subscribe to Premium</text>
+<ellipse cx="603" cy="918" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="603" y="911" text-anchor="middle" font-size="9.5" fill="#111">View Notifications</text>
+<text x="603" y="925" text-anchor="middle" font-size="9.5" fill="#111">&amp; Feedback</text>
+<ellipse cx="909" cy="128" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="132" text-anchor="middle" font-size="9.5" fill="#111">View Patient List</text>
+<ellipse cx="909" cy="207" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="200" text-anchor="middle" font-size="9.5" fill="#111">View Patient</text>
+<text x="909" y="214" text-anchor="middle" font-size="9.5" fill="#111">Meal Logs</text>
+<ellipse cx="909" cy="286" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="279" text-anchor="middle" font-size="9.5" fill="#111">View Patient</text>
+<text x="909" y="293" text-anchor="middle" font-size="9.5" fill="#111">Weight Progress</text>
+<ellipse cx="909" cy="365" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="369" text-anchor="middle" font-size="9.5" fill="#111">Create Diet Plan</text>
+<ellipse cx="909" cy="444" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="437" text-anchor="middle" font-size="9.5" fill="#111">Assign Diet Plan</text>
+<text x="909" y="451" text-anchor="middle" font-size="9.5" fill="#111">to Patient</text>
+<ellipse cx="909" cy="523" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="516" text-anchor="middle" font-size="9.5" fill="#111">Create Diet Plan</text>
+<text x="909" y="530" text-anchor="middle" font-size="9.5" fill="#111">Template</text>
+<ellipse cx="909" cy="602" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="595" text-anchor="middle" font-size="9.5" fill="#111">Send Feedback</text>
+<text x="909" y="609" text-anchor="middle" font-size="9.5" fill="#111">to Patient</text>
+<ellipse cx="909" cy="681" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="685" text-anchor="middle" font-size="9.5" fill="#111">Manage Consultations</text>
+<ellipse cx="909" cy="760" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="909" y="753" text-anchor="middle" font-size="9.5" fill="#111">View Nutritionist</text>
+<text x="909" y="767" text-anchor="middle" font-size="9.5" fill="#111">Dashboard</text>
+<ellipse cx="1215" cy="128" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="132" text-anchor="middle" font-size="9.5" fill="#111">Manage Users</text>
+<ellipse cx="1215" cy="207" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="211" text-anchor="middle" font-size="9.5" fill="#111">Manage Nutritionists</text>
+<ellipse cx="1215" cy="286" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="279" text-anchor="middle" font-size="9.5" fill="#111">Approve Diet Plan</text>
+<text x="1215" y="293" text-anchor="middle" font-size="9.5" fill="#111">Templates</text>
+<ellipse cx="1215" cy="365" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="358" text-anchor="middle" font-size="9.5" fill="#111">Manage</text>
+<text x="1215" y="372" text-anchor="middle" font-size="9.5" fill="#111">Subscriptions</text>
+<ellipse cx="1215" cy="444" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="437" text-anchor="middle" font-size="9.5" fill="#111">View Revenue</text>
+<text x="1215" y="451" text-anchor="middle" font-size="9.5" fill="#111">Statistics</text>
+<ellipse cx="1215" cy="523" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="527" text-anchor="middle" font-size="9.5" fill="#111">Manage Blog Posts</text>
+<ellipse cx="1215" cy="602" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="595" text-anchor="middle" font-size="9.5" fill="#111">Handle Support</text>
+<text x="1215" y="609" text-anchor="middle" font-size="9.5" fill="#111">Tickets</text>
+<ellipse cx="1215" cy="681" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="685" text-anchor="middle" font-size="9.5" fill="#111">Manage Testimonials</text>
+<ellipse cx="1215" cy="760" rx="128" ry="22" fill="#fff" stroke="#334" stroke-width="1.3"/>
+<text x="1215" y="753" text-anchor="middle" font-size="9.5" fill="#111">Manage Newsletter</text>
+<text x="1215" y="767" text-anchor="middle" font-size="9.5" fill="#111">Subscribers</text>
+<line x1="102.0" y1="238.0" x2="171.0" y2="128.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="207.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="286.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="365.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="444.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="523.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="602.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="681.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="238.0" x2="171.0" y2="760.0" stroke="#1a1a1a" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="128.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="207.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="286.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="365.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="444.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="523.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="602.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="681.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="760.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="839.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="490.0" x2="475.0" y2="918.0" stroke="#1a5c30" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="128.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="207.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="286.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="365.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="444.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="523.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="602.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="681.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="718.0" x2="781.0" y2="760.0" stroke="#804000" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="128.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="207.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="286.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="365.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="444.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="523.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="602.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="681.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="102.0" y1="910.0" x2="1087.0" y2="760.0" stroke="#7a1020" stroke-width="0.9"/>
+<line x1="72" y1="284" x2="72" y2="432" stroke="#444" stroke-width="1.3"/>
+<polygon points="72,283 64,297 80,297" fill="white" stroke="#444" stroke-width="1.3"/>
+<text x="86" y="362" font-size="9" fill="#666" font-style="italic">extends</text>
+<line x1="72" y1="536" x2="72" y2="660" stroke="#444" stroke-width="1.3"/>
+<polygon points="72,535 64,549 80,549" fill="white" stroke="#444" stroke-width="1.3"/>
+<text x="86" y="602" font-size="9" fill="#666" font-style="italic">extends</text>
+<circle cx="72" cy="188" r="15" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+<line x1="72" y1="203" x2="72" y2="246" stroke="#1a1a1a" stroke-width="1.5"/>
+<line x1="46" y1="218" x2="98" y2="218" stroke="#1a1a1a" stroke-width="1.5"/>
+<line x1="72" y1="246" x2="54" y2="276" stroke="#1a1a1a" stroke-width="1.5"/>
+<line x1="72" y1="246" x2="90" y2="276" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="72" y="293" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Guest</text>
+<circle cx="72" cy="440" r="15" fill="none" stroke="#1a5c30" stroke-width="1.5"/>
+<line x1="72" y1="455" x2="72" y2="498" stroke="#1a5c30" stroke-width="1.5"/>
+<line x1="46" y1="470" x2="98" y2="470" stroke="#1a5c30" stroke-width="1.5"/>
+<line x1="72" y1="498" x2="54" y2="528" stroke="#1a5c30" stroke-width="1.5"/>
+<line x1="72" y1="498" x2="90" y2="528" stroke="#1a5c30" stroke-width="1.5"/>
+<text x="72" y="545" text-anchor="middle" font-size="11" font-weight="600" fill="#1a5c30">Patient</text>
+<text x="72" y="559" text-anchor="middle" font-size="9" fill="#1a5c30" font-style="italic">(extends Guest)</text>
+<circle cx="72" cy="668" r="15" fill="none" stroke="#804000" stroke-width="1.5"/>
+<line x1="72" y1="683" x2="72" y2="726" stroke="#804000" stroke-width="1.5"/>
+<line x1="46" y1="698" x2="98" y2="698" stroke="#804000" stroke-width="1.5"/>
+<line x1="72" y1="726" x2="54" y2="756" stroke="#804000" stroke-width="1.5"/>
+<line x1="72" y1="726" x2="90" y2="756" stroke="#804000" stroke-width="1.5"/>
+<text x="72" y="773" text-anchor="middle" font-size="11" font-weight="600" fill="#804000">Nutritionist</text>
+<text x="72" y="787" text-anchor="middle" font-size="9" fill="#804000" font-style="italic">(extends Patient)</text>
+<circle cx="72" cy="860" r="15" fill="none" stroke="#7a1020" stroke-width="1.5"/>
+<line x1="72" y1="875" x2="72" y2="918" stroke="#7a1020" stroke-width="1.5"/>
+<line x1="46" y1="890" x2="98" y2="890" stroke="#7a1020" stroke-width="1.5"/>
+<line x1="72" y1="918" x2="54" y2="948" stroke="#7a1020" stroke-width="1.5"/>
+<line x1="72" y1="918" x2="90" y2="948" stroke="#7a1020" stroke-width="1.5"/>
+<text x="72" y="965" text-anchor="middle" font-size="11" font-weight="600" fill="#7a1020">System Admin</text>
+<rect x="158" y="930" width="560" height="58" rx="4" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
+<text x="168" y="946" font-size="9.5" font-weight="700" fill="#333">Legend</text>
+<line x1="168" y1="962" x2="240" y2="962" stroke="#444" stroke-width="1.3"/>
+<polygon points="240,962 232,957 232,967" fill="white" stroke="#444" stroke-width="1.3"/>
+<text x="246" y="966" font-size="9" fill="#333">Actor generalization (extends)</text>
+<line x1="168" y1="980" x2="240" y2="980" stroke="#888" stroke-width="0.9"/>
+<text x="246" y="984" font-size="9" fill="#333">Actor – use case association</text>
+</svg>

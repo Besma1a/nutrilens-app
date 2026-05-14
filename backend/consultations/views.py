@@ -71,17 +71,19 @@ class NutritionistViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        ctx = {"request": request}
         if request.method == 'GET':
-            return Response(NutritionistSerializer(nutritionist).data)
+            return Response(NutritionistSerializer(nutritionist, context=ctx).data)
 
         serializer = NutritionistSelfUpdateSerializer(
             nutritionist,
             data=request.data,
             partial=True,
+            context=ctx,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(NutritionistSerializer(nutritionist).data)
+        return Response(NutritionistSerializer(nutritionist, context=ctx).data)
 
 
 class ConsultationViewSet(viewsets.ModelViewSet):

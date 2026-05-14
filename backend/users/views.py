@@ -33,6 +33,35 @@ User = get_user_model()
 # Single source of truth so every auth endpoint returns the same shape.
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _resolve_profile_picture(user):
+    """
+    Return the best available profile-picture URL for a user.
+
+    Priority:
+      1. CustomUser.profile_picture  (set when a user uploads via their profile page)
+      2. Nutritionist.profile_picture (set via the admin / nutritionist profile page)
+         — looked up by email because Nutritionist has no FK to CustomUser.
+      3. None
+    """
+    try:
+        pic = user.profile_picture
+        if pic and pic.name:
+            return pic.url
+    except Exception:
+        pass
+
+    if getattr(user, 'is_nutritionist', False):
+        try:
+            from consultations.models import Nutritionist
+            nut = Nutritionist.objects.filter(email=user.email).first()
+            if nut and nut.profile_picture and nut.profile_picture.name:
+                return nut.profile_picture.url
+        except Exception:
+            pass
+
+    return None
+
+
 def build_user_payload(user):
     """
     Returns the user object expected by AuthContext.normalizeUser().
@@ -50,7 +79,7 @@ def build_user_payload(user):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'name': f"{user.first_name} {user.last_name}".strip() or user.username,
-        'profile_picture': user.profile_picture.url if getattr(user, "profile_picture", None) else None,
+        'profile_picture': _resolve_profile_picture(user),
         'gender': user.gender,
         'dob': str(user.date_of_birth) if user.date_of_birth else None,
         'location': user.location,
@@ -59,6 +88,7 @@ def build_user_payload(user):
         'diet_style': user.diet_style,
         'activity_level': user.activity_level,
         'sleep_target_hours': user.sleep_target_hours,
+        'phone_number': user.phone_number or '',
         'medical_conditions': user.medical_conditions,
         'medications': user.medications,
         'allergies': user.allergies,
@@ -311,8 +341,10 @@ class UserProfileViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['get'])
     def me(self, request):
         """GET /api/v1/users/profile/me/"""
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data)
+        # Use build_user_payload so nutritionist profile pictures are resolved
+        # the same way as login/register — avoids a separate code path for
+        # CustomUser.profile_picture vs Nutritionist.profile_picture.
+        return Response(build_user_payload(request.user))
 
     # ── UPDATE PROFILE ────────────────────────────────────────────────
     @action(detail=False, methods=['put', 'patch'])

@@ -112,7 +112,7 @@ function getInitials(name) {
 function asAbsoluteMediaUrl(urlOrPath) {
   if (!urlOrPath || typeof urlOrPath !== "string") return null;
   if (urlOrPath.startsWith("http")) return urlOrPath;
-  return `${window.location.protocol}//localhost:8000${urlOrPath}`;
+  return `${window.location.protocol}//${window.location.hostname}:8000${urlOrPath}`;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -416,9 +416,6 @@ export default function ConsultationContent() {
           </div>
           <button type="button" className="btn btn-prim" style={{ width: '100%', marginBottom: 8 }} onClick={openBook}>
             Book New Session
-          </button>
-          <button className="btn btn-sec btn-sm" style={{ width: '100%' }} onClick={() => navigate('/user/messages')}>
-            Send Message
           </button>
         </div>
       </div>

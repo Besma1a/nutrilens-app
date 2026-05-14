@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../hooks/useAuth';
 import Avatar from "../../components/common/Avatar";
 
-export default function Header() {
+export default function Header({ bg = C.white, scrolledBg = "rgba(254,248,224,0.96)" }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [featOpen, setFeatOpen] = useState(false);
   const [scrolled, setScrolled]  = useState(false);
@@ -14,7 +14,13 @@ export default function Header() {
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
 
+  // Admin users authenticate via a separate token that AuthContext never
+  // sees. Check localStorage directly so the avatar still appears when an
+  // admin visits the public home page.
+  const isAdminSession = !isAuthenticated && !!localStorage.getItem("adminToken");
+
   const getDashboardPath = () => {
+    if (isAdminSession) return "/admin/dashboard";
     if (user?.isStaff || user?.isSuperuser) return "/admin/dashboard";
     if (user?.isNutritionist) return "/nutritionist/dashboard";
     return "/user/dashboard";
@@ -40,7 +46,7 @@ export default function Header() {
     <header
       className="public-header"
       style={{
-        background: scrolled ? "rgba(254,248,224,0.96)" : C.white,
+        background: scrolled ? scrolledBg : bg,
         borderBottom: scrolled ? `1px solid ${C.bg}` : "none",
         backdropFilter: scrolled ? "blur(12px)" : "none",
         position: "fixed",
@@ -55,18 +61,13 @@ export default function Header() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
 
           {/* Logo */}
-          <Link
-            to="/"
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontWeight: 800,
-              fontSize: 26,
-              color: C.forest,
-              letterSpacing: "-0.5px",
-              textDecoration: "none",
-            }}
-          >
-            Nutri<span style={{ color: C.tomato }}>lens</span>
+          <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+            <img
+              src="/logos/nutrilens-logo-horizontal.svg"
+              alt="NutriLens"
+              height="34"
+              style={{ display: "block" }}
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -158,10 +159,10 @@ export default function Header() {
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {isAuthenticated ? (
+            {isAuthenticated || isAdminSession ? (
               <button
                 onClick={() => navigate(getDashboardPath())}
-                title="Go to dashboard"
+                title={isAdminSession ? "Back to admin panel" : "Go to dashboard"}
                 style={{
                   width: 38,
                   height: 38,
@@ -175,13 +176,29 @@ export default function Header() {
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "white",
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
-                <Avatar
-                  user={user}
-                  size={38}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                {isAdminSession ? (
+                  // Admin has no Avatar in AuthContext — render initials from
+                  // the adminUser object stored in localStorage.
+                  (() => {
+                    try {
+                      const a = JSON.parse(localStorage.getItem("adminUser") || "{}");
+                      const name = a.name || "A";
+                      return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+                    } catch { return "A"; }
+                  })()
+                ) : (
+                  <Avatar
+                    user={user}
+                    size={38}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                )}
               </button>
             ) : (
               <Link

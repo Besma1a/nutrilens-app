@@ -150,7 +150,7 @@ const styles = {
   },
   backLink: {
     fontSize: "14px",
-    color: "#888",
+    color: "#a50c05",
     textDecoration: "none",
     fontWeight: "500",
     transition: "color 0.2s",
@@ -249,8 +249,9 @@ const styles = {
   footerBack: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#F19335",
+    color: "#a50c05",
     textDecoration: "none",
+    padding: "14px 16px",
   },
   notFound: {
     textAlign: "center",

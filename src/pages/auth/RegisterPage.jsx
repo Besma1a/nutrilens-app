@@ -74,6 +74,15 @@ export default function RegisterPage() {
 
   return (
     <div className="auth-page">
+      <div className="auth-topbar">
+        <img src="/logos/nutrilens-logo-horizontal.svg" alt="NutriLens" height="32" />
+        <Link to="/" className="auth-topbar-home">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span>Back to Home</span>
+        </Link>
+      </div>
       <div className="auth-layout">
         <div className="auth-visual">
           <div className="auth-visual-inner">

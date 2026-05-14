@@ -75,12 +75,22 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-layout">
+      <div className="auth-topbar">
+        <img src="/logos/nutrilens-logo-horizontal.svg" alt="NutriLens" height="32" />
+        <Link to="/" className="auth-topbar-home">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
+      <div className="auth-layout" style={{ paddingTop: "50px" }}>
         <div className="auth-visual">
           <div className="auth-visual-inner">
             <img
-              src="https://images.unsplash.com/photo-1525296416200-59aaed194d0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaXRuZXNzJTIwZXhlcmNpc2UlMjB3b21hbnxlbnwxfHx8fDE3NzUyMzg5NTN8MA&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Fitness and exercise"
+              src="/media/login.png"
+              alt="NutriLens login"
             />
           </div>
         </div>

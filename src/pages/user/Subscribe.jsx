@@ -10,7 +10,7 @@ const TABLE_ROWS = [
   { feature: 'AI Meal Scans',              free: '3/day',  premium: 'Unlimited' },
   { feature: 'Personalized Meal Plans',    free: '✗',      premium: '✓' },
   { feature: 'Nutritionist Consultations', free: '✗',      premium: '4/week' },
-  { feature: 'Direct Messaging',           free: '✗',      premium: '✓' },
+  { feature: 'Ongoing WhatsApp Mentorship',           free: '✗',      premium: '✓' },
   { feature: 'Progress Reports',           free: 'Basic',  premium: 'Advanced' },
 ];
 

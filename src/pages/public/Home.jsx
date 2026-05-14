@@ -28,7 +28,7 @@ export default function Home() {
     <div className="public-page">
       <Header />
       {/* Header is `position: fixed` with height ~72px */}
-      <main style={{ paddingTop: 72 }}>
+      <main style={{ paddingTop: 50 }}>
         <Hero />
         <Consultation />
         <AITracker />

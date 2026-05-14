@@ -339,8 +339,10 @@ const styles = {
   footerBack: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#F19335",
+    color: "#DC2626",
     textDecoration: "none",
+    padding: "16px 0",
+    display: "inline-block",
   },
   notFound: {
     textAlign: "center",

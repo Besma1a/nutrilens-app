@@ -1,0 +1,321 @@
+<svg viewBox="0 0 1500 1400" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif" role="img">
+<title>NutriLens Class Diagram</title>
+<desc>UML Class Diagram for the NutriLens system showing all main domain classes, their attributes, methods, and relationships</desc>
+<rect width="1500" height="1400" fill="#fafafa"/>
+<text x="750" y="30" text-anchor="middle" font-size="15" font-weight="700" fill="#111">NutriLens — Class Diagram</text>
+<rect x="18" y="42" width="450" height="535" rx="6" fill="#e8f0ff" stroke="#90a8dd" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="26" y="57" font-size="9.5" font-weight="700" fill="#90a8dd">User Domain</text>
+<rect x="518" y="42" width="730" height="535" rx="6" fill="#e8fff0" stroke="#80c090" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="526" y="57" font-size="9.5" font-weight="700" fill="#80c090">Meal Domain</text>
+<rect x="1018" y="42" width="460" height="535" rx="6" fill="#f0e8ff" stroke="#a070cc" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="1026" y="57" font-size="9.5" font-weight="700" fill="#a070cc">Health Tracking</text>
+<rect x="18" y="608" width="460" height="460" rx="6" fill="#fff4e8" stroke="#d09055" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="26" y="623" font-size="9.5" font-weight="700" fill="#d09055">Diet Domain</text>
+<rect x="518" y="608" width="730" height="530" rx="6" fill="#fffce8" stroke="#c0aa40" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="526" y="623" font-size="9.5" font-weight="700" fill="#c0aa40">Consultation Domain</text>
+<rect x="518" y="884" width="460" height="130" rx="6" fill="#ffe8e8" stroke="#cc8080" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="526" y="899" font-size="9.5" font-weight="700" fill="#cc8080">Admin Domain</text>
+<rect x="766" y="1046" width="460" height="130" rx="6" fill="#ffe8e8" stroke="#cc8080" stroke-width="1" stroke-dasharray="4,2"/>
+<line x1="236" y1="110" x2="278" y2="107" stroke="#3355aa" stroke-width="1.1"/>
+<polyline points="267.4,112.8 278,107 266.7,102.8" fill="none" stroke="#3355aa" stroke-width="1.1"/>
+<text x="254" y="105" font-size="9" fill="#3355aa" text-anchor="middle">1</text>
+<text x="260" y="104" font-size="9" fill="#3355aa" text-anchor="middle">1</text>
+<text x="257" y="104" font-size="9" fill="#3355aa" text-anchor="middle" font-style="italic">has profile</text>
+<line x1="236" y1="277" x2="278" y2="429" stroke="#3355aa" stroke-width="1.1"/>
+<polyline points="270.3,419.7 278,429 279.9,417.1" fill="none" stroke="#3355aa" stroke-width="1.1"/>
+<text x="241" y="290" font-size="9" fill="#3355aa" text-anchor="middle">1</text>
+<text x="273" y="408" font-size="9" fill="#3355aa" text-anchor="middle">1</text>
+<text x="257" y="348" font-size="9" fill="#3355aa" text-anchor="middle" font-style="italic">has preferences</text>
+<line x1="236" y1="138" x2="528" y2="153" stroke="#225533" stroke-width="1.1"/>
+<polyline points="516.8,157.4 528,153 517.3,147.4" fill="none" stroke="#225533" stroke-width="1.1"/>
+<text x="254" y="135" font-size="9" fill="#225533" text-anchor="middle">1</text>
+<text x="510" y="148" font-size="9" fill="#225533" text-anchor="middle">*</text>
+<text x="382" y="140" font-size="9" fill="#225533" text-anchor="middle" font-style="italic">logs</text>
+<line x1="173" y1="55" x2="1030" y2="104" stroke="#5522aa" stroke-width="1.1"/>
+<polyline points="1018.7,108.4 1030,104 1019.3,98.4" fill="none" stroke="#5522aa" stroke-width="1.1"/>
+<text x="191" y="52" font-size="9" fill="#5522aa" text-anchor="middle">1</text>
+<text x="1012" y="99" font-size="9" fill="#5522aa" text-anchor="middle">*</text>
+<text x="602" y="74" font-size="9" fill="#5522aa" text-anchor="middle" font-style="italic">records</text>
+<line x1="204" y1="55" x2="1030" y2="280" stroke="#5522aa" stroke-width="1.1"/>
+<polyline points="1018.1,281.9 1030,280 1020.7,272.3" fill="none" stroke="#5522aa" stroke-width="1.1"/>
+<text x="221" y="56" font-size="9" fill="#5522aa" text-anchor="middle">1</text>
+<text x="1013" y="271" font-size="9" fill="#5522aa" text-anchor="middle">*</text>
+<line x1="278" y1="239" x2="236" y2="235" stroke="#3355aa" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="247.4,231.1 236,235 246.5,241.0" fill="none" stroke="#3355aa" stroke-width="1.1"/>
+<text x="254" y="233" font-size="9" fill="#3355aa" text-anchor="middle">0..1</text>
+<text x="257" y="232" font-size="9" fill="#3355aa" text-anchor="middle" font-style="italic">managed_by</text>
+<line x1="90" y1="333" x2="132" y2="620" stroke="#c06020" stroke-width="1.1"/>
+<polyline points="125.5,609.8 132,620 135.4,608.4" fill="none" stroke="#c06020" stroke-width="1.1"/>
+<text x="93" y="347" font-size="9" fill="#c06020" text-anchor="middle">1</text>
+<text x="129" y="598" font-size="9" fill="#c06020" text-anchor="middle">*</text>
+<text x="111" y="472" font-size="9" fill="#c06020" text-anchor="middle" font-style="italic">assigned to</text>
+<line x1="152" y1="333" x2="173" y2="620" stroke="#c06020" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="167.2,609.4 173,620 177.2,608.7" fill="none" stroke="#c06020" stroke-width="1.1"/>
+<text x="172" y="598" font-size="9" fill="#c06020" text-anchor="middle">*</text>
+<text x="162" y="472" font-size="9" fill="#c06020" text-anchor="middle" font-style="italic">creates</text>
+<line x1="132" y1="788" x2="132" y2="900" stroke="#c06020" stroke-width="1.1"/>
+<polyline points="127.0,889.0 132,900 137.0,889.0" fill="none" stroke="#c06020" stroke-width="1.1"/>
+<text x="132" y="802" font-size="9" fill="#c06020" text-anchor="middle">1</text>
+<text x="132" y="878" font-size="9" fill="#c06020" text-anchor="middle">*</text>
+<text x="132" y="839" font-size="9" fill="#c06020" text-anchor="middle" font-style="italic">has slots</text>
+<line x1="121" y1="333" x2="382" y2="620" stroke="#c06020" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="370.9,615.2 382,620 378.3,608.5" fill="none" stroke="#c06020" stroke-width="1.1"/>
+<text x="370" y="603" font-size="9" fill="#c06020" text-anchor="middle">*</text>
+<text x="252" y="472" font-size="9" fill="#c06020" text-anchor="middle" font-style="italic">creates template</text>
+<line x1="632" y1="251" x2="700" y2="360" stroke="#2a7a44" stroke-width="1.1"/>
+<polyline points="689.9,353.3 700,360 698.4,348.0" fill="none" stroke="#2a7a44" stroke-width="1.1"/>
+<text x="642" y="262" font-size="9" fill="#2a7a44" text-anchor="middle">1</text>
+<text x="690" y="341" font-size="9" fill="#2a7a44" text-anchor="middle">*</text>
+<line x1="882" y1="223" x2="804" y2="360" stroke="#2a7a44" stroke-width="1.1"/>
+<polyline points="805.1,348.0 804,360 813.8,352.9" fill="none" stroke="#2a7a44" stroke-width="1.1"/>
+<text x="873" y="235" font-size="9" fill="#2a7a44" text-anchor="middle">1</text>
+<text x="813" y="340" font-size="9" fill="#2a7a44" text-anchor="middle">*</text>
+<line x1="142" y1="333" x2="632" y2="620" stroke="#887700" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="620.0,618.8 632,620 625.0,610.1" fill="none" stroke="#887700" stroke-width="1.1"/>
+<text x="616" y="607" font-size="9" fill="#887700" text-anchor="middle">*</text>
+<text x="387" y="472" font-size="9" fill="#887700" text-anchor="middle" font-style="italic">receives</text>
+<line x1="173" y1="333" x2="840" y2="620" stroke="#887700" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="827.9,620.2 840,620 831.9,611.1" fill="none" stroke="#887700" stroke-width="1.1"/>
+<text x="823" y="609" font-size="9" fill="#887700" text-anchor="middle">*</text>
+<text x="506" y="472" font-size="9" fill="#887700" text-anchor="middle" font-style="italic">books</text>
+<line x1="1134" y1="744" x2="986" y2="669" stroke="#887700" stroke-width="1.1"/>
+<polyline points="998.1,669.5 986,669 993.6,678.4" fill="none" stroke="#887700" stroke-width="1.1"/>
+<text x="1118" y="732" font-size="9" fill="#887700" text-anchor="middle">1</text>
+<text x="1002" y="673" font-size="9" fill="#887700" text-anchor="middle">*</text>
+<text x="1060" y="702" font-size="9" fill="#887700" text-anchor="middle" font-style="italic">handles</text>
+<line x1="882" y1="718" x2="882" y2="840" stroke="#887700" stroke-width="1.1"/>
+<polyline points="877.0,829.0 882,840 887.0,829.0" fill="none" stroke="#887700" stroke-width="1.1"/>
+<text x="882" y="732" font-size="9" fill="#887700" text-anchor="middle">1</text>
+<text x="882" y="818" font-size="9" fill="#887700" text-anchor="middle">0..1</text>
+<text x="882" y="774" font-size="9" fill="#887700" text-anchor="middle" font-style="italic">has feedback</text>
+<line x1="632" y1="1024" x2="882" y2="1060" stroke="#992233" stroke-width="1.1" stroke-dasharray="5,3"/>
+<polyline points="870.4,1063.4 882,1060 871.8,1053.5" fill="none" stroke="#992233" stroke-width="1.1"/>
+<text x="864" y="1053" font-size="9" fill="#992233" text-anchor="middle">*</text>
+<text x="757" y="1037" font-size="9" fill="#992233" text-anchor="middle" font-style="italic">records</text>
+<rect x="28" y="55" width="208" height="278" fill="white" stroke="#3355aa" stroke-width="1.4" rx="3"/>
+<rect x="28" y="55" width="208" height="42" fill="#ccd8f4" stroke="#3355aa" stroke-width="1.4" rx="3"/>
+<rect x="28" y="94" width="208" height="3" fill="#ccd8f4"/>
+<line x1="28" y1="97" x2="236" y2="97" stroke="#3355aa" stroke-width="1.2"/>
+<text x="132" y="69" text-anchor="middle" font-size="9" fill="#555" font-style="italic">«AbstractUser»</text>
+<text x="132" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#111">CustomUser</text>
+<text x="34" y="113" font-size="9" fill="#222" font-family="Courier New, monospace">+ username: str</text>
+<text x="34" y="127" font-size="9" fill="#222" font-family="Courier New, monospace">+ email: str</text>
+<text x="34" y="141" font-size="9" fill="#222" font-family="Courier New, monospace">+ weight: float</text>
+<text x="34" y="155" font-size="9" fill="#222" font-family="Courier New, monospace">+ height: float</text>
+<text x="34" y="169" font-size="9" fill="#222" font-family="Courier New, monospace">+ goal: str</text>
+<text x="34" y="183" font-size="9" fill="#222" font-family="Courier New, monospace">+ daily_calorie_goal: int</text>
+<text x="34" y="197" font-size="9" fill="#222" font-family="Courier New, monospace">+ gender: str</text>
+<text x="34" y="211" font-size="9" fill="#222" font-family="Courier New, monospace">+ date_of_birth: date</text>
+<text x="34" y="225" font-size="9" fill="#222" font-family="Courier New, monospace">+ goal_weight: float</text>
+<text x="34" y="239" font-size="9" fill="#222" font-family="Courier New, monospace">+ activity_level: str</text>
+<text x="34" y="253" font-size="9" fill="#222" font-family="Courier New, monospace">+ medical_conditions: JSON</text>
+<text x="34" y="267" font-size="9" fill="#222" font-family="Courier New, monospace">+ allergies: JSON</text>
+<text x="34" y="281" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_nutritionist: bool</text>
+<text x="34" y="295" font-size="9" fill="#222" font-family="Courier New, monospace">+ plan: str</text>
+<text x="34" y="309" font-size="9" fill="#222" font-family="Courier New, monospace">+ email_verified: bool</text>
+<text x="34" y="323" font-size="9" fill="#222" font-family="Courier New, monospace">+ onboarding_complete: bool</text>
+<rect x="278" y="55" width="208" height="264" fill="white" stroke="#3377aa" stroke-width="1.4" rx="3"/>
+<rect x="278" y="55" width="208" height="30" fill="#d8eeff" stroke="#3377aa" stroke-width="1.4" rx="3"/>
+<rect x="278" y="82" width="208" height="3" fill="#d8eeff"/>
+<line x1="278" y1="85" x2="486" y2="85" stroke="#3377aa" stroke-width="1.2"/>
+<text x="382" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#111">UserProfile</text>
+<text x="284" y="101" font-size="9" fill="#222" font-family="Courier New, monospace">+ height_cm: float</text>
+<text x="284" y="115" font-size="9" fill="#222" font-family="Courier New, monospace">+ current_weight_kg: float</text>
+<text x="284" y="129" font-size="9" fill="#222" font-family="Courier New, monospace">+ start_weight_kg: float</text>
+<text x="284" y="143" font-size="9" fill="#222" font-family="Courier New, monospace">+ goal_weight_kg: float</text>
+<text x="284" y="157" font-size="9" fill="#222" font-family="Courier New, monospace">+ daily_calorie_goal: int</text>
+<text x="284" y="171" font-size="9" fill="#222" font-family="Courier New, monospace">+ protein_goal_g: float</text>
+<text x="284" y="185" font-size="9" fill="#222" font-family="Courier New, monospace">+ carbs_goal_g: float</text>
+<text x="284" y="199" font-size="9" fill="#222" font-family="Courier New, monospace">+ fat_goal_g: float</text>
+<text x="284" y="213" font-size="9" fill="#222" font-family="Courier New, monospace">+ goal_setting_mode: str</text>
+<text x="284" y="227" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_subscribed: bool</text>
+<text x="284" y="241" font-size="9" fill="#222" font-family="Courier New, monospace">+ subscription_plan: str</text>
+<text x="284" y="255" font-size="9" fill="#222" font-family="Courier New, monospace">+ subscription_end_date: datetime</text>
+<text x="284" y="269" font-size="9" fill="#222" font-family="Courier New, monospace">+ managed_by: FK(User)</text>
+<line x1="278" y1="279" x2="486" y2="279" stroke="#3377aa" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="284" y="295" font-size="9" fill="#444" font-style="italic" font-family="Courier New, monospace">+ bmi(): float</text>
+<text x="284" y="309" font-size="9" fill="#444" font-style="italic" font-family="Courier New, monospace">+ scans_used_today(): int</text>
+<rect x="278" y="400" width="208" height="98" fill="white" stroke="#3377aa" stroke-width="1.4" rx="3"/>
+<rect x="278" y="400" width="208" height="30" fill="#d8eeff" stroke="#3377aa" stroke-width="1.4" rx="3"/>
+<rect x="278" y="427" width="208" height="3" fill="#d8eeff"/>
+<line x1="278" y1="430" x2="486" y2="430" stroke="#3377aa" stroke-width="1.2"/>
+<text x="382" y="416" text-anchor="middle" font-size="11" font-weight="700" fill="#111">UserPreferences</text>
+<text x="284" y="446" font-size="9" fill="#222" font-family="Courier New, monospace">+ notifications_enabled: bool</text>
+<text x="284" y="460" font-size="9" fill="#222" font-family="Courier New, monospace">+ email_notifications: bool</text>
+<text x="284" y="474" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_premium: bool</text>
+<text x="284" y="488" font-size="9" fill="#222" font-family="Courier New, monospace">+ preferred_nutritionist: str</text>
+<rect x="528" y="55" width="208" height="196" fill="white" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="528" y="55" width="208" height="30" fill="#cff0d8" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="528" y="82" width="208" height="3" fill="#cff0d8"/>
+<line x1="528" y1="85" x2="736" y2="85" stroke="#2a7a44" stroke-width="1.2"/>
+<text x="632" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#111">Meal</text>
+<text x="534" y="101" font-size="9" fill="#222" font-family="Courier New, monospace">+ meal_type: str</text>
+<text x="534" y="115" font-size="9" fill="#222" font-family="Courier New, monospace">+ image: ImageField</text>
+<text x="534" y="129" font-size="9" fill="#222" font-family="Courier New, monospace">+ total_calories: float</text>
+<text x="534" y="143" font-size="9" fill="#222" font-family="Courier New, monospace">+ total_protein_g: float</text>
+<text x="534" y="157" font-size="9" fill="#222" font-family="Courier New, monospace">+ total_carbs_g: float</text>
+<text x="534" y="171" font-size="9" fill="#222" font-family="Courier New, monospace">+ total_fat_g: float</text>
+<text x="534" y="185" font-size="9" fill="#222" font-family="Courier New, monospace">+ logged_at: datetime</text>
+<text x="534" y="199" font-size="9" fill="#222" font-family="Courier New, monospace">+ consumed_at: datetime</text>
+<text x="534" y="213" font-size="9" fill="#222" font-family="Courier New, monospace">+ notes: str</text>
+<text x="534" y="227" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_confirmed: bool</text>
+<text x="534" y="241" font-size="9" fill="#222" font-family="Courier New, monospace">+ ai_confidence_score: float</text>
+<rect x="778" y="55" width="208" height="168" fill="white" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="778" y="55" width="208" height="30" fill="#cff0d8" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="778" y="82" width="208" height="3" fill="#cff0d8"/>
+<line x1="778" y1="85" x2="986" y2="85" stroke="#2a7a44" stroke-width="1.2"/>
+<text x="882" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#111">FoodItem</text>
+<text x="784" y="101" font-size="9" fill="#222" font-family="Courier New, monospace">+ name: str</text>
+<text x="784" y="115" font-size="9" fill="#222" font-family="Courier New, monospace">+ quantity_g: float</text>
+<text x="784" y="129" font-size="9" fill="#222" font-family="Courier New, monospace">+ calories: float</text>
+<text x="784" y="143" font-size="9" fill="#222" font-family="Courier New, monospace">+ protein_g: float</text>
+<text x="784" y="157" font-size="9" fill="#222" font-family="Courier New, monospace">+ carbs_g: float</text>
+<text x="784" y="171" font-size="9" fill="#222" font-family="Courier New, monospace">+ fat_g: float</text>
+<text x="784" y="185" font-size="9" fill="#222" font-family="Courier New, monospace">+ confidence: float</text>
+<text x="784" y="199" font-size="9" fill="#222" font-family="Courier New, monospace">+ category: str</text>
+<text x="784" y="213" font-size="9" fill="#222" font-family="Courier New, monospace">+ calories_per_100g: float</text>
+<rect x="648" y="360" width="208" height="194" fill="white" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="648" y="360" width="208" height="42" fill="#d8f0d0" stroke="#2a7a44" stroke-width="1.4" rx="3"/>
+<rect x="648" y="399" width="208" height="3" fill="#d8f0d0"/>
+<line x1="648" y1="402" x2="856" y2="402" stroke="#2a7a44" stroke-width="1.2"/>
+<text x="752" y="374" text-anchor="middle" font-size="9" fill="#555" font-style="italic">«association class»</text>
+<text x="752" y="390" text-anchor="middle" font-size="11" font-weight="700" fill="#111">MealFoodItem</text>
+<text x="654" y="418" font-size="9" fill="#222" font-family="Courier New, monospace">+ quantity: float</text>
+<text x="654" y="432" font-size="9" fill="#222" font-family="Courier New, monospace">+ unit: str</text>
+<text x="654" y="446" font-size="9" fill="#222" font-family="Courier New, monospace">+ calories: float</text>
+<text x="654" y="460" font-size="9" fill="#222" font-family="Courier New, monospace">+ protein_g: float</text>
+<text x="654" y="474" font-size="9" fill="#222" font-family="Courier New, monospace">+ carbs_g: float</text>
+<text x="654" y="488" font-size="9" fill="#222" font-family="Courier New, monospace">+ fat_g: float</text>
+<text x="654" y="502" font-size="9" fill="#222" font-family="Courier New, monospace">+ fiber_g: float</text>
+<text x="654" y="516" font-size="9" fill="#222" font-family="Courier New, monospace">+ ai_detected: bool</text>
+<text x="654" y="530" font-size="9" fill="#222" font-family="Courier New, monospace">+ user_edited: bool</text>
+<text x="654" y="544" font-size="9" fill="#222" font-family="Courier New, monospace">+ confidence_score: float</text>
+<rect x="1030" y="55" width="208" height="98" fill="white" stroke="#6633aa" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="55" width="208" height="30" fill="#ecdcff" stroke="#6633aa" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="82" width="208" height="3" fill="#ecdcff"/>
+<line x1="1030" y1="85" x2="1238" y2="85" stroke="#6633aa" stroke-width="1.2"/>
+<text x="1134" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#111">WeightEntry</text>
+<text x="1036" y="101" font-size="9" fill="#222" font-family="Courier New, monospace">+ date: date</text>
+<text x="1036" y="115" font-size="9" fill="#222" font-family="Courier New, monospace">+ weight_kg: float</text>
+<text x="1036" y="129" font-size="9" fill="#222" font-family="Courier New, monospace">+ notes: str</text>
+<text x="1036" y="143" font-size="9" fill="#222" font-family="Courier New, monospace">+ logged_at: datetime</text>
+<rect x="1030" y="210" width="208" height="140" fill="white" stroke="#6633aa" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="210" width="208" height="30" fill="#ecdcff" stroke="#6633aa" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="237" width="208" height="3" fill="#ecdcff"/>
+<line x1="1030" y1="240" x2="1238" y2="240" stroke="#6633aa" stroke-width="1.2"/>
+<text x="1134" y="226" text-anchor="middle" font-size="11" font-weight="700" fill="#111">BodyMeasurement</text>
+<text x="1036" y="256" font-size="9" fill="#222" font-family="Courier New, monospace">+ date: date</text>
+<text x="1036" y="270" font-size="9" fill="#222" font-family="Courier New, monospace">+ waist_cm: float</text>
+<text x="1036" y="284" font-size="9" fill="#222" font-family="Courier New, monospace">+ hips_cm: float</text>
+<text x="1036" y="298" font-size="9" fill="#222" font-family="Courier New, monospace">+ chest_cm: float</text>
+<text x="1036" y="312" font-size="9" fill="#222" font-family="Courier New, monospace">+ arms_cm: float</text>
+<text x="1036" y="326" font-size="9" fill="#222" font-family="Courier New, monospace">+ neck_cm: float</text>
+<text x="1036" y="340" font-size="9" fill="#222" font-family="Courier New, monospace">+ notes: str</text>
+<rect x="28" y="620" width="208" height="168" fill="white" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="28" y="620" width="208" height="30" fill="#ffdfc8" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="28" y="647" width="208" height="3" fill="#ffdfc8"/>
+<line x1="28" y1="650" x2="236" y2="650" stroke="#c06020" stroke-width="1.2"/>
+<text x="132" y="636" text-anchor="middle" font-size="11" font-weight="700" fill="#111">DietPlan</text>
+<text x="34" y="666" font-size="9" fill="#222" font-family="Courier New, monospace">+ title: str</text>
+<text x="34" y="680" font-size="9" fill="#222" font-family="Courier New, monospace">+ plan_type: str</text>
+<text x="34" y="694" font-size="9" fill="#222" font-family="Courier New, monospace">+ description: str</text>
+<text x="34" y="708" font-size="9" fill="#222" font-family="Courier New, monospace">+ daily_calorie_target: int</text>
+<text x="34" y="722" font-size="9" fill="#222" font-family="Courier New, monospace">+ protein_target_g: float</text>
+<text x="34" y="736" font-size="9" fill="#222" font-family="Courier New, monospace">+ carbs_target_g: float</text>
+<text x="34" y="750" font-size="9" fill="#222" font-family="Courier New, monospace">+ fat_target_g: float</text>
+<text x="34" y="764" font-size="9" fill="#222" font-family="Courier New, monospace">+ meals_data: JSON</text>
+<text x="34" y="778" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_active: bool</text>
+<rect x="278" y="620" width="208" height="154" fill="white" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="278" y="620" width="208" height="30" fill="#ffdfc8" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="278" y="647" width="208" height="3" fill="#ffdfc8"/>
+<line x1="278" y1="650" x2="486" y2="650" stroke="#c06020" stroke-width="1.2"/>
+<text x="382" y="636" text-anchor="middle" font-size="11" font-weight="700" fill="#111">DietPlanTemplate</text>
+<text x="284" y="666" font-size="9" fill="#222" font-family="Courier New, monospace">+ title: str</text>
+<text x="284" y="680" font-size="9" fill="#222" font-family="Courier New, monospace">+ plan_type: str</text>
+<text x="284" y="694" font-size="9" fill="#222" font-family="Courier New, monospace">+ category: str</text>
+<text x="284" y="708" font-size="9" fill="#222" font-family="Courier New, monospace">+ daily_calorie_target: int</text>
+<text x="284" y="722" font-size="9" fill="#222" font-family="Courier New, monospace">+ meals_data: JSON</text>
+<text x="284" y="736" font-size="9" fill="#222" font-family="Courier New, monospace">+ key_guidelines: JSON</text>
+<text x="284" y="750" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_published: bool</text>
+<text x="284" y="764" font-size="9" fill="#222" font-family="Courier New, monospace">+ moderation_status: str</text>
+<rect x="28" y="900" width="208" height="126" fill="white" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="28" y="900" width="208" height="30" fill="#ffe8c8" stroke="#c06020" stroke-width="1.4" rx="3"/>
+<rect x="28" y="927" width="208" height="3" fill="#ffe8c8"/>
+<line x1="28" y1="930" x2="236" y2="930" stroke="#c06020" stroke-width="1.2"/>
+<text x="132" y="916" text-anchor="middle" font-size="11" font-weight="700" fill="#111">PlanAssignment</text>
+<text x="34" y="946" font-size="9" fill="#222" font-family="Courier New, monospace">+ day_index: int</text>
+<text x="34" y="960" font-size="9" fill="#222" font-family="Courier New, monospace">+ slot_key: str</text>
+<text x="34" y="974" font-size="9" fill="#222" font-family="Courier New, monospace">+ meal_ids: JSON</text>
+<text x="34" y="988" font-size="9" fill="#222" font-family="Courier New, monospace">+ portion_size: float</text>
+<text x="34" y="1002" font-size="9" fill="#222" font-family="Courier New, monospace">+ scheduled_date: date</text>
+<text x="34" y="1016" font-size="9" fill="#222" font-family="Courier New, monospace">+ notes: str</text>
+<rect x="528" y="620" width="208" height="110" fill="white" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="528" y="620" width="208" height="42" fill="#fff0c0" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="528" y="659" width="208" height="3" fill="#fff0c0"/>
+<line x1="528" y1="662" x2="736" y2="662" stroke="#998800" stroke-width="1.2"/>
+<text x="632" y="634" text-anchor="middle" font-size="9" fill="#555" font-style="italic">«profiles»</text>
+<text x="632" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#111">NutritionistFeedback</text>
+<text x="534" y="678" font-size="9" fill="#222" font-family="Courier New, monospace">+ title: str</text>
+<text x="534" y="692" font-size="9" fill="#222" font-family="Courier New, monospace">+ message: str</text>
+<text x="534" y="706" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_read: bool</text>
+<text x="534" y="720" font-size="9" fill="#222" font-family="Courier New, monospace">+ created_at: datetime</text>
+<rect x="778" y="620" width="208" height="98" fill="white" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="778" y="620" width="208" height="30" fill="#fff0c0" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="778" y="647" width="208" height="3" fill="#fff0c0"/>
+<line x1="778" y1="650" x2="986" y2="650" stroke="#998800" stroke-width="1.2"/>
+<text x="882" y="636" text-anchor="middle" font-size="11" font-weight="700" fill="#111">Consultation</text>
+<text x="784" y="666" font-size="9" fill="#222" font-family="Courier New, monospace">+ status: str</text>
+<text x="784" y="680" font-size="9" fill="#222" font-family="Courier New, monospace">+ notes: str</text>
+<text x="784" y="694" font-size="9" fill="#222" font-family="Courier New, monospace">+ scheduled_at: datetime</text>
+<text x="784" y="708" font-size="9" fill="#222" font-family="Courier New, monospace">+ created_at: datetime</text>
+<rect x="778" y="840" width="208" height="84" fill="white" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="778" y="840" width="208" height="30" fill="#fff8d0" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="778" y="867" width="208" height="3" fill="#fff8d0"/>
+<line x1="778" y1="870" x2="986" y2="870" stroke="#998800" stroke-width="1.2"/>
+<text x="882" y="856" text-anchor="middle" font-size="11" font-weight="700" fill="#111">ConsultationFeedback</text>
+<text x="784" y="886" font-size="9" fill="#222" font-family="Courier New, monospace">+ rating: int</text>
+<text x="784" y="900" font-size="9" fill="#222" font-family="Courier New, monospace">+ comment: str</text>
+<text x="784" y="914" font-size="9" fill="#222" font-family="Courier New, monospace">+ created_at: datetime</text>
+<rect x="1030" y="620" width="208" height="124" fill="white" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="620" width="208" height="42" fill="#fff0c0" stroke="#998800" stroke-width="1.4" rx="3"/>
+<rect x="1030" y="659" width="208" height="3" fill="#fff0c0"/>
+<line x1="1030" y1="662" x2="1238" y2="662" stroke="#998800" stroke-width="1.2"/>
+<text x="1134" y="634" text-anchor="middle" font-size="9" fill="#555" font-style="italic">«consultations»</text>
+<text x="1134" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#111">Nutritionist</text>
+<text x="1036" y="678" font-size="9" fill="#222" font-family="Courier New, monospace">+ name: str</text>
+<text x="1036" y="692" font-size="9" fill="#222" font-family="Courier New, monospace">+ email: str</text>
+<text x="1036" y="706" font-size="9" fill="#222" font-family="Courier New, monospace">+ specialization: str</text>
+<text x="1036" y="720" font-size="9" fill="#222" font-family="Courier New, monospace">+ bio: str</text>
+<text x="1036" y="734" font-size="9" fill="#222" font-family="Courier New, monospace">+ is_available: bool</text>
+<rect x="528" y="900" width="208" height="124" fill="white" stroke="#992233" stroke-width="1.4" rx="3"/>
+<rect x="528" y="900" width="208" height="42" fill="#ffd8d8" stroke="#992233" stroke-width="1.4" rx="3"/>
+<rect x="528" y="939" width="208" height="3" fill="#ffd8d8"/>
+<line x1="528" y1="942" x2="736" y2="942" stroke="#992233" stroke-width="1.2"/>
+<text x="632" y="914" text-anchor="middle" font-size="9" fill="#555" font-style="italic">«separate auth»</text>
+<text x="632" y="930" text-anchor="middle" font-size="11" font-weight="700" fill="#111">AdminAccount</text>
+<text x="534" y="958" font-size="9" fill="#222" font-family="Courier New, monospace">+ username: str</text>
+<text x="534" y="972" font-size="9" fill="#222" font-family="Courier New, monospace">+ email: str</text>
+<text x="534" y="986" font-size="9" fill="#222" font-family="Courier New, monospace">+ password_hash: str</text>
+<text x="534" y="1000" font-size="9" fill="#222" font-family="Courier New, monospace">+ role: str</text>
+<text x="534" y="1014" font-size="9" fill="#222" font-family="Courier New, monospace">+ created_at: datetime</text>
+<rect x="778" y="1060" width="208" height="112" fill="white" stroke="#992233" stroke-width="1.4" rx="3"/>
+<rect x="778" y="1060" width="208" height="30" fill="#ffd8d8" stroke="#992233" stroke-width="1.4" rx="3"/>
+<rect x="778" y="1087" width="208" height="3" fill="#ffd8d8"/>
+<line x1="778" y1="1090" x2="986" y2="1090" stroke="#992233" stroke-width="1.2"/>
+<text x="882" y="1076" text-anchor="middle" font-size="11" font-weight="700" fill="#111">Transaction</text>
+<text x="784" y="1106" font-size="9" fill="#222" font-family="Courier New, monospace">+ amount: decimal</text>
+<text x="784" y="1120" font-size="9" fill="#222" font-family="Courier New, monospace">+ status: str</text>
+<text x="784" y="1134" font-size="9" fill="#222" font-family="Courier New, monospace">+ method: str</text>
+<text x="784" y="1148" font-size="9" fill="#222" font-family="Courier New, monospace">+ plan: str</text>
+<text x="784" y="1162" font-size="9" fill="#222" font-family="Courier New, monospace">+ created_at: datetime</text>
+<rect x="18" y="1285" width="500" height="100" rx="4" fill="#f5f5f5" stroke="#bbb" stroke-width="1"/>
+<text x="26" y="1301" font-size="10" font-weight="700" fill="#333">Legend</text>
+<line x1="28" y1="1317" x2="98" y2="1317" stroke="#446" stroke-width="1.2"/>
+<polyline points="98,1317 88,1312 88,1322" fill="none" stroke="#446" stroke-width="1.2"/>
+<text x="104" y="1321" font-size="9" fill="#333">Association / navigability</text>
+<line x1="28" y1="1337" x2="98" y2="1337" stroke="#446" stroke-width="1.2" stroke-dasharray="5,3"/>
+<polyline points="98,1337 88,1332 88,1342" fill="none" stroke="#446" stroke-width="1.2"/>
+<text x="104" y="1341" font-size="9" fill="#333">Dependency / FK reference (dashed)</text>
+<text x="28" y="1361" font-size="9" fill="#333">Multiplicity: 1 = exactly one   * = zero or more   0..1 = optional</text>
+<text x="28" y="1379" font-size="9" fill="#888" font-style="italic">Note: Dead FoodItem.meal FK omitted. profiles.NutritionistFeedback distinct from consultations.NutritionistFeedback.</text>
+</svg>

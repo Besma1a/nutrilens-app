@@ -577,10 +577,10 @@ export default function Progress() {
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ink-2)', marginBottom: 8, fontFamily: 'var(--font)' }}>Unlock Advanced Insights</div>
             <div style={{ fontSize: 14, color: 'var(--ink-3)', maxWidth: 320, marginBottom: 24, lineHeight: 1.5 }}>
-              Upgrade to Premium to track body measurements, calculate BMI, and get direct feedback from our nutritionists.
+              Upgrade to Pro to track body measurements, calculate BMI, and get direct feedback from our nutritionists.
             </div>
             <button type="button" onClick={() => navigate('/user/Subscribe')} className="btn btn-prim" style={{ padding: '12px 32px', fontSize: 15 }}>
-              Upgrade to Premium →
+              Upgrade to Pro →
             </button>
           </div>
         )}

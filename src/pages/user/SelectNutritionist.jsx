@@ -24,7 +24,7 @@ const pageStyles = {
 function getImageUrl(src) {
   if (!src) return null;
   if (src.startsWith("http")) return src;
-  return `${window.location.protocol}//localhost:8000${src}`;
+  return `${window.location.protocol}//${window.location.hostname}:8000${src}`;
 }
 
 export default function SelectNutritionist() {

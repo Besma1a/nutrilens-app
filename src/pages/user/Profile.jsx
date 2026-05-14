@@ -167,7 +167,7 @@ export default function Profile() {
   const [isSyncBlocked,    setIsSyncBlocked]    = useState(false);
 
   const [form, setForm] = useState({
-    firstName:'', lastName:'', email:'', location:'', dob:'', gender:'Female',
+    firstName:'', lastName:'', email:'', phoneNumber:'', location:'', dob:'', gender:'Female',
     height:'', weight:'', goalWeight:'', bodyFat:'',
     goalDesc:'', goalType:'Lose Weight',
     dietStyle:'Mediterranean', activityLevel:'Moderately Active',
@@ -238,6 +238,7 @@ export default function Profile() {
         firstName:        userData.firstName || userData.name?.split(' ')[0] || prev.firstName || '',
         lastName:         userData.lastName  || userData.name?.split(' ').slice(1).join(' ') || prev.lastName || '',
         email:            userData.email     || prev.email || '',
+        phoneNumber:      userData.phoneNumber ?? prev.phoneNumber ?? '',
         location:         userData.location  || prev.location || '',
         dob:              userData.dob       || prev.dob || '',
         gender:           userData.gender    || prev.gender || 'Female',
@@ -297,7 +298,7 @@ export default function Profile() {
     const raw = user?.profilePicture || '';
     if (!raw) return '';
     if (raw.startsWith('http') || raw.startsWith('data:')) return raw;
-    return `${window.location.protocol}//localhost:8000${raw}`;
+    return `${window.location.protocol}//${window.location.hostname}:8000${raw}`;
   }, [user?.profilePicture]);
 
   const onPickProfilePhoto = async (file) => {
@@ -369,9 +370,10 @@ export default function Profile() {
     try {
       // ── STEP 1 — Update main user record ────────────────────────────────
       const userPayload = {
-        first_name: form.firstName.trim(),
-        last_name:  form.lastName.trim(),
-        email:      form.email.trim(),
+        first_name:   form.firstName.trim(),
+        last_name:    form.lastName.trim(),
+        email:        form.email.trim(),
+        phone_number: form.phoneNumber?.trim() ?? '',
       };
       if (form.location?.trim())  userPayload.location           = form.location.trim();
       if (form.dob)               userPayload.date_of_birth      = form.dob;
@@ -611,10 +613,11 @@ export default function Profile() {
           <div className="pf-card">
             <div className="pf-card-title">Personal Information</div>
             <div className="pf-grid-2">
-              <Field name="firstName" label="First Name"    isEditing={isEditing} form={form} set={set} />
-              <Field name="lastName"  label="Last Name"     isEditing={isEditing} form={form} set={set} />
-              <Field name="email"     label="Email Address" type="email" isEditing={isEditing} form={form} set={set} />
-              <Field name="location"  label="Location"      isEditing={isEditing} form={form} set={set} />
+              <Field name="firstName"   label="First Name"    isEditing={isEditing} form={form} set={set} />
+              <Field name="lastName"    label="Last Name"     isEditing={isEditing} form={form} set={set} />
+              <Field name="email"       label="Email Address" type="email" isEditing={isEditing} form={form} set={set} />
+              <Field name="phoneNumber" label="Phone Number"  type="tel"   isEditing={isEditing} form={form} set={set} />
+              <Field name="location"    label="Location"      isEditing={isEditing} form={form} set={set} />
               <Field name="dob"       label="Date of Birth" type="date" isEditing={isEditing} form={form} set={set} />
               <Field name="gender"    label="Gender" type="select"
                 opts={['Female','Male','Non-binary','Prefer not to say']}

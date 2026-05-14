@@ -260,7 +260,7 @@ export default function Tracker() {
   const fakeScan = useCallback(() => {
     try {
       if (!user.isSubscribed && user.scansUsedToday >= 3) {
-        toast({ message: '3 scans used. Upgrade to Premium', type: 'warning' });
+        toast({ message: '3 scans used. Upgrade to Pro for unlimited.', type: 'warning' });
         navigate('/user/subscribe');
         return;
       }
@@ -634,7 +634,7 @@ export default function Tracker() {
                       </svg>
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e' }}>{scansRemaining} scans remaining</div>
-                        <div style={{ fontSize: 11, color: '#b45309', marginTop: 2 }}>Upgrade to Premium for unlimited</div>
+                        <div style={{ fontSize: 11, color: '#b45309', marginTop: 2 }}>Upgrade to Pro for unlimited</div>
                       </div>
                       <button className="btn btn-amber btn-xs" onClick={() => navigate('/user/subscribe')} style={{ marginLeft: 'auto', flexShrink: 0 }}>Upgrade</button>
                     </div>

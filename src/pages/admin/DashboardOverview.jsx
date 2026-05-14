@@ -116,10 +116,7 @@ export default function DashboardOverview() {
         <div style={css.cardPad}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: T.text }}>User Growth</span>
-            <select style={{ border: `1px solid ${T.border}`, borderRadius: 7, padding: "5px 10px", fontSize: 12, color: T.text, background: T.white, outline: "none" }}>
-              <option>Last 6 months</option>
-              <option>Last year</option>
-            </select>
+          
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={stats.userGrowth}>

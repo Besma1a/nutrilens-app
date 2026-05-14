@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Star, TrendingDown, Users } from "lucide-react";
+import { ArrowRight, Star, TrendingDown } from "lucide-react";
+
+const MEDIA_BASE = `${window.location.protocol}//${window.location.hostname}:8000/media`;
 import { motion } from "framer-motion";
 import { C } from "./constants/tokens";
 import FadeUp from "./FadeUp";
@@ -125,7 +127,7 @@ export default function Hero() {
               }}
             >
               Connect with world class dietitians and let our AI do the heavy
-              lifting — track every meal with a single snap.
+              lifting, Track every meal with a single snap.
             </p>
           </FadeUp>
 
@@ -195,58 +197,19 @@ export default function Hero() {
 
         {/* ── Right: Rotated phones ── */}
         <FadeUp delay={0.2} className="hero-right">
-          <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", height: 480 }}>
-
-            {/* Dietitian card — tilted left, behind */}
-            <div
-              className="phone-tilt-left"
-              style={{
-                position: "absolute", left: "8%", top: "50%",
-                transform: "rotate(-8deg) translateY(-50%) translateX(-10px)",
-                zIndex: 1,
-              }}
-            >
-              <div
-                style={{
-                  width: 180, height: 360,
-                  background: `linear-gradient(180deg, ${C.cream} 0%, #e8dca0 100%)`,
-                  borderRadius: 20, overflow: "hidden", position: "relative",
-                }}
-              >
-                <Users size={80} color={C.forest} style={{ opacity: 0.15, position: "absolute", top: "30%", left: "50%", transform: "translateX(-50%)" }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60%", background: `linear-gradient(180deg, transparent, ${C.forest})` }} />
-                <div style={{ position: "absolute", bottom: 16, left: 16, right: 16 }}>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 14, color: C.white }}>
-                    Dr. Amara Diallo
-                  </div>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.7)" }}>
-                    Registered Dietitian · 8 yrs
-                  </div>
-                  <div style={{ display: "flex", gap: 2, marginTop: 4 }}>
-                    {[1,2,3,4,5].map((s) => <Star key={s} size={9} fill={C.lime} color={C.lime} />)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Phone mockup — tilted right, front */}
-            <div
-              className="phone-tilt-right"
-              style={{
-                position: "absolute", right: "8%", top: "50%",
-                transform: "rotate(8deg) translateY(-50%) translateX(10px)",
-                zIndex: 2,
-              }}
-            >
-              <PhoneMockup size="small" />
-            </div>
+          {/*
+            Absolute positioning lets us spread the phones to left/right edges so
+            their bounding boxes have a small gap — only the rotated bottom corners
+            reach toward each other. Using flex caused the tops to cross heavily.
+          */}
+          <div style={{ position: "relative", height: 560 }}>
 
             {/* Floating chip */}
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               style={{
-                position: "absolute", top: 20, left: "50%",
+                position: "absolute", top: 16, left: "50%",
                 transform: "translateX(-50%)", zIndex: 10,
                 background: C.lime, borderRadius: 16,
                 padding: "8px 14px", display: "flex", alignItems: "center",
@@ -258,6 +221,54 @@ export default function Hero() {
                 −5.4 kg in 60 days
               </span>
             </motion.div>
+
+            {/* Nutritionist card — left side, behind */}
+            <div
+              className="phone-tilt-left"
+              style={{
+                position: "absolute", left: "3%", top: "52%",
+                transform: "rotate(-9deg) translateY(-52%)",
+                zIndex: 1,
+              }}
+            >
+              <div
+                style={{
+                  width: 250, height: 470,
+                  borderRadius: 28, overflow: "hidden", position: "relative",
+                  boxShadow: "0 16px 48px rgba(0,0,0,0.22)",
+                }}
+              >
+                <img
+                  src={`${MEDIA_BASE}/profile_pictures/drhadil.png`}
+                  alt="Hadil Zidouri"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+                />
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "52%", background: `linear-gradient(180deg, transparent, ${C.forest})` }} />
+                <div style={{ position: "absolute", bottom: 22, left: 18, right: 18 }}>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 15, color: C.white }}>
+                    Dr.Hadil Zidouri
+                  </div>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: "rgba(255,255,255,0.75)" }}>
+                    Clinical Nutritionist · NutriLens
+                  </div>
+                  <div style={{ display: "flex", gap: 2, marginTop: 6 }}>
+                    {[1,2,3,4,5].map((s) => <Star key={s} size={10} fill={C.lime} color={C.lime} />)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone mockup — right side, front */}
+            <div
+              className="phone-tilt-right"
+              style={{
+                position: "absolute", right: "3%", top: "48%",
+                transform: "rotate(9deg) translateY(-48%)",
+                zIndex: 2,
+              }}
+            >
+              <PhoneMockup size="small" />
+            </div>
           </div>
         </FadeUp>
       </div>

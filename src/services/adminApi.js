@@ -1,4 +1,4 @@
-const API_ROOT = `${window.location.protocol}//localhost:8000/api/admin`;
+const API_ROOT = `${window.location.protocol}//${window.location.hostname}:8000/api/admin`;
 
 export async function apiFetch(path, options = {}) {
   const token = localStorage.getItem("adminToken");

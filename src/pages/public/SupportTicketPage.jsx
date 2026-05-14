@@ -1,7 +1,10 @@
 import { useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
+import WaveToFooter from "./WaveToFooter";
 import { supportApi } from "../../services/api";
+
+
 
 export default function SupportTicketPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -41,6 +44,7 @@ export default function SupportTicketPage() {
 
   return (
     <div className="public-page" style={{ background: "#fff" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap');`}</style>
       <Header />
       <main style={{ paddingTop: 72 }}>
         <section
@@ -120,6 +124,8 @@ export default function SupportTicketPage() {
           </form>
         </section>
       </main>
+      
+      <WaveToFooter fromColor="#ffffff" />
       <Footer />
     </div>
   );

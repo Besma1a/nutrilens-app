@@ -216,9 +216,10 @@ class NutritionistPatientSerializer(serializers.ModelSerializer):
     fat_goal_g         = serializers.FloatField(read_only=True)
 
     # ── Personal info from user model (may not exist on all custom users) ─
-    dob      = serializers.SerializerMethodField()
-    location = serializers.SerializerMethodField()
-    gender   = serializers.SerializerMethodField()
+    dob          = serializers.SerializerMethodField()
+    location     = serializers.SerializerMethodField()
+    gender       = serializers.SerializerMethodField()
+    phone_number = serializers.SerializerMethodField()
     medical_conditions = serializers.SerializerMethodField()
     medications = serializers.SerializerMethodField()
     allergies = serializers.SerializerMethodField()
@@ -229,7 +230,7 @@ class NutritionistPatientSerializer(serializers.ModelSerializer):
             "id", "full_name", "email", "avatar",
             "goal", "daily_calorie_goal", "protein_goal_g", "carbs_goal_g", "fat_goal_g",
             "height_cm", "current_weight_kg", "goal_weight_kg",
-            "dob", "location", "gender",
+            "dob", "location", "gender", "phone_number",
             "medical_conditions", "medications", "allergies",
             "joined_at", "has_active_plan", "active_diet_plan",
         ]
@@ -295,6 +296,10 @@ class NutritionistPatientSerializer(serializers.ModelSerializer):
     def get_gender(self, obj):
         """Return gender from the user model if the field exists."""
         return getattr(obj.user, "gender", None) or None
+
+    def get_phone_number(self, obj):
+        """Return phone_number from the user model if the field exists."""
+        return getattr(obj.user, "phone_number", None) or None
 
     def get_active_diet_plan(self, obj):
         """Return the active diet plan for this patient if one exists."""

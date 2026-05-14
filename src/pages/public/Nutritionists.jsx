@@ -52,7 +52,7 @@ const Nutritionists = () => {
         image: item.profile_picture
           ? item.profile_picture.startsWith("http")
             ? item.profile_picture
-            : `${window.location.protocol}//localhost:8000${item.profile_picture}`
+            : `${window.location.protocol}//${window.location.hostname}:8000${item.profile_picture}`
           : "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
         experience: item.credentials ? "Certified" : "Experienced",
         rating: "5.0",
@@ -60,7 +60,7 @@ const Nutritionists = () => {
     [nutritionists]
   );
 
-  const canSelect = !!user?.isSubscribed && !user?.managedBy;
+  const canSelect = !!user?.isSubscribed && (!user?.managedBy || fromSubscription);
 
   const handleCardClick = async (expert) => {
     const selected = nutritionists.find((item) => item.id === expert.id);
@@ -77,7 +77,10 @@ const Nutritionists = () => {
       return;
     }
 
-    if (user.managedBy) {
+    // Only block re-selection when not coming from the subscription flow.
+    // A returning subscriber landing here via ?from=subscription must always
+    // be allowed to pick a new nutritionist.
+    if (user.managedBy && !fromSubscription) {
       navigate("/user/dashboard");
       return;
     }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AdminUiContext } from "./adminUtils";
 import DashboardOverview  from "./DashboardOverview";
 import UsersPage          from "./UsersPage";
@@ -78,7 +78,11 @@ function Icon({ children, className = "si" }) {
 // ─── Root Shell ───────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [page, setPage] = useState("dashboard");
+  const location = useLocation();
+  // Derive active page from the URL so refresh always lands on the right page.
+  // /admin → "dashboard", /admin/revenue → "revenue", etc.
+  const page = location.pathname.split("/").filter(Boolean).pop() || "dashboard";
+  const setPage = (id) => navigate(`/admin/${id}`);
   const [admin, setAdmin] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("adminUser") || "null");
@@ -159,23 +163,15 @@ export default function AdminDashboard() {
           style={{ cursor: "pointer" }}
         >
           <div className="sb-mark">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 3c.5 5-3 8-6 9 1.5 3 4 5 6 6 2-1 4.5-3 6-6-3-1-6.5-4-6-9z" />
+            <svg viewBox="0 0 60 60">
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z"/>
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z" transform="rotate(120 30 30)"/>
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z" transform="rotate(240 30 30)"/>
+              <circle cx="30" cy="30" r="10" style={{ fill: "#2B5726", stroke: "none" }}/>
+              <path style={{ fill: "#DEE660", stroke: "none" }} d="M30,24 C32,24 35,26 35,29 C35,32 32,34 30,34 C28,34 25,32 25,29 C25,26 28,24 30,24Z"/>
             </svg>
           </div>
           <div className="sb-wordmark">Nutri<span>Lens</span></div>
-        </div>
-
-        <div className="sb-plan">
-          <div className="sb-plan-ic">
-            <svg viewBox="0 0 24 24" style={{ width: 13, height: 13, fill: "white" }}>
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-            </svg>
-          </div>
-          <div>
-            <div className="sb-plan-name">Admin Access</div>
-            <div className="sb-plan-days">Full platform controls</div>
-          </div>
         </div>
 
         <nav className="sb-nav">

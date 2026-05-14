@@ -1201,9 +1201,10 @@ body:has(.hs),
   flex: 1 0 auto;
   background: #fffef8;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 32px 16px 48px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px 48px;
   font-family: var(--font-b);
   box-sizing: border-box;
   position: relative;
@@ -1238,11 +1239,66 @@ body:has(.hs),
 }
 @media (min-height: 720px) {
   .auth-page {
-    align-items: center;
-    padding-top: 24px;
+    justify-content: flex-start;
     padding-bottom: 48px;
   }
 }
+
+.auth-topbar {
+  width: 100%;
+  max-width: 1080px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.auth-topbar-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-b);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--g2);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(43, 87, 38, 0.18);
+  background: transparent;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.auth-topbar-home:hover {
+  background: var(--g2);
+  color: #fff;
+  border-color: var(--g2);
+}
+
+.auth-topbar-home svg {
+  flex-shrink: 0;
+  transition: transform 0.18s;
+}
+
+.auth-topbar-home:hover svg {
+  transform: translateX(-2px);
+}
+
+@media (max-width: 600px) {
+  .auth-topbar {
+    padding: 14px 0;
+  }
+  .auth-topbar-home span {
+    display: none;
+  }
+  .auth-topbar-home {
+    padding: 8px 10px;
+  }
+}
+
 .auth-layout {
   width: 100%;
   max-width: 1080px;

@@ -11,11 +11,7 @@ const LINK_MAP = {
   "Contact Support":      { type: "route", to: "/support" },
 };
 
-/**
- * Footer shares the same red (#A50C05) background as the Newsletter above it,
- * making them feel like one unified section.
- * HIPAA, GDPR, Press Kit, HIPAA Notice — all removed.
- */
+
 const linkStyle = {
   fontFamily: "'Inter', sans-serif",
   fontSize: 14,
@@ -62,16 +58,20 @@ export default function Footer() {
           >
             {/* ── Brand column ── */}
             <div>
-              {/* Logo on red — Nutri white, lens lime */}
-              <div
-                style={{
-                  fontFamily: "'Outfit', sans-serif",
-                  fontWeight: 800, fontSize: 28,
-                  color: C.white, marginBottom: 14,
-                  letterSpacing: "-0.5px",
-                }}
-              >
-                Nutri<span style={{ color: C.lime }}>lens</span>
+              {/* Logo on red — aperture sprout, white blades, lime leaf */}
+              <div style={{ marginBottom: 14 }}>
+                <svg viewBox="0 0 210 44" width="210" height="44" style={{ display: "block" }} xmlns="http://www.w3.org/2000/svg">
+                  <path style={{ fill: "rgba(255,255,255,0.92)", stroke: "none" }} d="M22,22 L33,11 A15.6,15.6 0 0,1 33,33 Z"/>
+                  <path style={{ fill: "rgba(255,255,255,0.92)", stroke: "none" }} d="M22,22 L33,11 A15.6,15.6 0 0,1 33,33 Z" transform="rotate(120 22 22)"/>
+                  <path style={{ fill: "rgba(255,255,255,0.92)", stroke: "none" }} d="M22,22 L33,11 A15.6,15.6 0 0,1 33,33 Z" transform="rotate(240 22 22)"/>
+                  <circle cx="22" cy="22" r="7" style={{ fill: "#A50C05", stroke: "none" }}/>
+                  <path style={{ fill: "#DEE660", stroke: "none" }} d="M22,17.5 C23.4,17.5 25.5,19 25.5,21.5 C25.5,24 23.4,25.2 22,25.2 C20.6,25.2 18.5,24 18.5,21.5 C18.5,19 20.6,17.5 22,17.5Z"/>
+                  <line x1="22" y1="17.5" x2="22" y2="25.2" style={{ stroke: "#A50C05", strokeWidth: 0.6, strokeLinecap: "round" }}/>
+                  <line x1="22" y1="25.2" x2="22" y2="27.5" style={{ stroke: "#DEE660", strokeWidth: 1.2, strokeLinecap: "round" }}/>
+                  <text fontFamily="system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif" fontSize="27" fontWeight="800" letterSpacing="-0.8">
+                    <tspan x="50" y="31" fill="white">Nutri</tspan><tspan fill="#DEE660">Lens</tspan>
+                  </text>
+                </svg>
               </div>
 
               <p
@@ -81,7 +81,7 @@ export default function Footer() {
                   lineHeight: 1.7, maxWidth: 230, marginBottom: 24,
                 }}
               >
-                AI-powered nutrition meets human expertise. Your health transformation
+                AI powered nutrition meets human expertise. Your health transformation
                 starts here.
               </p>
 
@@ -173,7 +173,7 @@ export default function Footer() {
           }}
         >
           <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-            © 2025 NutriLens. All rights reserved.
+            © 2026 NutriLens. All rights reserved.
           </span>
         </div>
       </div>

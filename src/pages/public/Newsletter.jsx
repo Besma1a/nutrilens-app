@@ -3,16 +3,42 @@ import { Check } from "lucide-react";
 import { C } from "./constants/tokens";
 import FadeUp from "./FadeUp";
 
+const SUBSCRIBE_URL = `${window.location.protocol}//${window.location.hostname}:8000/api/v1/newsletter/subscribe/`;
+
 /**
  * Newsletter is now visually fused with Footer via a shared red background.
  * The wavy SVG divider at the TOP of this component transitions from the white
  * FAQ section above into the red block.
  */
 export default function Newsletter() {
-  const [email, setEmail]         = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail]     = useState("");
+  const [status, setStatus]   = useState("idle"); // "idle" | "loading" | "done" | "error"
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit  = () => { if (email.trim()) setSubmitted(true); };
+  const handleSubmit = async () => {
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    setStatus("loading");
+    setErrorMsg("");
+    try {
+      const res = await fetch(SUBSCRIBE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
+      if (res.ok) {
+        setStatus("done");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setErrorMsg(data.detail || "Something went wrong. Please try again.");
+        setStatus("error");
+      }
+    } catch {
+      setErrorMsg("Could not reach the server. Check your connection.");
+      setStatus("error");
+    }
+  };
+
   const handleKeyDown = (e) => { if (e.key === "Enter") handleSubmit(); };
 
   return (
@@ -65,65 +91,17 @@ export default function Newsletter() {
                 /* green on red = bold, fun, high contrast */
                 color: C.lime,
                 margin: "0 0 14px", lineHeight: 1.15,
+              
               }}
             >
               Nutrition science,{" "}
               <span style={{ color: C.white }}>delivered weekly.</span>
             </h2>
 
-            <p
-              style={{
-                fontFamily: "'Inter', sans-serif", fontSize: 16,
-                color: "rgba(255,255,255,0.75)",
-                marginBottom: 36, lineHeight: 1.6,
-              }}
-            >
-              No spam. Just research-backed tips, recipe ideas, and platform updates.
-            </p>
+           
 
-            {!submitted ? (
-              <div
-                style={{
-                  display: "flex", maxWidth: 500, margin: "0 auto",
-                  /* off-white input bg */
-                  background: "#FEF8E0",
-                  borderRadius: 999,           /* fully rounded pill */
-                  overflow: "hidden",
-                  border: "none",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-                }}
-              >
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  style={{
-                    flex: 1, padding: "15px 24px",
-                    border: "none", background: "transparent",
-                    fontFamily: "'Inter', sans-serif", fontSize: 15,
-                    color: C.forest, outline: "none",
-                  }}
-                />
-                {/* Orange CTA button */}
-                <button
-                  onClick={handleSubmit}
-                  style={{
-                    background: C.ochre, color: C.white,
-                    border: "none", padding: "15px 28px",
-                    fontFamily: "'Outfit', sans-serif", fontSize: 15,
-                    fontWeight: 700, flexShrink: 0,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    margin: 4,
-                  }}
-                >
-                  Subscribe →
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+            {status === "done" ? (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 40 }}>
                 <div
                   style={{
                     width: 34, height: 34, borderRadius: "50%",
@@ -137,6 +115,59 @@ export default function Newsletter() {
                   You're in! Welcome to the community.
                 </span>
               </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex", maxWidth: 500, margin: "40px auto 0 auto",
+                    background: "#FEF8E0",
+                    borderRadius: 999,
+                    overflow: "hidden",
+                    border: "none",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                  }}
+                >
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={status === "loading"}
+                    style={{
+                      flex: 1, padding: "15px 24px",
+                      border: "none", background: "transparent",
+                      fontFamily: "'Inter', sans-serif", fontSize: 15,
+                      color: C.forest, outline: "none",
+                      opacity: status === "loading" ? 0.6 : 1,
+                    }}
+                  />
+                  <button
+                    onClick={handleSubmit}
+                    disabled={status === "loading"}
+                    style={{
+                      background: C.ochre, color: C.white,
+                      border: "none", padding: "15px 28px",
+                      fontFamily: "'Outfit', sans-serif", fontSize: 15,
+                      fontWeight: 700, flexShrink: 0,
+                      borderRadius: 999,
+                      cursor: status === "loading" ? "not-allowed" : "pointer",
+                      margin: 4,
+                      opacity: status === "loading" ? 0.7 : 1,
+                    }}
+                  >
+                    {status === "loading" ? "Subscribing…" : "Subscribe →"}
+                  </button>
+                </div>
+                {status === "error" && (
+                  <p style={{
+                    marginTop: 12, fontFamily: "'Inter', sans-serif",
+                    fontSize: 13, color: "#ffe4e4", fontWeight: 500,
+                  }}>
+                    {errorMsg}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </FadeUp>

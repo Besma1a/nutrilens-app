@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAPIBaseUrl, getToken } from "../../services/api.js";
 import {
-  CalendarDays, Users, FileText, MessageSquare,
+  DollarSign, Users, FileText, MessageSquare,
   Utensils, TrendingUp, Camera, AlertTriangle,
 } from "lucide-react";
 import {
@@ -82,9 +82,9 @@ async function dashboardGetJson(relPath) {
 
 function mapStatsCards(raw) {
   return {
-    upcomingSessions: {
-      value: raw.upcomingSessions ?? 0,
-      meta: "Pending & confirmed",
+    monthlyEarnings: {
+      value: `$${(raw.totalClients ?? 0) * 4}`,
+      meta: "Earnings this month",
     },
     totalClients: {
       value: raw.totalClients ?? 0,
@@ -291,7 +291,7 @@ function Badge({ type, children }) {
 }
 
 const STAT_DEFS = [
-  { key: "upcomingSessions", color: "#2B5726", Icon: CalendarDays, label: "Upcoming sessions" },
+  { key: "monthlyEarnings", color: "#2B5726", Icon: DollarSign, label: "Monthly earnings" },
   { key: "totalClients",     color: "#DEE660",  Icon: Users,         label: "Total clients" },
   { key: "activeMealPlans",  color: "#F19335", Icon: FileText,      label: "Active meal plans" },
   { key: "newClientsThisMonth", color: "#A50C05", Icon: MessageSquare, label: "New clients (month)" },

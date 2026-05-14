@@ -113,7 +113,7 @@ const styles = {
     fontSize: "14px",
   },
   button: {
-    backgroundColor: "#F19335",
+    backgroundColor: "#A50C05",
     color: "#ffffff",
     border: "none",
     borderRadius: "50px",
@@ -139,7 +139,7 @@ if (typeof document !== "undefined") {
       transform: scale(1.04);
     }
     .expert-card button:hover {
-      background-color: #d97d1e !important;
+      background-color: #8a0904 !important;
     }
   `;
   document.head.appendChild(style);

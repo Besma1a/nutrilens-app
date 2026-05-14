@@ -3,11 +3,19 @@ from rest_framework import serializers
 from .models import Blog
 
 
-def _uploads_url(request, image_name: str) -> str:
-    path = f"/uploads/{image_name.replace(chr(92), '/')}"
+def _media_url(request, image_field) -> str:
+    """Return a full absolute URL for a Django ImageField using the standard
+    /media/ path.  Falls back to a protocol-relative URL when no request
+    context is available (e.g. management commands)."""
+    if not image_field:
+        return None
+    try:
+        relative = image_field.url          # e.g.  /media/blogs/photo.jpg
+    except ValueError:
+        return None
     if request:
-        return request.build_absolute_uri(path)
-    return path
+        return request.build_absolute_uri(relative)
+    return relative
 
 
 class BlogReadSerializer(serializers.ModelSerializer):
@@ -30,12 +38,7 @@ class BlogReadSerializer(serializers.ModelSerializer):
         )
 
     def get_imageUrl(self, obj):
-        if not obj.image:
-            return None
-        name = obj.image.name
-        if not name:
-            return None
-        return _uploads_url(self.context.get("request"), name)
+        return _media_url(self.context.get("request"), obj.image)
 
     def get_author(self, obj):
         u = obj.author

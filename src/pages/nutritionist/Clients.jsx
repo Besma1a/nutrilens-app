@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Search, ArrowLeft, TrendingUp, Sliders, MessageSquare,
+  Search, ArrowLeft, TrendingUp, Sliders,
   ChevronRight, User, Calendar, Mail, Heart,
   Pill, AlertCircle, Target, Utensils, BookOpen, Activity,
   Loader
@@ -174,9 +174,10 @@ export default function Clients() {
         carbsGoalG:       p.carbs_goal_g      ?? 200,
         fatGoalG:         p.fat_goal_g        ?? 65,
         // personal info
-        dob:          p.dob      || null,
-        location:     p.location || null,
-        gender:       p.gender   || null,
+        dob:          p.dob         || null,
+        location:     p.location    || null,
+        gender:       p.gender      || null,
+        phoneNumber:  p.phone_number || p.phoneNumber || null,
         medicalConditions: toArray(
           p.medicalConditions,
           p.medical_conditions,
@@ -488,9 +489,6 @@ function PatientProfile({ patient: p, onBack, navigate }) {
             >
               <Sliders size={14} /> Adjust Plan
             </button>
-            <button onClick={() => navigate("/nutritionist/messaging")} style={{ ...btn("outline"), fontSize: 13 }}>
-              <MessageSquare size={14} /> Message
-            </button>
           </div>
         </div>
 
@@ -580,6 +578,7 @@ function PersonalTab({ patient: p }) {
           <InfoField label="First Name"    value={firstName || "—"} />
           <InfoField label="Last Name"     value={lastName || "—"} />
           <InfoField label="Email"         value={p.email || "—"} />
+          <InfoField label="Phone Number"  value={p.phoneNumber || "—"} />
           <InfoField label="Location"      value={p.location || "—"} />
           <InfoField label="Date of Birth" value={formatDate(p.dob)} />
           <InfoField label="Gender"        value={p.gender || "—"} />

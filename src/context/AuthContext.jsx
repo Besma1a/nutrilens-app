@@ -55,6 +55,9 @@ function normalizeUser(raw) {
     carbsGoalG:       raw.carbsGoalG       ?? raw.carbs_goal_g       ?? null,
     fatGoalG:         raw.fatGoalG         ?? raw.fat_goal_g         ?? null,
 
+    // Contact
+    phoneNumber: raw.phoneNumber ?? raw.phone_number ?? "",
+
     // Medical
     medicalConditions: raw.medicalConditions ?? raw.medical_conditions ?? [],
     medications:       raw.medications       ?? [],
@@ -351,7 +354,8 @@ export function AuthProvider({ children }) {
   const subscribe = async (planName) => {
     try {
       const response = await subscriptionsApi.subscribe(planName);
-      // Update user state with subscription data from backend
+      // Update subscription state and clear any previously assigned nutritionist
+      // so the user is forced through nutritionist selection on resubscription.
       updateUserState((prev) => ({
         ...prev,
         isSubscribed: response.isSubscribed,
@@ -359,6 +363,9 @@ export function AuthProvider({ children }) {
         subscriptionStatus: response.status,
         subscriptionEndDate: response.endDate,
         subscriptionDaysRemaining: response.daysRemaining,
+        managedBy: null,
+        managedByUsername: null,
+        nutritionistId: null,
       }));
       return response;
     } catch (error) {
@@ -370,7 +377,8 @@ export function AuthProvider({ children }) {
   const unsubscribe = async () => {
     try {
       const response = await subscriptionsApi.unsubscribe();
-      // Update user state with unsubscribed data from backend
+      // Clear subscription state and nutritionist assignment so a cancelled
+      // user sees no pre-assigned nutritionist on the Nutritionists page.
       updateUserState((prev) => ({
         ...prev,
         isSubscribed: response.isSubscribed,
@@ -378,6 +386,9 @@ export function AuthProvider({ children }) {
         subscriptionStatus: response.status,
         subscriptionEndDate: response.endDate,
         subscriptionDaysRemaining: response.daysRemaining,
+        managedBy: null,
+        managedByUsername: null,
+        nutritionistId: null,
       }));
       return response;
     } catch (error) {

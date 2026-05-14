@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from adminpanel.models import Transaction
+from profiles.models import UserProfile
 from .models import Subscription, SubscriptionPlan
 from .serializers import (
     SubscribeRequestSerializer,
@@ -75,6 +77,22 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 },
             )
 
+            # On resubscription, clear the previously assigned nutritionist so
+            # the user is forced through the nutritionist selection step again.
+            if not created:
+                UserProfile.objects.filter(user=user).update(managed_by=None)
+
+            # Record a Transaction row for every activation so the admin
+            # revenue page can show real transaction history.
+            Transaction.objects.create(
+                user=user,
+                subscription=subscription,
+                plan=plan.name,
+                amount=plan.price,
+                method="Direct",
+                status="Paid",
+            )
+
             response_serializer = SubscriptionResponseSerializer(subscription)
             return Response(
                 response_serializer.data,
@@ -103,6 +121,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
             subscription = Subscription.objects.get(user=user)
             subscription.status = "cancelled"
             subscription.save()
+
+            # Clear the assigned nutritionist so a cancelled user
+            # sees no pre-assignment on the Nutritionists page.
+            UserProfile.objects.filter(user=user).update(managed_by=None)
 
             response_serializer = SubscriptionResponseSerializer(subscription)
             return Response(response_serializer.data, status=status.HTTP_200_OK)

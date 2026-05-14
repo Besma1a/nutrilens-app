@@ -167,6 +167,7 @@ function formFromUser(u) {
       firstName: "",
       lastName: "",
       email: "",
+      phoneNumber: "",
       dob: "",
       gender: "Female",
       location: "",
@@ -188,6 +189,7 @@ function formFromUser(u) {
     firstName: u.firstName || u.name?.split(" ")[0] || "",
     lastName: u.lastName || u.name?.split(" ").slice(1).join(" ") || "",
     email: u.email || "",
+    phoneNumber: u.phoneNumber || u.phone_number || "",
     dob: u.dob || "",
     gender: u.gender || "Female",
     location: u.location || "",
@@ -315,6 +317,7 @@ export default function HealthSetupPage() {
         firstName:         form.firstName,
         lastName:          form.lastName,
         email:             form.email,
+        phone_number:      form.phoneNumber,
         date_of_birth:     form.dob,         // already snake_case in form
         gender:            form.gender,
         location:          form.location,
@@ -435,7 +438,7 @@ export default function HealthSetupPage() {
               <div className="hs-field">
                 <span className="hs-lbl">Gender</span>
                 <select className="hs-sel" value={form.gender} onChange={(e) => set("gender", e.target.value)}>
-                  {["Female", "Male", "Non-binary", "Prefer not to say"].map((g) => (
+                  {["Female", "Male"].map((g) => (
                     <option key={g} value={g}>
                       {g}
                     </option>
@@ -445,6 +448,10 @@ export default function HealthSetupPage() {
               <div className="hs-field span2">
                 <span className="hs-lbl">Location (optional)</span>
                 <input className="hs-inp" value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="City, country" />
+              </div>
+              <div className="hs-field span2">
+                <span className="hs-lbl">Phone number (optional)</span>
+                <input className="hs-inp" type="tel" value={form.phoneNumber} onChange={(e) => set("phoneNumber", e.target.value)} placeholder="+1 555 000 0000" autoComplete="tel" />
               </div>
             </div>
           )}
@@ -745,7 +752,7 @@ export default function HealthSetupPage() {
         </div>
 
         <div className="hs-foot">
-          <span className="hs-brand">Nutrilens</span>
+          <img src="/logos/nutrilens-logo-horizontal.svg" alt="NutriLens" height="22" style={{ display: "inline-block", verticalAlign: "middle" }} />
           <span>
             <a href="#">Privacy Policy</a>
             {" · "}

@@ -71,43 +71,16 @@ export default function UserSidebar({ user, open, onClose }) {
           }}
         >
           <div className="sb-mark">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 3c.5 5-3 8-6 9 1.5 3 4 5 6 6 2-1 4.5-3 6-6-3-1-6.5-4-6-9z"/>
+            <svg viewBox="0 0 60 60">
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z"/>
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z" transform="rotate(120 30 30)"/>
+              <path style={{ fill: "white", stroke: "none" }} d="M30,30 L45.6,14.4 A22,22 0 0,1 45.6,45.6 Z" transform="rotate(240 30 30)"/>
+              <circle cx="30" cy="30" r="10" style={{ fill: "#2B5726", stroke: "none" }}/>
+              <path style={{ fill: "#DEE660", stroke: "none" }} d="M30,24 C32,24 35,26 35,29 C35,32 32,34 30,34 C28,34 25,32 25,29 C25,26 28,24 30,24Z"/>
             </svg>
           </div>
           <div className="sb-wordmark">Nutri<span>Lens</span></div>
         </div>
-
-        {/* Plan status */}
-        {user.isSubscribed ? (
-          <div className="sb-plan">
-            <div className="sb-plan-ic">
-              <svg viewBox="0 0 24 24" style={{ width: 13, height: 13, fill: 'white' }}>
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-              </svg>
-            </div>
-            <div>
-              <div className="sb-plan-name">{user.planName} Plan</div>
-              <div className="sb-plan-days">Active · Renews Apr 13</div>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="sb-free-pill"
-            role="button" tabIndex={0}
-            onClick={() => { navigate('/user/subscribe'); onClose(); }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                navigate('/user/subscribe');
-                onClose();
-              }
-            }}
-          >
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '.5px', lineHeight: 1 }}>Free Plan</div>
-            <div style={{ fontSize: 10, color: '#92400e', marginTop: 3, lineHeight: 1.3 }}>Upgrade to unlock all features →</div>
-          </div>
-        )}
 
         {/* Nav */}
         <nav className="sb-nav">
@@ -134,7 +107,7 @@ export default function UserSidebar({ user, open, onClose }) {
                     to={to}
                     onClick={() => {
                       if (isLocked) {
-                        toast({ message: `Upgrade to Premium to access ${item.label}! ✨`, type: 'info' });
+                        toast({ message: `Upgrade to Pro to access ${item.label}.`, type: 'info' });
                       }
                       onClose();
                     }}

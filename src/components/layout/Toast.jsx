@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const ToastContext = createContext(null);
 
@@ -108,11 +109,14 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="toast-container" aria-live="polite">
-        {visibleToasts.map(t => (
-          <ToastItem key={t.id} toast={t} onRemove={removeToast} />
-        ))}
-      </div>
+      {createPortal(
+        <div className="toast-container" aria-live="polite">
+          {visibleToasts.map(t => (
+            <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+          ))}
+        </div>,
+        document.body
+      )}
     </ToastContext.Provider>
   );
 }

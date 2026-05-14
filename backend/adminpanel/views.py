@@ -2,6 +2,7 @@ from collections import Counter
 from decimal import Decimal
 import random
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncMonth
@@ -24,6 +25,7 @@ from .auth import create_admin_token, hash_password, humanize_age, verify_passwo
 from .models import (
     AdminAccount,
     AdminNotification,
+    NewsletterSubscriber,
     NutritionistAdminProfile,
     SupportTicket,
     SupportTicketMessage,
@@ -593,6 +595,41 @@ class AdminContentView(APIView):
         return Response({"items": rows, "total": total, "totalPages": total_pages})
 
 
+def _notify_users_new_blog(blog):
+    """
+    Create an in-app Notification for every registered user (non-nutritionist,
+    non-staff) when a blog post is approved and published.
+    Uses bulk_create for efficiency — one DB round-trip regardless of user count.
+    """
+    from notifications.models import Notification
+
+    author_name = blog.author.get_full_name() or blog.author.username
+    excerpt = (blog.excerpt or blog.content[:120]).rstrip()
+    if len(blog.content) > 120 and not blog.excerpt:
+        excerpt += "…"
+
+    users = User.objects.filter(
+        is_active=True,
+        is_staff=False,
+        is_superuser=False,
+        is_nutritionist=False,
+    ).values_list("id", flat=True)
+
+    notifications = [
+        Notification(
+            recipient_id=uid,
+            actor=blog.author,
+            notification_type=Notification.TYPE_SYSTEM,
+            title=f"New article: {blog.title}",
+            message=f"By {author_name} — {excerpt}",
+            link=f"/blog/{blog.id}",
+        )
+        for uid in users
+    ]
+    if notifications:
+        Notification.objects.bulk_create(notifications, ignore_conflicts=True)
+
+
 class AdminContentApproveView(APIView):
     permission_classes = [AdminAuth]
 
@@ -601,14 +638,16 @@ class AdminContentApproveView(APIView):
         parts = content_id.split("_", 1)
         if len(parts) != 2:
             return Response({"error": "Invalid content ID"}, status=400)
-        
+
         content_type, obj_id = parts
-        
+
         if content_type == "blog":
             blog = Blog.objects.get(id=obj_id)
             blog.moderation_status = Blog.STATUS_APPROVED
             blog.is_published = True
             blog.save(update_fields=["moderation_status", "is_published"])
+            # Push an in-app notification to all registered users.
+            _notify_users_new_blog(blog)
         elif content_type == "diet":
             diet = DietPlanTemplate.objects.get(id=obj_id)
             diet.moderation_status = DietPlanTemplate.STATUS_APPROVED
@@ -616,7 +655,7 @@ class AdminContentApproveView(APIView):
             diet.save(update_fields=["moderation_status", "is_published"])
         else:
             return Response({"error": "Unknown content type"}, status=400)
-        
+
         return Response({"status": "Approved"})
 
 
@@ -988,7 +1027,67 @@ class AdminRevenueStatsView(APIView):
     permission_classes = [AdminAuth]
 
     def get(self, request):
-        return Response(_build_mock_revenue_payload())
+        now = timezone.now()
+
+        # ── MRR: sum plan prices for all currently active subscriptions ──────
+        active_subs = Subscription.objects.filter(status="active").select_related("subscription_plan")
+        mrr = sum(_plan_price(s) for s in active_subs)
+
+        # ── Monthly revenue: last 6 months, sum Transaction amounts per month ─
+        monthly_revenue = []
+        for months_back in range(5, -1, -1):
+            month_start = (now - timezone.timedelta(days=30 * months_back)).replace(
+                day=1, hour=0, minute=0, second=0, microsecond=0
+            )
+            month_end = (month_start + timezone.timedelta(days=32)).replace(day=1)
+            total = Transaction.objects.filter(
+                status="Paid",
+                created_at__gte=month_start,
+                created_at__lt=month_end,
+            ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+            monthly_revenue.append({"m": month_start.strftime("%b"), "r": float(total)})
+
+        # ── Revenue by plan: group active subscriptions by plan name ──────────
+        plan_buckets = {}
+        for s in active_subs:
+            name = s.plan or "Unknown"
+            plan_buckets[name] = plan_buckets.get(name, Decimal("0")) + _plan_price(s)
+        revenue_by_plan = [{"name": k, "value": float(v)} for k, v in sorted(plan_buckets.items())]
+
+        # ── New revenue: Transaction amounts created this calendar month ──────
+        month_start_this = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        new_revenue = Transaction.objects.filter(
+            status="Paid",
+            created_at__gte=month_start_this,
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+
+        # ── Churn: cancelled this month / active at start of month × 100 ─────
+        cancelled_this_month = Subscription.objects.filter(
+            status="cancelled",
+            updated_at__gte=month_start_this,
+        ).count()
+        active_at_month_start = Subscription.objects.filter(
+            status="active",
+            created_at__lt=month_start_this,
+        ).count()
+        churn = round(
+            (cancelled_this_month / active_at_month_start * 100) if active_at_month_start else 0.0,
+            1,
+        )
+
+        # ── Refunds: sum Transaction amounts where status = Refunded ─────────
+        refunds_total = Transaction.objects.filter(
+            status="Refunded",
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+
+        return Response({
+            "mrr": float(mrr),
+            "newRevenue": float(new_revenue),
+            "churn": churn,
+            "refundsTotal": float(refunds_total),
+            "monthlyRevenue": monthly_revenue,
+            "revenueByPlan": revenue_by_plan,
+        })
 
 
 class AdminRevenueSummaryView(APIView):
@@ -1067,9 +1166,25 @@ class AdminTransactionsView(APIView):
     permission_classes = [AdminAuth]
 
     def get(self, request):
-        all_transactions = _build_mock_transactions()
-        rows, total, total_pages = _paginate_list(request, all_transactions, default_limit=8)
-        return Response({"transactions": rows, "total": total, "totalPages": total_pages})
+        qs = Transaction.objects.select_related("user").order_by("-created_at")
+        rows, total, total_pages = paginate_queryset(request, qs, default_limit=8)
+        data = []
+        for t in rows:
+            user_name = (
+                f"{t.user.first_name} {t.user.last_name}".strip() or t.user.username
+                if t.user else "Unknown"
+            )
+            data.append({
+                "id": str(t.id),
+                "user": user_name,
+                "plan": t.plan,
+                "amount": float(t.amount),
+                "date": t.created_at.strftime("%b %d"),
+                "method": t.method,
+                "status": t.status,
+                "refundStatus": t.refund_status if t.refund_status != "None" else None,
+            })
+        return Response({"transactions": data, "total": total, "totalPages": total_pages})
 
 
 class AdminTransactionRefundView(APIView):
@@ -1142,3 +1257,38 @@ class AdminTestimonialFeatureView(APIView):
         t.featured = not t.featured
         t.save(update_fields=["featured"])
         return Response({"featured": t.featured})
+
+
+class NewsletterSubscribeView(APIView):
+    """
+    POST /api/v1/newsletter/subscribe/
+    Body: { "email": "user@example.com" }
+
+    Public endpoint — no authentication required.
+    Returns 201 on first subscription, 200 if the address was already
+    registered (idempotent so double-clicks don't surface errors to the user).
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = (request.data.get("email") or "").strip().lower()
+        if not email:
+            return Response(
+                {"detail": "A valid email address is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(
+            email=email,
+            defaults={"is_active": True},
+        )
+
+        # If the address existed but had been unsubscribed, reactivate it.
+        if not created and not subscriber.is_active:
+            subscriber.is_active = True
+            subscriber.save(update_fields=["is_active"])
+
+        return Response(
+            {"detail": "Subscribed successfully."},
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )

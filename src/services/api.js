@@ -1,11 +1,13 @@
 
 export const getAPIBaseUrl = () => {
   const protocol = window.location.protocol;
-  return `${protocol}//localhost:8000/api/v1`;
+  const host = window.location.hostname;
+  return `${protocol}//${host}:8000/api/v1`;
 };
 export const getAPIRootUrl = () => {
   const protocol = window.location.protocol;
-  return `${protocol}//localhost:8000/api`;
+  const host = window.location.hostname;
+  return `${protocol}//${host}:8000/api`;
 };
 
 const BASE_URL          = getAPIBaseUrl() + "/users";
@@ -193,9 +195,6 @@ export const logoutUser = () =>
 export const profileApi = {
   getProfile:    ()     => request(`${PROFILES_URL}/profile/`),
   updateProfile: (data) => request(`${PROFILES_URL}/profile/`, "PATCH", data),
-
-  subscribe:   (plan) => request(`${PROFILES_URL}/subscription/`, "POST",   { plan }),
-  unsubscribe: ()     => request(`${PROFILES_URL}/subscription/`, "DELETE"),
 
   getWeightHistory: async () => {
     const res = await request(`${PROFILES_URL}/weight/`);

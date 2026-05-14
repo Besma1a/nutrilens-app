@@ -92,7 +92,7 @@ const styles = {
   readMore: {
     fontSize: "13px",
     fontWeight: "600",
-    color: "#F19335",
+    color: "#a50c05",
     fontFamily: "'DM Sans', sans-serif",
     letterSpacing: "0.02em",
   },

@@ -1,9 +1,18 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import WaveToFooter from "./WaveToFooter";
 import FadeUp from "./FadeUp";
 import { C } from "./constants/tokens";
 import { useAuth } from "../../context/AuthContext";
+import { subscriptionsApi } from "../../services/api";
+
+// Playfair Display must be loaded here — it is not guaranteed to be in cache
+// from other pages when this one is opened directly.
+const _playfairImport = (
+  <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap');`}</style>
+);
 
 const FEATURES = [
   { text: "AI calorie scans",                                  free: "3 per day", pro: "Unlimited" },
@@ -12,6 +21,7 @@ const FEATURES = [
   { text: "Online consultation with a nutritionist",           free: false,       pro: true, pro_label: "4/week" },
   { text: "Personalized diet plan assigned by nutritionist",   free: false,       pro: true },
   { text: "Diet plan updated based on consultation progress",  free: false,       pro: true },
+  { text: "Ongoing WhatsApp Mentorship",                       free: false,       pro: true },
 ];
 
 function Checkmark() {
@@ -53,11 +63,36 @@ function Pill({ text }) {
   );
 }
 
+// Fallback in case the backend is unreachable
+const FALLBACK_PLANS = [
+  { id: "free", name: "Free", price: "0", duration_days: null, is_active: true, is_featured: false },
+  { id: "pro",  name: "Pro",  price: "9.99", duration_days: 30, is_active: true, is_featured: true },
+];
+
+function formatPeriod(durationDays) {
+  if (!durationDays || durationDays >= 3650) return "month";
+  if (durationDays === 30)  return "month";
+  if (durationDays === 90)  return "3 months";
+  if (durationDays === 365) return "year";
+  return `${durationDays} days`;
+}
+
 export default function PlansPage() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
 
-  const isPro = user?.planName === "Pro" && user?.subscriptionStatus === "active";
+  useEffect(() => {
+    subscriptionsApi.listPlans()
+      .then((data) => setPlans(Array.isArray(data) && data.length ? data : FALLBACK_PLANS))
+      .catch(() => setPlans(FALLBACK_PLANS));
+  }, []);
+
+  const displayPlans = plans.length ? plans : FALLBACK_PLANS;
+  const freePlan = displayPlans.find((p) => !p.is_featured) || displayPlans[0];
+  const proPlan  = displayPlans.find((p) => p.is_featured)  || displayPlans[1];
+
+  const isPro = user?.planName === proPlan?.name && user?.subscriptionStatus === "active";
 
   const handleUpgrade = () => {
     if (isAuthenticated) {
@@ -69,6 +104,7 @@ export default function PlansPage() {
 
   return (
     <div className="public-page">
+      {_playfairImport}
       <Header />
       <main style={{ paddingTop: 72 }}>
 
@@ -79,15 +115,15 @@ export default function PlansPage() {
             <FadeUp>
               <div style={{ textAlign: "center", marginBottom: 56 }}>
                 <h1 style={{
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: "'Playfair Display', serif",
                   fontWeight: 800,
                   fontSize: "clamp(32px, 5vw, 48px)",
                   color: C.tomato,
                   margin: "0 0 16px",
-                  lineHeight: 1.1,
-                  letterSpacing: "-1px",
+                  lineHeight: 1.2,
+                  padding: "10px"
                 }}>
-                  Choose your plan , Now 
+                  Choose your plan , Now
                 </h1>
 
                 <p style={{
@@ -132,7 +168,7 @@ export default function PlansPage() {
                       color: C.forest,
                       margin: "0 0 6px",
                     }}>
-                      Free
+                      {freePlan?.name ?? "Free"}
                     </h2>
                     <p style={{
                       fontFamily: "'Inter', sans-serif",
@@ -151,7 +187,7 @@ export default function PlansPage() {
                       letterSpacing: "-1px",
                       lineHeight: 1,
                     }}>
-                      $0
+                      ${freePlan ? Number(freePlan.price).toFixed(2).replace(".00", "") : "0"}
                       <span style={{
                         fontFamily: "'Inter', sans-serif",
                         fontWeight: 400,
@@ -159,7 +195,7 @@ export default function PlansPage() {
                         color: "#6b7280",
                         letterSpacing: 0,
                       }}>
-                        /month
+                        /{formatPeriod(freePlan?.duration_days)}
                       </span>
                     </div>
                   </div>
@@ -250,7 +286,7 @@ export default function PlansPage() {
                       color: C.forest,
                       margin: "0 0 6px",
                     }}>
-                      Pro
+                      {proPlan?.name ?? "Pro"}
                     </h2>
                     <p style={{
                       fontFamily: "'Inter', sans-serif",
@@ -269,7 +305,7 @@ export default function PlansPage() {
                       letterSpacing: "-1px",
                       lineHeight: 1,
                     }}>
-                      $9.99
+                      ${proPlan ? Number(proPlan.price).toFixed(2) : "9.99"}
                       <span style={{
                         fontFamily: "'Inter', sans-serif",
                         fontWeight: 400,
@@ -277,7 +313,7 @@ export default function PlansPage() {
                         color: "#6b7280",
                         letterSpacing: 0,
                       }}>
-                        /month
+                        /{formatPeriod(proPlan?.duration_days)}
                       </span>
                     </div>
                   </div>
@@ -332,6 +368,7 @@ export default function PlansPage() {
           </div>
         </section>
 
+        <WaveToFooter fromColor={C.white} />
         <Footer />
       </main>
     </div>

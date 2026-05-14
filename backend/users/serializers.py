@@ -230,7 +230,7 @@ class HealthSetupSerializer(serializers.ModelSerializer):
             'goalType', 'activityLevel', 'sleepTargetHours',
             'medicalConditions',
             # snake_case fields that arrive as-is from the form
-            'gender', 'date_of_birth', 'location',
+            'gender', 'date_of_birth', 'location', 'phone_number',
             'height', 'weight',
             'medications', 'allergies',
             'goal', 'daily_calorie_goal',
@@ -265,7 +265,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'weight', 'height', 'goal', 'goal_display', 'daily_calorie_goal',
             'profile_picture', 'bio', 'gender', 'date_of_birth', 'location',
             'goal_weight', 'body_fat', 'diet_style', 'goal_type', 'goal_desc',
-            'activity_level', 'sleep_target_hours',
+            'activity_level', 'sleep_target_hours', 'phone_number',
             'medical_conditions', 'medications', 'allergies',
             'email_verified', 'onboarding_complete',
             'start_weight',

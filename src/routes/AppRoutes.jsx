@@ -130,6 +130,10 @@ export default function AppRoutes() {
             <Route path="support" element={<SupportPage />} />
             <Route path="revenue" element={<RevenuePage />} />
             <Route path="testimonials" element={<TestimonialsPage />} />
+            {/* AdminDashboard renders all pages itself via PAGE_MAP — this
+                just ensures /admin/profile is a valid URL and not caught
+                by the wildcard redirect. */}
+            <Route path="profile" element={null} />
           </Route>
 
           {/* ── NUTRITIONIST ─────────────────────────── */}
@@ -183,7 +187,7 @@ export default function AppRoutes() {
 <Route
               path="meal-plan"
               element={
-                <SubscriptionGuard title="Meal Plans are Premium">
+                <SubscriptionGuard>
                   <UserMealPlan />
                 </SubscriptionGuard>
               }
@@ -192,7 +196,7 @@ export default function AppRoutes() {
             <Route
               path="consultation"
               element={
-                <SubscriptionGuard title="Consultations are Premium">
+                <SubscriptionGuard>
                   <UserConsultation />
                 </SubscriptionGuard>
               }

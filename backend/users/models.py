@@ -58,6 +58,7 @@ class CustomUser(AbstractUser):
     goal_desc = models.CharField(max_length=255, blank=True, null=True)
     activity_level = models.CharField(max_length=50, blank=True, null=True)
     sleep_target_hours = models.FloatField(null=True, blank=True)
+    phone_number = models.CharField(max_length=30, blank=True, null=True)
 
     # Medical info stored as JSON
     medical_conditions = models.JSONField(default=list, blank=True)

@@ -12,6 +12,7 @@ const FEATURES = [
   { text: 'Online consultation with a nutritionist',           free: false,       pro: true, pro_label: '4/week' },
   { text: 'Personalized diet plan assigned by nutritionist',   free: false,       pro: true },
   { text: 'Diet plan updated based on consultation progress',  free: false,       pro: true },
+  { text: 'Ongoing WhatsApp Mentorship',                       free: false,       pro: true },
 ];
 
 // Shown when the API returns no plans (billing system not yet active)
@@ -208,10 +209,14 @@ export default function PricingSection() {
     subscriptionsApi.listPlans()
       .then((data) => {
         if (!Array.isArray(data)) return setPlans([]);
-        const normalized = data.slice(0, 2).map((p) => ({
-          ...p,
-          featureKey: p.name?.toLowerCase().includes('pro') ? 'pro' : 'free',
-        }));
+        const TAGLINES = {
+          free: 'Get started with essential tools',
+          pro:  'Full access to personalized nutrition care',
+        };
+        const normalized = data.slice(0, 2).map((p) => {
+          const key = p.name?.toLowerCase().includes('pro') ? 'pro' : 'free';
+          return { ...p, featureKey: key, tagline: p.tagline || TAGLINES[key] || '' };
+        });
         setPlans(normalized);
       })
       .catch(() => setPlans([]));

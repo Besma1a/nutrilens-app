@@ -59,7 +59,7 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers().catch(() => {});
+    fetchUsers().catch(() => { });
   }, [debouncedSearch, statusF, planF, currentPage]);
 
   const toggleBan = (email) => {
@@ -118,7 +118,7 @@ export default function UsersPage() {
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <SearchBar value={search} onChange={setSearch} placeholder="Search users..." />
         <Select value={statusF} onChange={setStatusF} opts={["All Status", "Active", "Pending", "Suspended"]} />
-        <Select value={planF} onChange={setPlanF} opts={["All Plans", "Monthly", "Quarterly", "Annual", "Unsubscribed", "Cancelled"]} />
+        <Select value={planF} onChange={setPlanF} opts={["All Plans", "Free", "Pro", "Cancelled"]} />
       </div>
 
       {users.length === 0 ? (
@@ -146,13 +146,13 @@ export default function UsersPage() {
                     <td style={css.td} onClick={e => e.stopPropagation()}>
                       <div style={{ display: "flex", gap: 2 }}>
                         <IBtn title="View" onClick={() => openProfile(u)}>
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                         </IBtn>
                         <IBtn title={u.status === "Suspended" ? "Unban" : "Ban"} onClick={() => toggleBan(u.email)}>
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
                         </IBtn>
                         <IBtn title="Delete" danger onClick={() => requestDelete(u)}>
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /></svg>
                         </IBtn>
                       </div>
                     </td>
