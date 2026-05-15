@@ -211,3 +211,8 @@ else:
 
 # Used in verification and password-reset email links
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+
+# USDA FoodData Central API key — get a free key at:
+# https://fdc.nal.usda.gov/api-key-signup.html
+# Leave empty to skip the API and use the hardcoded fallback table.
+USDA_API_KEY = config('USDA_API_KEY', default='')

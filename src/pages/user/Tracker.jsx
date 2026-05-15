@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/layout/Toast';
 import { useNavigate } from 'react-router-dom';
@@ -30,12 +30,6 @@ const MEAL_SECTIONS = [
   { key: 'Lunch',     label: 'Lunch',     time: '12:00–1:30 PM', tag: 'LN' },
   { key: 'Snack',     label: 'Snack',     time: '3:30–4:30 PM',  tag: 'SN' },
   { key: 'Dinner',    label: 'Dinner',    time: '6:30–8:00 PM',  tag: 'DN' },
-];
-
-const SCAN_RESULTS = [
-  { name: 'Salmon Avocado Bowl',           quantity: 1, measure: 'bowl',  info: 'AI Scanned', p: 28, c: 38, f: 18, fiber: 3, kcal: 430, netWt: 350, confidence: 92 },
-  { name: 'Caesar Salad with Chicken',     quantity: 1, measure: 'salad', info: 'AI Scanned', p: 32, c: 14, f: 20, fiber: 4, kcal: 360, netWt: 280, confidence: 87 },
-  { name: 'Chicken Curry with Brown Rice', quantity: 1, measure: 'bowl',  info: 'AI Scanned', p: 40, c: 52, f: 14, fiber: 5, kcal: 490, netWt: 400, confidence: 95 },
 ];
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -90,7 +84,7 @@ function parseMealsToDiary(todayMeals) {
       f:          Math.round(item.fat_g     || 0),
       kcal:       Math.round(item.calories  || 0),
       timestamp:  meal.logged_at,
-      confidence: item.confidence,
+      confidence: item.confidence != null ? Math.round(item.confidence * 100) : null,
       mealId:     meal.id,   // ← store the meal DB id for deletion
     }));
 
@@ -130,10 +124,11 @@ export default function Tracker() {
   const [scanResult,   setScanResult]   = useState(null);
   const [editingScan,  setEditingScan]  = useState(false);
   const [scanEdit,     setScanEdit]     = useState({});
-  const [manual,       setManual]       = useState({ name: '', kcal: '', p: '', c: '', f: '' });
   const [dragOver,     setDragOver]     = useState(false);
   const [hoverMeal,    setHoverMeal]    = useState(null);
   const [loading,      setLoading]      = useState(true);
+  const [scannedMealId, setScannedMealId] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Goals from profile (dynamic)
   const [calorieGoal,  setCalorieGoal]  = useState(2000);
@@ -196,6 +191,7 @@ export default function Tracker() {
   const closeModal = useCallback(() => {
     setModal(null);
     setScanResult(null);
+    setScannedMealId(null);
     setQ('');
     setScanning(false);
     setEditingScan(false);
@@ -256,44 +252,79 @@ export default function Tracker() {
     }
   }, [addTo, toast, closeModal, refreshDiary]);
 
-  // ── AI scan (mock) ────────────────────────────────────────────────────────
-  const fakeScan = useCallback(() => {
+  // ── AI scan (real) ────────────────────────────────────────────────────────
+  const realScan = useCallback(async (file) => {
+    if (!file) return;
+    if (!user.isSubscribed && user.scansUsedToday >= 3) {
+      toast({ message: '3 scans used. Upgrade to Pro for unlimited.', type: 'warning' });
+      navigate('/user/subscribe');
+      return;
+    }
+    setScanning(true);
+    setScanResult(null);
     try {
-      if (!user.isSubscribed && user.scansUsedToday >= 3) {
-        toast({ message: '3 scans used. Upgrade to Pro for unlimited.', type: 'warning' });
-        navigate('/user/subscribe');
+      const meal = await mealsApi.create({
+        meal_image:  file,
+        meal_type:   addTo,
+        consumed_at: new Date().toISOString(),
+      });
+      recordScan();
+      const items = (meal.food_items || []).map(item => ({
+        id:         item.id,
+        name:       item.name,
+        p:          Math.round(item.protein_g  || 0),
+        c:          Math.round(item.carbs_g    || 0),
+        f:          Math.round(item.fat_g      || 0),
+        kcal:       Math.round(item.calories   || 0),
+        confidence: item.confidence != null ? Math.round(item.confidence * 100) : null,
+        quantity_g: Math.round(item.quantity_g || 0),
+      }));
+      if (items.length === 0) {
+        toast({ message: 'No food detected. Try a clearer photo.', type: 'warning' });
+        try { await mealsApi.deleteMeal(meal.id); } catch {}
         return;
       }
-      setScanning(true);
-      setTimeout(() => {
-        setScanning(false);
-        try {
-          recordScan();
-          const r = SCAN_RESULTS[Math.floor(Math.random() * SCAN_RESULTS.length)];
-          setScanResult(r);
-          setScanEdit({
-            name:       r.name,
-            quantity:   r.quantity,
-            measure:    r.measure,
-            kcal:       r.kcal,
-            p:          r.p,
-            c:          r.c,
-            f:          r.f,
-            fiber:      r.fiber,
-            netWt:      r.netWt,
-            confidence: r.confidence,
-          });
-        } catch (err) {
-          toast({ message: err.message, type: 'error' });
-        }
-      }, 1800);
+      setScannedMealId(meal.id);
+      setScanResult({
+        mealId:    meal.id,
+        items,
+        totalKcal: Math.round(meal.total_calories  || 0),
+        totalP:    Math.round(meal.total_protein_g || 0),
+        totalC:    Math.round(meal.total_carbs_g   || 0),
+        totalF:    Math.round(meal.total_fat_g     || 0),
+        confidence: Math.round((meal.ai_confidence_score || 0) * 100),
+      });
+      setScanEdit({
+        name: items.length === 1 ? items[0].name : `${items.length} items detected`,
+        kcal: Math.round(meal.total_calories  || 0),
+        p:    Math.round(meal.total_protein_g || 0),
+        c:    Math.round(meal.total_carbs_g   || 0),
+        f:    Math.round(meal.total_fat_g     || 0),
+        confidence: Math.round((meal.ai_confidence_score || 0) * 100),
+      });
     } catch (err) {
+      toast({ message: err.message || 'Scan failed. Check your connection and try again.', type: 'error' });
+    } finally {
       setScanning(false);
-      toast({ message: err.message, type: 'error' });
     }
-  }, [user.isSubscribed, user.scansUsedToday, recordScan, toast, navigate]);
+  }, [user.isSubscribed, user.scansUsedToday, recordScan, toast, navigate, addTo]);
 
-  const applyScanEdit = useCallback(() => {
+  const handleFileChange = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (file) realScan(file);
+    e.target.value = '';
+  }, [realScan]);
+
+  const rescan = useCallback(async () => {
+    if (scannedMealId) {
+      try { await mealsApi.deleteMeal(scannedMealId); } catch {}
+      setScannedMealId(null);
+    }
+    setScanResult(null);
+    fileInputRef.current?.click();
+  }, [scannedMealId]);
+
+  const applyScanEdit = useCallback(async () => {
     try {
       if (!scanEdit.name?.trim()) { toast({ message: 'Enter food name', type: 'warning' }); return; }
 
@@ -307,92 +338,47 @@ export default function Tracker() {
       const cErr = validateMacro(c, 'Carbs');    if (cErr)       { toast({ message: cErr,       type: 'warning' }); return; }
       const fErr = validateMacro(f, 'Fat');      if (fErr)       { toast({ message: fErr,       type: 'warning' }); return; }
 
-      setScanResult({
-        name:       scanEdit.name.trim(),
-        quantity:   scanEdit.quantity || 1,
-        measure:    scanEdit.measure  || 'unit',
-        info:       'AI Scanned · Edited',
-        p:          Math.round(p),
-        c:          Math.round(c),
-        f:          Math.round(f),
-        fiber:      Math.round(parseFloat(scanEdit.fiber) || 0),
-        kcal:       Math.round(kcal),
-        netWt:      Math.round(parseFloat(scanEdit.netWt) || 0),
-        confidence: scanEdit.confidence,
-      });
-      setEditingScan(false);
-      toast({ message: 'Changes applied', type: 'success' });
-    } catch (err) {
-      toast({ message: err.message, type: 'error' });
-    }
-  }, [scanEdit, toast]);
-
-  // ── Add scan result ───────────────────────────────────────────────────────
-  const addScanResult = useCallback(async () => {
-    try {
-      if (!scanResult)            throw new Error('No scan result');
-      if (!scanResult.name?.trim()) throw new Error('Invalid food');
+      if (scannedMealId) {
+        try { await mealsApi.deleteMeal(scannedMealId); } catch {}
+        setScannedMealId(null);
+      }
 
       await mealsApi.createManual({
         meal_type:       addTo,
-        total_calories:  scanResult.kcal,
-        total_protein_g: scanResult.p,
-        total_carbs_g:   scanResult.c,
-        total_fat_g:     scanResult.f,
+        total_calories:  Math.round(kcal),
+        total_protein_g: Math.round(p),
+        total_carbs_g:   Math.round(c),
+        total_fat_g:     Math.round(f),
         food_items: [{
-          name:        scanResult.name,
-          calories:    scanResult.kcal,
-          protein_g:   scanResult.p,
-          carbs_g:     scanResult.c,
-          fat_g:       scanResult.f,
-          quantity_g:  scanResult.netWt || 100,
-          confidence:  scanResult.confidence,
+          name:       scanEdit.name.trim(),
+          calories:   Math.round(kcal),
+          protein_g:  Math.round(p),
+          carbs_g:    Math.round(c),
+          fat_g:      Math.round(f),
+          quantity_g: 100,
+          confidence: null,
         }],
       });
 
-      toast({ message: `${scanResult.name} added`, type: 'success' });
+      toast({ message: 'Meal saved', type: 'success' });
+      closeModal();
+      await refreshDiary();
+    } catch (err) {
+      toast({ message: err.message, type: 'error' });
+    }
+  }, [scanEdit, scannedMealId, addTo, toast, closeModal, refreshDiary]);
+
+  // ── Add scan result (meal already in DB) ─────────────────────────────────
+  const addScanResult = useCallback(async () => {
+    try {
+      if (!scanResult) throw new Error('No scan result');
+      toast({ message: 'Meal added to diary', type: 'success' });
       closeModal();
       await refreshDiary();
     } catch (err) {
       toast({ message: err.message || 'Failed to add scan result', type: 'error' });
     }
-  }, [scanResult, addTo, toast, closeModal, refreshDiary]);
-
-  // ── Add manual entry ──────────────────────────────────────────────────────
-  const addManual = useCallback(async () => {
-    try {
-      if (!manual.name?.trim()) { toast({ message: 'Enter food name', type: 'warning' }); return; }
-
-      const kcalErr = validateCalories(manual.kcal); if (kcalErr) { toast({ message: kcalErr, type: 'warning' }); return; }
-      const pErr    = validateMacro(manual.p, 'Protein'); if (pErr) { toast({ message: pErr,    type: 'warning' }); return; }
-      const cErr    = validateMacro(manual.c, 'Carbs');   if (cErr) { toast({ message: cErr,    type: 'warning' }); return; }
-      const fErr    = validateMacro(manual.f, 'Fat');     if (fErr) { toast({ message: fErr,    type: 'warning' }); return; }
-
-      await mealsApi.createManual({
-        meal_type:       addTo,
-        total_calories:  parseInt(manual.kcal),
-        total_protein_g: parseInt(manual.p) || 0,
-        total_carbs_g:   parseInt(manual.c) || 0,
-        total_fat_g:     parseInt(manual.f) || 0,
-        food_items: [{
-          name:        manual.name.trim(),
-          calories:    parseInt(manual.kcal),
-          protein_g:   parseInt(manual.p) || 0,
-          carbs_g:     parseInt(manual.c) || 0,
-          fat_g:       parseInt(manual.f) || 0,
-          quantity_g:  100,
-          confidence:  null,
-        }],
-      });
-
-      toast({ message: `${manual.name.trim()} added`, type: 'success' });
-      closeModal();
-      setManual({ name: '', kcal: '', p: '', c: '', f: '' });
-      await refreshDiary();
-    } catch (err) {
-      toast({ message: err.message || 'Failed to add manual entry', type: 'error' });
-    }
-  }, [manual, addTo, toast, closeModal, refreshDiary]);
+  }, [scanResult, toast, closeModal, refreshDiary]);
 
   const filtered = FOOD_DB.filter(f =>
     !q || f.name.toLowerCase().includes(q.toLowerCase())
@@ -598,7 +584,6 @@ export default function Tracker() {
               {[
                 { key: 'scan',   label: 'AI Scan'  },
                 { key: 'search', label: 'Search'   },
-                { key: 'manual', label: 'Manual'   },
               ].map(t => (
                 <button key={t.key} type="button"
                   onClick={() => { setModal(t.key); setScanResult(null); setScanning(false); setEditingScan(false); }}
@@ -627,6 +612,14 @@ export default function Tracker() {
               {/* ── AI Scan panel ── */}
               {modal === 'scan' && (
                 <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+
                   {!user.isSubscribed && (
                     <div style={{ background: 'var(--yellow-bg)', border: '1px solid #fde68a', borderRadius: 'var(--r-md)', padding: '12px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16, color: '#92400e', flexShrink: 0 }}>
@@ -645,13 +638,18 @@ export default function Tracker() {
                       <div
                         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                         onDragLeave={() => setDragOver(false)}
-                        onDrop={e => { e.preventDefault(); setDragOver(false); fakeScan(); }}
-                        onClick={fakeScan}
+                        onDrop={e => {
+                          e.preventDefault();
+                          setDragOver(false);
+                          const file = e.dataTransfer.files?.[0];
+                          if (file) realScan(file);
+                        }}
+                        onClick={() => !scanning && fileInputRef.current?.click()}
                         style={{
                           background: 'var(--g-light)',
                           border: `2px dashed ${dragOver ? 'var(--g2)' : 'var(--g-mid)'}`,
                           borderRadius: 'var(--r-lg)', padding: '44px 20px',
-                          textAlign: 'center', marginBottom: 16, cursor: 'pointer', transition: 'all .2s',
+                          textAlign: 'center', marginBottom: 16, cursor: scanning ? 'default' : 'pointer', transition: 'all .2s',
                         }}>
                         {scanning
                           ? <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
@@ -664,62 +662,59 @@ export default function Tracker() {
                           : <>
                               <div style={{ fontSize: 40, marginBottom: 10, lineHeight: 1 }}>📸</div>
                               <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--g-text)', fontFamily: 'var(--font)', marginBottom: 4 }}>Scan Food</div>
-                              <div style={{ fontSize: 12, color: 'var(--ink-4)' }}>Take a photo to analyze</div>
+                              <div style={{ fontSize: 12, color: 'var(--ink-4)' }}>Drop a photo here or click to choose</div>
                             </>
                         }
                       </div>
                       {!scanning && (
-                        <button className="btn btn-prim" style={{ width: '100%', justifyContent: 'center', padding: '11px' }} onClick={fakeScan} disabled={!canScan}>
+                        <button
+                          className="btn btn-prim"
+                          style={{ width: '100%', justifyContent: 'center', padding: '11px' }}
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={!canScan}
+                        >
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ width: 14, height: 14 }}>
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" />
                           </svg>
-                          Simulate AI Scan
+                          Choose Photo
                         </button>
                       )}
                     </>
                   ) : !editingScan ? (
                     <div>
+                      {/* Header */}
                       <div style={{
-                        background: 'linear-gradient(135deg, #9ca3af, #6b7280)',
+                        background: 'linear-gradient(135deg, var(--g1), var(--g2))',
                         borderRadius: 'var(--r-lg)',
-                        padding: '16px 20px',
-                        marginBottom: 18,
+                        padding: '14px 18px',
+                        marginBottom: 16,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         color: 'white',
                       }}>
                         <div>
-                          <div style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--font)' }}>{scanResult.name}</div>
-                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font)' }}>
+                            {scanResult.items.length === 1 ? scanResult.items[0].name : `${scanResult.items.length} items detected`}
+                          </div>
+                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 3 }}>
                             AI Scanned · {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          {scanResult.confidence != null && (
-                            <div style={{
-                              background: 'rgba(255,255,255,0.15)',
-                              borderRadius: 'var(--r-md)',
-                              padding: '6px 12px',
-                              textAlign: 'center',
-                              minWidth: 60,
-                            }}>
-                              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', marginBottom: 2 }}>confidence</div>
-                              <div style={{ fontSize: 18, fontWeight: 700 }}>{scanResult.confidence}%</div>
+                          {scanResult.confidence > 0 && (
+                            <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--r-md)', padding: '5px 10px', textAlign: 'center' }}>
+                              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.65)', marginBottom: 1 }}>confidence</div>
+                              <div style={{ fontSize: 16, fontWeight: 700 }}>{scanResult.confidence}%</div>
                             </div>
                           )}
                           <button
                             onClick={() => setEditingScan(true)}
-                            style={{
-                              background: 'none', border: 'none', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', gap: 6,
-                              color: 'white', fontWeight: 600, fontSize: 13,
-                              padding: '6px 12px', borderRadius: 'var(--r-sm)', transition: 'all 0.2s ease',
-                            }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: 'white', fontWeight: 600, fontSize: 12, padding: '5px 10px', borderRadius: 'var(--r-sm)', transition: 'all 0.2s ease' }}
                             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                           >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ width: 14, height: 14 }}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ width: 13, height: 13 }}>
                               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
@@ -728,41 +723,57 @@ export default function Tracker() {
                         </div>
                       </div>
 
-                      {scanResult.confidence != null && (() => {
-                        const meta = getConfidenceMeta(scanResult.confidence);
-                        return (
-                          <div style={{ marginBottom: 18 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                              <span style={{ fontSize: 12, color: 'var(--ink-5)' }}>AI confidence</span>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>{meta.label}</span>
+                      {/* Detected items list */}
+                      <div style={{ marginBottom: 16, maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {scanResult.items.map((item, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 'var(--r-md)', background: 'var(--ink-9)', border: '1px solid var(--border)' }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-2)', fontFamily: 'var(--font)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {item.name}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 10, color: 'var(--ink-5)' }}>{item.quantity_g}g</span>
+                                {item.confidence != null && (
+                                  <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 'var(--r-sm)', background: getConfidenceMeta(item.confidence).color + '18', color: getConfidenceMeta(item.confidence).color }}>
+                                    {item.confidence}% AI
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <div style={{ height: 6, background: 'var(--ink-8)', borderRadius: 'var(--r-sm)', overflow: 'hidden' }}>
-                              <div style={{ width: `${scanResult.confidence}%`, height: '100%', background: meta.bar, transition: 'width 0.4s ease', borderRadius: 'var(--r-sm)' }} />
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0, marginLeft: 10 }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#dcfce7', color: '#166534', borderRadius: 'var(--r-sm)' }}>P {item.p}g</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#dbeafe', color: '#1e40af', borderRadius: 'var(--r-sm)' }}>C {item.c}g</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#fef3c7', color: '#92400e', borderRadius: 'var(--r-sm)' }}>F {item.f}g</span>
+                              <div style={{ textAlign: 'right', minWidth: 42 }}>
+                                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--g1)', fontFamily: 'var(--font)' }}>{item.kcal}</div>
+                                <div style={{ fontSize: 9, color: 'var(--ink-5)' }}>kcal</div>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })()}
-
-                      <div style={{ marginBottom: 20 }}>
-                        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink-2)', marginBottom: 14, fontFamily: 'var(--font)' }}>Macronutrients</h3>
-                        {[
-                          { label: 'Protein',  val: `${scanResult.p}g`        },
-                          { label: 'Carbs',    val: `${scanResult.c}g`        },
-                          { label: 'Fats',     val: `${scanResult.f}g`        },
-                          { label: 'Calories', val: `${scanResult.kcal} kcal` },
-                        ].map(item => (
-                          <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--ink-8)' }}>
-                            <div style={{ fontSize: 13, color: 'var(--ink-3)', fontWeight: 500 }}>{item.label}</div>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink-2)', fontFamily: 'var(--font)' }}>{item.val}</div>
                           </div>
                         ))}
                       </div>
+
+                      {/* Totals row */}
+                      {scanResult.items.length > 1 && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 'var(--r-md)', background: 'var(--g-light)', border: '1px solid var(--g-mid)', marginBottom: 16 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--g-text)', fontFamily: 'var(--font)' }}>Total</div>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#dcfce7', color: '#166534', borderRadius: 'var(--r-sm)' }}>P {scanResult.totalP}g</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#dbeafe', color: '#1e40af', borderRadius: 'var(--r-sm)' }}>C {scanResult.totalC}g</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 6px', background: '#fef3c7', color: '#92400e', borderRadius: 'var(--r-sm)' }}>F {scanResult.totalF}g</span>
+                            <div style={{ textAlign: 'right', minWidth: 42 }}>
+                              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--g1)', fontFamily: 'var(--font)' }}>{scanResult.totalKcal}</div>
+                              <div style={{ fontSize: 9, color: 'var(--ink-5)' }}>kcal</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div style={{ display: 'flex', gap: 8 }}>
                         <button className="btn btn-prim" style={{ flex: 1, justifyContent: 'center', padding: '12px' }} onClick={addScanResult}>
                           Add to {addTo}
                         </button>
-                        <button className="btn btn-sec" style={{ justifyContent: 'center', padding: '12px 16px' }} onClick={fakeScan}>
+                        <button className="btn btn-sec" style={{ justifyContent: 'center', padding: '12px 16px' }} onClick={rescan}>
                           Rescan
                         </button>
                       </div>
@@ -829,31 +840,6 @@ export default function Tracker() {
                 </div>
               )}
 
-              {/* ── Manual panel ── */}
-              {modal === 'manual' && (
-                <div>
-                  <div className="fg">
-                    <label className="inp-label">Food Name</label>
-                    <input className="inp" placeholder="e.g. Homemade pasta" value={manual.name} onChange={e => setManual(m => ({ ...m, name: e.target.value }))} maxLength={100} />
-                  </div>
-                  <div className="fg3" style={{ marginBottom: 14 }}>
-                    {[
-                      { key: 'kcal', label: 'Calories (kcal)' },
-                      { key: 'p',    label: 'Protein (g)'     },
-                      { key: 'c',    label: 'Carbs (g)'       },
-                      { key: 'f',    label: 'Fat (g)'         },
-                    ].map(item => (
-                      <div key={item.key}>
-                        <label className="inp-label">{item.label}</label>
-                        <input className="inp" type="number" placeholder="0" value={manual[item.key]} onChange={e => setManual(m => ({ ...m, [item.key]: e.target.value }))} min="0" max="10000" />
-                      </div>
-                    ))}
-                  </div>
-                  <button className="btn btn-prim" style={{ width: '100%', justifyContent: 'center' }} onClick={addManual}>
-                    Add to {addTo}
-                  </button>
-                </div>
-              )}
 
             </div>
           </div>
