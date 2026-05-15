@@ -67,6 +67,7 @@ class MealViewSet(viewsets.ModelViewSet):
         Create meal and process AI image if provided.
         """
         meal = serializer.save(user=self.request.user)
+        print(f"[NutriLens] Meal {meal.pk} saved. image={bool(meal.image)}")
 
         # If image was provided, run AI detection
         if meal.image:
@@ -74,18 +75,24 @@ class MealViewSet(viewsets.ModelViewSet):
                 service = MealProcessingService()
                 result = service.process_meal_image(meal)
                 if not result.success:
+                    print(f"[NutriLens] Detection returned no items for meal {meal.pk}: {result.error}")
                     logger.warning(
                         "AI detection failed for meal %d: %s",
                         meal.pk,
                         result.error,
                     )
             except Exception as exc:
+                import traceback
+                print(f"[NutriLens] EXCEPTION in perform_create for meal {meal.pk}: {exc}")
+                traceback.print_exc()
                 logger.error(
                     "Error processing meal image for meal %d: %s",
                     meal.pk,
                     str(exc),
                     exc_info=True,
                 )
+        else:
+            print(f"[NutriLens] No image on meal {meal.pk}, skipping detection.")
 
     @action(detail=False, methods=["get"])
     def today(self, request):
