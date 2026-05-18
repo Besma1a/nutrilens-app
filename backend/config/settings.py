@@ -12,7 +12,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # In .env set: ALLOWED_HOSTS=localhost,127.0.0.1,your-backend.onrender.com
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+
+
 
 # --- 2. APPLICATION DEFINITION ---
 INSTALLED_APPS = [
