@@ -1,0 +1,4259 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "authtoken",
+    "model": "token"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "authtoken",
+    "model": "tokenproxy"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "users",
+    "model": "customuser"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "users",
+    "model": "emailverificationtoken"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "users",
+    "model": "passwordresettoken"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "users",
+    "model": "userpreferences"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "meals",
+    "model": "fooditem"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "meals",
+    "model": "meal"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "meals",
+    "model": "mealfooditem"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "consultations",
+    "model": "nutritionist"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "consultations",
+    "model": "consultation"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "consultations",
+    "model": "consultationfeedback"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "consultations",
+    "model": "nutritionistfeedback"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "userprofile"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "bodymeasurement"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "weightentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "nutritionistfeedback"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "dietplan"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "planassignment"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "profiles",
+    "model": "dietplantemplate"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "subscriptions",
+    "model": "subscription"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "subscriptions",
+    "model": "subscriptionplan"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "notifications",
+    "model": "notification"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "blogs",
+    "model": "blog"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "adminaccount"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "supportticket"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "testimonial"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "transaction"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "supportticketmessage"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "nutritionistadminprofile"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "adminnotification"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "adminpanel",
+    "model": "newslettersubscriber"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "1ff489c891e58fa56eb1a32aecbbb98c927b8883",
+  "fields": {
+    "user": [
+      "messaoudibesmala1_1"
+    ],
+    "created": "2026-04-29T14:24:56.242Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "558145ae13418909399978eb391d8aadfd968f9d",
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "created": "2026-05-05T09:55:52.889Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "8928a7f39afa8f3484bf0e27c2d54fc0da079be6",
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "created": "2026-04-29T18:09:09.372Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "8a7b3def18738c9379e282c2eed04cf08acc4bc8",
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "created": "2026-04-29T14:31:46.241Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "939c6934b066db025f0ca2b5223e9cdb3d0304d2",
+  "fields": {
+    "user": [
+      "hadil.zidouri_2"
+    ],
+    "created": "2026-04-29T15:10:16.744Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "9d6b8fa1d40397e61a2d02727382e97f9332a490",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "created": "2026-04-29T14:21:30.214Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "6a0d9bb06cb6e1bcee6d18d5d6a5412d7db804ab",
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "created": "2026-05-15T06:34:55.682Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "dd5c599aa7e19e4d1142356f2ef3e07d8cf004b1",
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "created": "2026-05-15T14:24:48.388Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "1ff489c891e58fa56eb1a32aecbbb98c927b8883",
+  "fields": {
+    "user": [
+      "messaoudibesmala1_1"
+    ],
+    "created": "2026-04-29T14:24:56.242Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "558145ae13418909399978eb391d8aadfd968f9d",
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "created": "2026-05-05T09:55:52.889Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "8928a7f39afa8f3484bf0e27c2d54fc0da079be6",
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "created": "2026-04-29T18:09:09.372Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "8a7b3def18738c9379e282c2eed04cf08acc4bc8",
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "created": "2026-04-29T14:31:46.241Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "939c6934b066db025f0ca2b5223e9cdb3d0304d2",
+  "fields": {
+    "user": [
+      "hadil.zidouri_2"
+    ],
+    "created": "2026-04-29T15:10:16.744Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "9d6b8fa1d40397e61a2d02727382e97f9332a490",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "created": "2026-04-29T14:21:30.214Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "6a0d9bb06cb6e1bcee6d18d5d6a5412d7db804ab",
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "created": "2026-05-15T06:34:55.682Z"
+  }
+},
+{
+  "model": "authtoken.tokenproxy",
+  "pk": "dd5c599aa7e19e4d1142356f2ef3e07d8cf004b1",
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "created": "2026-05-15T14:24:48.388Z"
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$00wSfsdv5rrkNCRvHgH7u9$GQ72nAfOcVd4aU7hs73fqKDWvrW+YM5Jivxc+bC4XCw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "besmala.messaoudi@univ-constantine2.dz",
+    "first_name": "besmala",
+    "last_name": "Messaoudi",
+    "email": "besmala.messaoudi@univ-constantine2.dz",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-15T14:24:47.642Z",
+    "weight": 54.0,
+    "start_weight": 54.0,
+    "height": 168.0,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "profile_pictures/photo_2026-05-17_11-05-59.jpg",
+    "bio": null,
+    "gender": "Female",
+    "date_of_birth": "2004-08-04",
+    "location": "",
+    "goal_weight": 57.0,
+    "body_fat": null,
+    "diet_style": "Balanced",
+    "goal_type": "Maintain Weight",
+    "goal_desc": "maintain healthy diet",
+    "activity_level": "Moderately Active",
+    "sleep_target_hours": 7.0,
+    "phone_number": "",
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": false,
+    "onboarding_complete": true,
+    "is_nutritionist": false,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-05-15T14:24:48.356Z",
+    "updated_at": "2026-05-17T09:06:08.567Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$thnauyi54d8dFAPaJtSPnV$oP3eIQYJYArzYt5b5nZO6dWlAYVSr5/x6vaoP30F4o8=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "besmala",
+    "first_name": "",
+    "last_name": "",
+    "email": "messaoudibesmala1@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-15T06:29:30.022Z",
+    "weight": null,
+    "start_weight": null,
+    "height": null,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": null,
+    "date_of_birth": null,
+    "location": null,
+    "goal_weight": null,
+    "body_fat": null,
+    "diet_style": null,
+    "goal_type": null,
+    "goal_desc": null,
+    "activity_level": null,
+    "sleep_target_hours": null,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": false,
+    "onboarding_complete": false,
+    "is_nutritionist": false,
+    "plan": "Pro",
+    "plan_started_at": null,
+    "created_at": "2026-05-15T06:29:30.439Z",
+    "updated_at": "2026-05-15T08:11:18.597Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$9Oows6dXpLna98axEbmyWK$OTTAw/bEK79vaZf6yyAXKwFn/PvQbmVnGBQqcIxR/Fs=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "hadil@gmail.com",
+    "first_name": "hadil",
+    "last_name": "zidouri",
+    "email": "hadil@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-05T09:55:52.764Z",
+    "weight": 50.0,
+    "start_weight": 50.0,
+    "height": 160.0,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": "Female",
+    "date_of_birth": "2004-05-05",
+    "location": "constantine",
+    "goal_weight": 55.0,
+    "body_fat": null,
+    "diet_style": "Balanced",
+    "goal_type": "Gain Muscle",
+    "goal_desc": "gain",
+    "activity_level": "Moderately Active",
+    "sleep_target_hours": 7.5,
+    "phone_number": "0558733460",
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": false,
+    "onboarding_complete": true,
+    "is_nutritionist": false,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-05-05T09:55:52.873Z",
+    "updated_at": "2026-05-05T09:58:55.876Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$QlmDHgMbXwakHqsxHR8L2g$fkEPRxZNb2gvThDFx20OKmyzMa4LRcRxjdxzlB55LXE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "douaa.karboua@univ-constantine2.dz",
+    "first_name": "DOUAA",
+    "last_name": "KARBOUA",
+    "email": "douaa.karboua@univ-constantine2.dz",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T18:09:08.952Z",
+    "weight": 66.0,
+    "start_weight": 66.0,
+    "height": 161.0,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": "Female",
+    "date_of_birth": "2005-08-26",
+    "location": "",
+    "goal_weight": 55.0,
+    "body_fat": null,
+    "diet_style": "High-Protein",
+    "goal_type": "Lose Weight",
+    "goal_desc": "LOSE",
+    "activity_level": "Moderately Active",
+    "sleep_target_hours": 7.5,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": true,
+    "onboarding_complete": true,
+    "is_nutritionist": false,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T18:09:09.343Z",
+    "updated_at": "2026-04-29T18:09:56.217Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$zJxnjbv52sxiYAUgSwv5AP$de1Uzgh746dmClubp3MAG09dta3yYe+uXSDKYJNUr3I=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "devnutritionist",
+    "first_name": "Dev",
+    "last_name": "Nutritionist",
+    "email": "nutritionist@dev.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T14:48:58.094Z",
+    "weight": null,
+    "start_weight": null,
+    "height": null,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": null,
+    "date_of_birth": null,
+    "location": null,
+    "goal_weight": null,
+    "body_fat": null,
+    "diet_style": null,
+    "goal_type": null,
+    "goal_desc": null,
+    "activity_level": null,
+    "sleep_target_hours": null,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": true,
+    "onboarding_complete": true,
+    "is_nutritionist": true,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T14:48:58.095Z",
+    "updated_at": "2026-04-29T14:48:58.475Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$8sB3p8JFMsbtI4SUIdyAC7$B9Stt4+jjRRf5kGTj3RlDCExKiQnAgR5bm2QSRImSrY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "doudikarb@gmail.com",
+    "first_name": "Doudi",
+    "last_name": "karb",
+    "email": "doudikarb@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T14:31:45.831Z",
+    "weight": 65.0,
+    "start_weight": 65.0,
+    "height": 161.0,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "profile_pictures/photo_2026-04-27_20-22-32.jpg",
+    "bio": null,
+    "gender": "Female",
+    "date_of_birth": "2005-08-26",
+    "location": "",
+    "goal_weight": 55.0,
+    "body_fat": null,
+    "diet_style": "Balanced",
+    "goal_type": "Lose Weight",
+    "goal_desc": "lose",
+    "activity_level": "Moderately Active",
+    "sleep_target_hours": 7.5,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": true,
+    "onboarding_complete": true,
+    "is_nutritionist": false,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T14:31:46.213Z",
+    "updated_at": "2026-04-29T15:05:47.079Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$7lzQTOkNOeZXQvGqcRyltM$nBFd7hp1zkCi4PvTEjAfavobs/itTHGQlhH3C3Khwk0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "hadil.zidouri_2",
+    "first_name": "hadil",
+    "last_name": "zidouri",
+    "email": "hadil.zidouri@univ-constantine2.dz",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T14:25:57.447Z",
+    "weight": null,
+    "start_weight": null,
+    "height": null,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": null,
+    "date_of_birth": null,
+    "location": null,
+    "goal_weight": null,
+    "body_fat": null,
+    "diet_style": null,
+    "goal_type": null,
+    "goal_desc": null,
+    "activity_level": null,
+    "sleep_target_hours": null,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": false,
+    "onboarding_complete": false,
+    "is_nutritionist": true,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T14:25:57.447Z",
+    "updated_at": "2026-04-29T15:10:16.712Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$66gDXP4euGx3hVhQ716iHP$MI6NspyHZt2zpCpEumDXkGfKgEnEfZn1xGK8cR1w578=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "messaoudibesmala1_1",
+    "first_name": "messaoudi",
+    "last_name": "besmala",
+    "email": "messaoudibesmala1@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T14:24:05.042Z",
+    "weight": null,
+    "start_weight": null,
+    "height": null,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "",
+    "bio": null,
+    "gender": null,
+    "date_of_birth": null,
+    "location": null,
+    "goal_weight": null,
+    "body_fat": null,
+    "diet_style": null,
+    "goal_type": null,
+    "goal_desc": null,
+    "activity_level": null,
+    "sleep_target_hours": null,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": false,
+    "onboarding_complete": false,
+    "is_nutritionist": true,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T14:24:05.042Z",
+    "updated_at": "2026-04-29T14:24:05.042Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$VVYOMrfwpiTjVIM8b82jrb$wwapP0b2/mh+Csn7c0uoeBO1miA4LOfPX5N49BrZQRs=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "douaakarboua098@gmail.com",
+    "first_name": "Douaa",
+    "last_name": "Karboua",
+    "email": "douaakarboua098@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T14:21:29.809Z",
+    "weight": 65.0,
+    "start_weight": 65.0,
+    "height": 161.0,
+    "goal": "maintain",
+    "daily_calorie_goal": 2000,
+    "profile_picture": "profile_pictures/WIN_20251027_10_41_57_Pro.jpg",
+    "bio": null,
+    "gender": "Female",
+    "date_of_birth": "2005-04-26",
+    "location": "constantine",
+    "goal_weight": 55.0,
+    "body_fat": null,
+    "diet_style": "Balanced",
+    "goal_type": "Lose Weight",
+    "goal_desc": "lose",
+    "activity_level": "Moderately Active",
+    "sleep_target_hours": 7.5,
+    "phone_number": null,
+    "medical_conditions": [],
+    "medications": [],
+    "allergies": [],
+    "email_verified": true,
+    "onboarding_complete": true,
+    "is_nutritionist": false,
+    "plan": "free",
+    "plan_started_at": null,
+    "created_at": "2026-04-29T14:21:30.187Z",
+    "updated_at": "2026-04-29T17:41:57.909Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-04-29T14:21:30.206Z",
+    "updated_at": "2026-04-29T14:21:30.206Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "messaoudibesmala1_1"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-04-29T14:24:56.251Z",
+    "updated_at": "2026-04-29T14:24:56.251Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "hadil.zidouri_2"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-04-29T14:26:52.110Z",
+    "updated_at": "2026-04-29T14:26:52.110Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-04-29T14:31:46.233Z",
+    "updated_at": "2026-04-29T14:31:46.233Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-04-29T18:09:09.364Z",
+    "updated_at": "2026-04-29T18:09:09.364Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-05-05T09:55:52.886Z",
+    "updated_at": "2026-05-05T09:55:52.886Z"
+  }
+},
+{
+  "model": "users.userpreferences",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "notifications_enabled": true,
+    "email_notifications": true,
+    "is_premium": false,
+    "preferred_nutritionist": null,
+    "created_at": "2026-05-15T14:24:48.388Z",
+    "updated_at": "2026-05-15T14:24:48.388Z"
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "token": "6e1945f1-1773-4f75-b9b7-efe8b66c6373",
+    "created_at": "2026-05-15T14:25:25.141Z",
+    "is_used": false
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "token": "97e0bd57-8e99-4c04-bb9e-bdbd4fc95e30",
+    "created_at": "2026-05-15T14:24:48.388Z",
+    "is_used": true
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "token": "0f338bf7-f4e7-4409-aaed-493676c4c1cf",
+    "created_at": "2026-05-05T09:55:52.890Z",
+    "is_used": false
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "token": "cafc1dbb-65a7-40c8-976d-ddfd8a118481",
+    "created_at": "2026-04-29T18:09:09.380Z",
+    "is_used": true
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "token": "207c7a28-660a-4895-94a7-164cdc21442e",
+    "created_at": "2026-04-29T14:31:46.248Z",
+    "is_used": true
+  }
+},
+{
+  "model": "users.emailverificationtoken",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "token": "4393b987-1dd2-49fb-b666-53f2da6b9cd4",
+    "created_at": "2026-04-29T14:21:30.220Z",
+    "is_used": true
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 37,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "meal_type": "Lunch",
+    "image": "meals/téléchargé_5_rSd5hPG.jfif",
+    "total_calories": 913.53,
+    "total_protein_g": 51.65,
+    "total_carbs_g": 72.45,
+    "total_fat_g": 44.9,
+    "logged_at": "2026-05-18T14:04:15.964Z",
+    "consumed_at": "2026-05-18T14:04:15.787Z",
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.917
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 36,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/𝘉𝘳𝘦𝘢𝘬𝘧𝘢𝘴𝘵_ZOui2GC.jfif",
+    "total_calories": 302.12,
+    "total_protein_g": 8.75,
+    "total_carbs_g": 18.67,
+    "total_fat_g": 21.5,
+    "logged_at": "2026-05-18T14:01:08.246Z",
+    "consumed_at": "2026-05-18T14:01:08.058Z",
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.792
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 30,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/seasoned_egg__tomatoes_and_carrot.jfif",
+    "total_calories": 448.52,
+    "total_protein_g": 14.21,
+    "total_carbs_g": 35.08,
+    "total_fat_g": 28.33,
+    "logged_at": "2026-05-15T15:43:26.382Z",
+    "consumed_at": "2026-05-15T15:43:26.234Z",
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.848
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 29,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "meal_type": "Lunch",
+    "image": "meals/fruit.jfif",
+    "total_calories": 239.71,
+    "total_protein_g": 4.46,
+    "total_carbs_g": 58.78,
+    "total_fat_g": 1.15,
+    "logged_at": "2026-05-15T15:38:25.795Z",
+    "consumed_at": "2026-05-15T15:38:25.547Z",
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.925
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 26,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "meal_type": "Breakfast",
+    "image": "",
+    "total_calories": 490.0,
+    "total_protein_g": 40.0,
+    "total_carbs_g": 52.0,
+    "total_fat_g": 14.0,
+    "logged_at": "2026-05-15T14:21:48.581Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 25,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/plate_eggs_and_potato.jpg",
+    "total_calories": 533.51,
+    "total_protein_g": 16.15,
+    "total_carbs_g": 40.91,
+    "total_fat_g": 33.97,
+    "logged_at": "2026-05-15T13:54:49.908Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.923
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 24,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/btata_VQtWUJm.jpg",
+    "total_calories": 113.96,
+    "total_protein_g": 2.96,
+    "total_carbs_g": 25.16,
+    "total_fat_g": 0.15,
+    "logged_at": "2026-05-15T13:51:59.847Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.93
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 23,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/fraza_ZVh3qbz.jpg",
+    "total_calories": 47.04,
+    "total_protein_g": 1.03,
+    "total_carbs_g": 11.32,
+    "total_fat_g": 0.44,
+    "logged_at": "2026-05-15T13:51:23.024Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.97
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 22,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/9c2ce05f24fe3bb30f1ca091260978bb_v9dN8q1.jpg",
+    "total_calories": 221.2,
+    "total_protein_g": 8.12,
+    "total_carbs_g": 43.4,
+    "total_fat_g": 1.26,
+    "logged_at": "2026-05-15T13:50:08.507Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.61
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 21,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/9c2ce05f24fe3bb30f1ca091260978bb.jpg",
+    "total_calories": 142.2,
+    "total_protein_g": 5.22,
+    "total_carbs_g": 27.9,
+    "total_fat_g": 0.81,
+    "logged_at": "2026-05-15T09:35:40.869Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.61
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 20,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/ff158656774a178dcaab2b3ea24b7c5e.jpg",
+    "total_calories": 254.7,
+    "total_protein_g": 8.97,
+    "total_carbs_g": 42.9,
+    "total_fat_g": 4.56,
+    "logged_at": "2026-05-15T09:33:17.158Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.71
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 19,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/250fa8b3750feaa6a57265c79ace1c37.jpg",
+    "total_calories": 136.5,
+    "total_protein_g": 4.55,
+    "total_carbs_g": 18.2,
+    "total_fat_g": 4.55,
+    "logged_at": "2026-05-15T09:32:27.101Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.7
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 18,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/mawza.jpg",
+    "total_calories": 103.24,
+    "total_protein_g": 1.28,
+    "total_carbs_g": 26.68,
+    "total_fat_g": 0.35,
+    "logged_at": "2026-05-15T09:31:21.446Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.98
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 17,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/btata_MjmMGHR.jpg",
+    "total_calories": 112.5,
+    "total_protein_g": 3.75,
+    "total_carbs_g": 15.0,
+    "total_fat_g": 3.75,
+    "logged_at": "2026-05-15T09:26:01.183Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.93
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 16,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/pizza.jpg",
+    "total_calories": 562.5,
+    "total_protein_g": 18.75,
+    "total_carbs_g": 75.0,
+    "total_fat_g": 18.75,
+    "logged_at": "2026-05-15T09:24:08.282Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.885
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 15,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/fraza.jpg",
+    "total_calories": 16.0,
+    "total_protein_g": 0.35,
+    "total_carbs_g": 3.85,
+    "total_fat_g": 0.15,
+    "logged_at": "2026-05-15T09:21:38.420Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.97
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 14,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/kahwa_yU9EXEv.jpg",
+    "total_calories": 112.5,
+    "total_protein_g": 3.75,
+    "total_carbs_g": 15.0,
+    "total_fat_g": 3.75,
+    "logged_at": "2026-05-15T09:19:20.886Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.9
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 13,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot_W006C51.jpg",
+    "total_calories": 16.4,
+    "total_protein_g": 0.36,
+    "total_carbs_g": 4.0,
+    "total_fat_g": 0.08,
+    "logged_at": "2026-05-15T09:17:35.525Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.97
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 12,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/btata_JhVZp0Q.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T09:04:39.178Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 11,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/btata_hNE2ZqI.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T08:16:12.721Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 10,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/btata.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T08:15:46.182Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot_nuJDHVt.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T07:56:45.352Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot_JCVqWfp.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T07:44:10.164Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot_Nuwe8nf.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T07:38:08.596Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot_FuzLQC9.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T07:14:01.113Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/carrot.jpg",
+    "total_calories": 0.0,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T07:01:06.630Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "meal_type": "Breakfast",
+    "image": "meals/kahwa.jpg",
+    "total_calories": 760.5,
+    "total_protein_g": 0.0,
+    "total_carbs_g": 0.0,
+    "total_fat_g": 0.0,
+    "logged_at": "2026-05-15T06:53:51.822Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.823
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "meal_type": "Snack",
+    "image": "",
+    "total_calories": 430.0,
+    "total_protein_g": 28.0,
+    "total_carbs_g": 38.0,
+    "total_fat_g": 18.0,
+    "logged_at": "2026-04-29T17:57:18.808Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "meal_type": "Lunch",
+    "image": "",
+    "total_calories": 360.0,
+    "total_protein_g": 32.0,
+    "total_carbs_g": 14.0,
+    "total_fat_g": 20.0,
+    "logged_at": "2026-04-29T17:57:12.678Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.meal",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "meal_type": "Breakfast",
+    "image": "",
+    "total_calories": 490.0,
+    "total_protein_g": 40.0,
+    "total_carbs_g": 52.0,
+    "total_fat_g": 14.0,
+    "logged_at": "2026-04-29T17:57:03.836Z",
+    "consumed_at": null,
+    "notes": "",
+    "is_confirmed": false,
+    "ai_confidence_score": 0.0
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 58,
+  "fields": {
+    "meal": null,
+    "name": "Avocado",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 427.0,
+    "protein_per_100g": 1.9,
+    "carbs_per_100g": 7.36,
+    "fat_per_100g": 43.33,
+    "fiber_per_100g": 0.1,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 10,
+  "fields": {
+    "meal": 18,
+    "name": "Banana",
+    "quantity_g": 116.0,
+    "calories": 103.24,
+    "protein_g": 1.28,
+    "carbs_g": 26.68,
+    "fat_g": 0.35,
+    "confidence": 0.98,
+    "calories_per_100g": 89.0,
+    "protein_per_100g": 1.1,
+    "carbs_per_100g": 23.0,
+    "fat_per_100g": 0.3,
+    "fiber_per_100g": 2.6,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 66,
+  "fields": {
+    "meal": 37,
+    "name": "Broccoli",
+    "quantity_g": 91.0,
+    "calories": 202.93,
+    "protein_g": 3.89,
+    "carbs_g": 20.39,
+    "fat_g": 11.72,
+    "confidence": 0.9,
+    "calories_per_100g": 223.0,
+    "protein_per_100g": 4.28,
+    "carbs_per_100g": 22.41,
+    "fat_per_100g": 12.88,
+    "fiber_per_100g": 1.7,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 23,
+  "fields": {
+    "meal": 25,
+    "name": "Broccoli",
+    "quantity_g": 91.0,
+    "calories": 202.93,
+    "protein_g": 3.89,
+    "carbs_g": 20.39,
+    "fat_g": 11.72,
+    "confidence": 0.91,
+    "calories_per_100g": 223.0,
+    "protein_per_100g": 4.28,
+    "carbs_per_100g": 22.41,
+    "fat_per_100g": 12.88,
+    "fiber_per_100g": 1.7,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 20,
+  "fields": {
+    "meal": null,
+    "name": "Broccoli",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 223.0,
+    "protein_per_100g": 4.28,
+    "carbs_per_100g": 22.41,
+    "fat_per_100g": 12.88,
+    "fiber_per_100g": 1.7,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 21,
+  "fields": {
+    "meal": null,
+    "name": "Carrot",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 44.0,
+    "protein_per_100g": 0.87,
+    "carbs_per_100g": 9.68,
+    "fat_per_100g": 0.24,
+    "fiber_per_100g": 2.9,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 4,
+  "fields": {
+    "meal": 13,
+    "name": "Carrot",
+    "quantity_g": 40.0,
+    "calories": 16.4,
+    "protein_g": 0.36,
+    "carbs_g": 4.0,
+    "fat_g": 0.08,
+    "confidence": 0.97,
+    "calories_per_100g": 41.0,
+    "protein_per_100g": 0.9,
+    "carbs_per_100g": 10.0,
+    "fat_per_100g": 0.2,
+    "fiber_per_100g": 2.8,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 40,
+  "fields": {
+    "meal": 30,
+    "name": "Carrot",
+    "quantity_g": 61.0,
+    "calories": 26.84,
+    "protein_g": 0.53,
+    "carbs_g": 5.9,
+    "fat_g": 0.15,
+    "confidence": 0.93,
+    "calories_per_100g": 44.0,
+    "protein_per_100g": 0.87,
+    "carbs_per_100g": 9.68,
+    "fat_per_100g": 0.24,
+    "fiber_per_100g": 2.9,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 35,
+  "fields": {
+    "meal": 29,
+    "name": "Cherry",
+    "quantity_g": 138.0,
+    "calories": 86.94,
+    "protein_g": 1.52,
+    "carbs_g": 22.08,
+    "fat_g": 0.28,
+    "confidence": 0.91,
+    "calories_per_100g": 63.0,
+    "protein_per_100g": 1.1,
+    "carbs_per_100g": 16.0,
+    "fat_per_100g": 0.2,
+    "fiber_per_100g": 2.1,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 67,
+  "fields": {
+    "meal": 37,
+    "name": "Chicken",
+    "quantity_g": 140.0,
+    "calories": 249.2,
+    "protein_g": 32.48,
+    "carbs_g": 0.0,
+    "fat_g": 12.25,
+    "confidence": 0.82,
+    "calories_per_100g": 178.0,
+    "protein_per_100g": 23.2,
+    "carbs_per_100g": 0.0,
+    "fat_per_100g": 8.75,
+    "fiber_per_100g": 0.0,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 51,
+  "fields": {
+    "meal": null,
+    "name": "Chicken",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 178.0,
+    "protein_per_100g": 23.2,
+    "carbs_per_100g": 0.0,
+    "fat_per_100g": 8.75,
+    "fiber_per_100g": 0.0,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 5,
+  "fields": {
+    "meal": 14,
+    "name": "Coffee",
+    "quantity_g": 75.0,
+    "calories": 112.5,
+    "protein_g": 3.75,
+    "carbs_g": 15.0,
+    "fat_g": 3.75,
+    "confidence": 0.9,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 61,
+  "fields": {
+    "meal": 36,
+    "name": "Cucumber",
+    "quantity_g": 119.0,
+    "calories": 40.46,
+    "protein_g": 0.59,
+    "carbs_g": 8.08,
+    "fat_g": 0.15,
+    "confidence": 0.94,
+    "calories_per_100g": 34.0,
+    "protein_per_100g": 0.5,
+    "carbs_per_100g": 6.79,
+    "fat_per_100g": 0.13,
+    "fiber_per_100g": 0.5,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 28,
+  "fields": {
+    "meal": null,
+    "name": "Cucumber",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 34.0,
+    "protein_per_100g": 0.5,
+    "carbs_per_100g": 6.79,
+    "fat_per_100g": 0.13,
+    "fiber_per_100g": 0.5,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 1,
+  "fields": {
+    "meal": null,
+    "name": "Cup",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 2,
+  "fields": {
+    "meal": null,
+    "name": "Dining Table",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 27,
+  "fields": {
+    "meal": null,
+    "name": "Egg",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 288.0,
+    "protein_per_100g": 13.81,
+    "carbs_per_100g": 8.48,
+    "fat_per_100g": 22.1,
+    "fiber_per_100g": 0.6,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 24,
+  "fields": {
+    "meal": 25,
+    "name": "Egg",
+    "quantity_g": 50.0,
+    "calories": 77.5,
+    "protein_g": 6.5,
+    "carbs_g": 0.55,
+    "fat_g": 5.5,
+    "confidence": 0.89,
+    "calories_per_100g": 155.0,
+    "protein_per_100g": 13.0,
+    "carbs_per_100g": 1.1,
+    "fat_per_100g": 11.0,
+    "fiber_per_100g": 0.0,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 38,
+  "fields": {
+    "meal": 30,
+    "name": "Egg",
+    "quantity_g": 50.0,
+    "calories": 144.0,
+    "protein_g": 6.91,
+    "carbs_g": 4.24,
+    "fat_g": 11.05,
+    "confidence": 1.0,
+    "calories_per_100g": 288.0,
+    "protein_per_100g": 13.81,
+    "carbs_per_100g": 8.48,
+    "fat_per_100g": 22.1,
+    "fiber_per_100g": 0.6,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 60,
+  "fields": {
+    "meal": 36,
+    "name": "Egg",
+    "quantity_g": 50.0,
+    "calories": 144.0,
+    "protein_g": 6.91,
+    "carbs_g": 4.24,
+    "fat_g": 11.05,
+    "confidence": 0.99,
+    "calories_per_100g": 288.0,
+    "protein_per_100g": 13.81,
+    "carbs_per_100g": 8.48,
+    "fat_per_100g": 22.1,
+    "fiber_per_100g": 0.6,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 52,
+  "fields": {
+    "meal": null,
+    "name": "Fish",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 277.0,
+    "protein_per_100g": 11.0,
+    "carbs_per_100g": 21.7,
+    "fat_per_100g": 16.2,
+    "fiber_per_100g": 1.5,
+    "category": "protein"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 15,
+  "fields": {
+    "meal": null,
+    "name": "French Beans",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 31.0,
+    "protein_per_100g": 1.83,
+    "carbs_per_100g": 6.97,
+    "fat_per_100g": 0.22,
+    "fiber_per_100g": 2.7,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 32,
+  "fields": {
+    "meal": null,
+    "name": "Kiwi",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 64.0,
+    "protein_per_100g": 1.06,
+    "carbs_per_100g": 14.0,
+    "fat_per_100g": 0.44,
+    "fiber_per_100g": 3.0,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 33,
+  "fields": {
+    "meal": 29,
+    "name": "Kiwi",
+    "quantity_g": 69.0,
+    "calories": 44.16,
+    "protein_g": 0.73,
+    "carbs_g": 9.66,
+    "fat_g": 0.3,
+    "confidence": 0.97,
+    "calories_per_100g": 64.0,
+    "protein_per_100g": 1.06,
+    "carbs_per_100g": 14.0,
+    "fat_per_100g": 0.44,
+    "fiber_per_100g": 3.0,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 57,
+  "fields": {
+    "meal": null,
+    "name": "Olives",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 282.0,
+    "protein_per_100g": 0.73,
+    "carbs_per_100g": 4.17,
+    "fat_per_100g": 30.05,
+    "fiber_per_100g": 1.8,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 63,
+  "fields": {
+    "meal": 36,
+    "name": "Olives",
+    "quantity_g": 33.0,
+    "calories": 93.06,
+    "protein_g": 0.24,
+    "carbs_g": 1.38,
+    "fat_g": 9.92,
+    "confidence": 0.57,
+    "calories_per_100g": 282.0,
+    "protein_per_100g": 0.73,
+    "carbs_per_100g": 4.17,
+    "fat_per_100g": 30.05,
+    "fiber_per_100g": 1.8,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 42,
+  "fields": {
+    "meal": null,
+    "name": "Onion",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 38.0,
+    "protein_per_100g": 0.86,
+    "carbs_per_100g": 8.46,
+    "fat_per_100g": 0.08,
+    "fiber_per_100g": 1.7,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 36,
+  "fields": {
+    "meal": 29,
+    "name": "Orange",
+    "quantity_g": 131.0,
+    "calories": 61.57,
+    "protein_g": 1.18,
+    "carbs_g": 15.72,
+    "fat_g": 0.13,
+    "confidence": 0.86,
+    "calories_per_100g": 47.0,
+    "protein_per_100g": 0.9,
+    "carbs_per_100g": 12.0,
+    "fat_per_100g": 0.1,
+    "fiber_per_100g": 2.4,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 13,
+  "fields": {
+    "meal": 20,
+    "name": "Pasta",
+    "quantity_g": 90.0,
+    "calories": 142.2,
+    "protein_g": 5.22,
+    "carbs_g": 27.9,
+    "fat_g": 0.81,
+    "confidence": 0.6,
+    "calories_per_100g": 158.0,
+    "protein_per_100g": 5.8,
+    "carbs_per_100g": 31.0,
+    "fat_per_100g": 0.9,
+    "fiber_per_100g": 1.8,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 16,
+  "fields": {
+    "meal": 22,
+    "name": "Pasta",
+    "quantity_g": 140.0,
+    "calories": 221.2,
+    "protein_g": 8.12,
+    "carbs_g": 43.4,
+    "fat_g": 1.26,
+    "confidence": 0.61,
+    "calories_per_100g": 158.0,
+    "protein_per_100g": 5.8,
+    "carbs_per_100g": 31.0,
+    "fat_per_100g": 0.9,
+    "fiber_per_100g": 1.8,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 14,
+  "fields": {
+    "meal": 21,
+    "name": "Pasta",
+    "quantity_g": 90.0,
+    "calories": 142.2,
+    "protein_g": 5.22,
+    "carbs_g": 27.9,
+    "fat_g": 0.81,
+    "confidence": 0.61,
+    "calories_per_100g": 158.0,
+    "protein_per_100g": 5.8,
+    "carbs_per_100g": 31.0,
+    "fat_per_100g": 0.9,
+    "fiber_per_100g": 1.8,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 12,
+  "fields": {
+    "meal": 20,
+    "name": "Pepper",
+    "quantity_g": 75.0,
+    "calories": 112.5,
+    "protein_g": 3.75,
+    "carbs_g": 15.0,
+    "fat_g": 3.75,
+    "confidence": 0.82,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 8,
+  "fields": {
+    "meal": 16,
+    "name": "Pie",
+    "quantity_g": 300.0,
+    "calories": 450.0,
+    "protein_g": 15.0,
+    "carbs_g": 60.0,
+    "fat_g": 15.0,
+    "confidence": 0.8,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 65,
+  "fields": {
+    "meal": 37,
+    "name": "Potato",
+    "quantity_g": 148.0,
+    "calories": 253.08,
+    "protein_g": 5.76,
+    "carbs_g": 19.97,
+    "fat_g": 16.75,
+    "confidence": 0.96,
+    "calories_per_100g": 171.0,
+    "protein_per_100g": 3.89,
+    "carbs_per_100g": 13.49,
+    "fat_per_100g": 11.32,
+    "fiber_per_100g": 1.5,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 22,
+  "fields": {
+    "meal": 25,
+    "name": "Potato",
+    "quantity_g": 148.0,
+    "calories": 253.08,
+    "protein_g": 5.76,
+    "carbs_g": 19.97,
+    "fat_g": 16.75,
+    "confidence": 0.97,
+    "calories_per_100g": 171.0,
+    "protein_per_100g": 3.89,
+    "carbs_per_100g": 13.49,
+    "fat_per_100g": 11.32,
+    "fiber_per_100g": 1.5,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 19,
+  "fields": {
+    "meal": null,
+    "name": "Potato",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 171.0,
+    "protein_per_100g": 3.89,
+    "carbs_per_100g": 13.49,
+    "fat_per_100g": 11.32,
+    "fiber_per_100g": 1.5,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 41,
+  "fields": {
+    "meal": 30,
+    "name": "Potato",
+    "quantity_g": 148.0,
+    "calories": 253.08,
+    "protein_g": 5.76,
+    "carbs_g": 19.97,
+    "fat_g": 16.75,
+    "confidence": 0.52,
+    "calories_per_100g": 171.0,
+    "protein_per_100g": 3.89,
+    "carbs_per_100g": 13.49,
+    "fat_per_100g": 11.32,
+    "fiber_per_100g": 1.5,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 18,
+  "fields": {
+    "meal": 24,
+    "name": "Potato",
+    "quantity_g": 148.0,
+    "calories": 113.96,
+    "protein_g": 2.96,
+    "carbs_g": 25.16,
+    "fat_g": 0.15,
+    "confidence": 0.93,
+    "calories_per_100g": 77.0,
+    "protein_per_100g": 2.0,
+    "carbs_per_100g": 17.0,
+    "fat_per_100g": 0.1,
+    "fiber_per_100g": 2.2,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 9,
+  "fields": {
+    "meal": 17,
+    "name": "Potato",
+    "quantity_g": 75.0,
+    "calories": 112.5,
+    "protein_g": 3.75,
+    "carbs_g": 15.0,
+    "fat_g": 3.75,
+    "confidence": 0.93,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 64,
+  "fields": {
+    "meal": 37,
+    "name": "Rice",
+    "quantity_g": 186.0,
+    "calories": 208.32,
+    "protein_g": 9.52,
+    "carbs_g": 32.09,
+    "fat_g": 4.18,
+    "confidence": 0.99,
+    "calories_per_100g": 112.0,
+    "protein_per_100g": 5.12,
+    "carbs_per_100g": 17.25,
+    "fat_per_100g": 2.25,
+    "fiber_per_100g": 0.6,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 25,
+  "fields": {
+    "meal": null,
+    "name": "Rice",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 112.0,
+    "protein_per_100g": 5.12,
+    "carbs_per_100g": 17.25,
+    "fat_per_100g": 2.25,
+    "fiber_per_100g": 0.6,
+    "category": "grain"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 7,
+  "fields": {
+    "meal": 16,
+    "name": "Sauce",
+    "quantity_g": 75.0,
+    "calories": 112.5,
+    "protein_g": 3.75,
+    "carbs_g": 15.0,
+    "fat_g": 3.75,
+    "confidence": 0.97,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 11,
+  "fields": {
+    "meal": 19,
+    "name": "Shellfish",
+    "quantity_g": 91.0,
+    "calories": 136.5,
+    "protein_g": 4.55,
+    "carbs_g": 18.2,
+    "fat_g": 4.55,
+    "confidence": 0.7,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 3,
+  "fields": {
+    "meal": null,
+    "name": "Spoon",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 150.0,
+    "protein_per_100g": 5.0,
+    "carbs_per_100g": 20.0,
+    "fat_per_100g": 5.0,
+    "fiber_per_100g": 1.0,
+    "category": "other"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 17,
+  "fields": {
+    "meal": 23,
+    "name": "Strawberry",
+    "quantity_g": 147.0,
+    "calories": 47.04,
+    "protein_g": 1.03,
+    "carbs_g": 11.32,
+    "fat_g": 0.44,
+    "confidence": 0.97,
+    "calories_per_100g": 32.0,
+    "protein_per_100g": 0.7,
+    "carbs_per_100g": 7.7,
+    "fat_per_100g": 0.3,
+    "fiber_per_100g": 2.0,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 6,
+  "fields": {
+    "meal": 15,
+    "name": "Strawberry",
+    "quantity_g": 50.0,
+    "calories": 16.0,
+    "protein_g": 0.35,
+    "carbs_g": 3.85,
+    "fat_g": 0.15,
+    "confidence": 0.97,
+    "calories_per_100g": 32.0,
+    "protein_per_100g": 0.7,
+    "carbs_per_100g": 7.7,
+    "fat_per_100g": 0.3,
+    "fiber_per_100g": 2.0,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 34,
+  "fields": {
+    "meal": 29,
+    "name": "Strawberry",
+    "quantity_g": 147.0,
+    "calories": 47.04,
+    "protein_g": 1.03,
+    "carbs_g": 11.32,
+    "fat_g": 0.44,
+    "confidence": 0.96,
+    "calories_per_100g": 32.0,
+    "protein_per_100g": 0.7,
+    "carbs_per_100g": 7.7,
+    "fat_per_100g": 0.3,
+    "fiber_per_100g": 2.0,
+    "category": "fruit"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 37,
+  "fields": {
+    "meal": null,
+    "name": "Tomato",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 20.0,
+    "protein_per_100g": 0.82,
+    "carbs_per_100g": 4.04,
+    "fat_per_100g": 0.31,
+    "fiber_per_100g": 1.2,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 62,
+  "fields": {
+    "meal": 36,
+    "name": "Tomato",
+    "quantity_g": 123.0,
+    "calories": 24.6,
+    "protein_g": 1.01,
+    "carbs_g": 4.97,
+    "fat_g": 0.38,
+    "confidence": 0.67,
+    "calories_per_100g": 20.0,
+    "protein_per_100g": 0.82,
+    "carbs_per_100g": 4.04,
+    "fat_per_100g": 0.31,
+    "fiber_per_100g": 1.2,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 39,
+  "fields": {
+    "meal": 30,
+    "name": "Tomato",
+    "quantity_g": 123.0,
+    "calories": 24.6,
+    "protein_g": 1.01,
+    "carbs_g": 4.97,
+    "fat_g": 0.38,
+    "confidence": 0.94,
+    "calories_per_100g": 20.0,
+    "protein_per_100g": 0.82,
+    "carbs_per_100g": 4.04,
+    "fat_per_100g": 0.31,
+    "fiber_per_100g": 1.2,
+    "category": "vegetable"
+  }
+},
+{
+  "model": "meals.fooditem",
+  "pk": 59,
+  "fields": {
+    "meal": null,
+    "name": "Wine",
+    "quantity_g": 0.0,
+    "calories": 0.0,
+    "protein_g": 0.0,
+    "carbs_g": 0.0,
+    "fat_g": 0.0,
+    "confidence": 0.95,
+    "calories_per_100g": 49.0,
+    "protein_per_100g": 0.04,
+    "carbs_per_100g": 1.62,
+    "fat_per_100g": 0.0,
+    "fiber_per_100g": 0.0,
+    "category": "beverage"
+  }
+},
+{
+  "model": "meals.mealfooditem",
+  "pk": 1,
+  "fields": {
+    "meal": 4,
+    "food_item": 1,
+    "quantity": 132.0,
+    "unit": "g",
+    "calories": 198.0,
+    "protein_g": 6.6,
+    "carbs_g": 26.4,
+    "fat_g": 6.6,
+    "fiber_g": 1.32,
+    "ai_detected": true,
+    "user_edited": false,
+    "confidence_score": 0.94
+  }
+},
+{
+  "model": "meals.mealfooditem",
+  "pk": 2,
+  "fields": {
+    "meal": 4,
+    "food_item": 2,
+    "quantity": 300.0,
+    "unit": "g",
+    "calories": 450.0,
+    "protein_g": 15.0,
+    "carbs_g": 60.0,
+    "fat_g": 15.0,
+    "fiber_g": 3.0,
+    "ai_detected": true,
+    "user_edited": false,
+    "confidence_score": 0.9
+  }
+},
+{
+  "model": "meals.mealfooditem",
+  "pk": 3,
+  "fields": {
+    "meal": 4,
+    "food_item": 3,
+    "quantity": 75.0,
+    "unit": "g",
+    "calories": 112.5,
+    "protein_g": 3.75,
+    "carbs_g": 15.0,
+    "fat_g": 3.75,
+    "fiber_g": 0.75,
+    "ai_detected": true,
+    "user_edited": false,
+    "confidence_score": 0.63
+  }
+},
+{
+  "model": "consultations.nutritionist",
+  "pk": 2,
+  "fields": {
+    "name": "hadil zidouri",
+    "email": "hadil.zidouri@univ-constantine2.dz",
+    "phone": "",
+    "specialization": "",
+    "bio": null,
+    "credentials": "",
+    "profile_picture": "profile_pictures/drhadil.png",
+    "availability_url": "",
+    "zoom_meeting_link": null,
+    "is_active": true,
+    "created_at": "2026-04-29T14:25:57.419Z",
+    "updated_at": "2026-04-29T14:25:57.419Z"
+  }
+},
+{
+  "model": "consultations.nutritionist",
+  "pk": 1,
+  "fields": {
+    "name": "messaoudi besmala",
+    "email": "messaoudibesmala1@gmail.com",
+    "phone": "",
+    "specialization": "nutrition",
+    "bio": null,
+    "credentials": "",
+    "profile_picture": "profile_pictures/drbesmala.png",
+    "availability_url": "",
+    "zoom_meeting_link": null,
+    "is_active": true,
+    "created_at": "2026-04-29T14:24:05.035Z",
+    "updated_at": "2026-04-29T14:24:05.035Z"
+  }
+},
+{
+  "model": "consultations.consultation",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "nutritionist": 1,
+    "status": "confirmed",
+    "session_type": "monthly_checkin",
+    "scheduled_at": "2026-04-30T11:00:00Z",
+    "duration_minutes": 30,
+    "zoom_link": "hhk",
+    "topic": "Monthly Check-In",
+    "notes": "",
+    "is_premium": false,
+    "post_notes": null,
+    "recommendations": null,
+    "completed_at": null,
+    "requested_at": "2026-04-29T17:54:18.855Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 8,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": [
+      "hadil.zidouri_2"
+    ],
+    "created_at": "2026-05-05T09:55:52.883Z",
+    "updated_at": "2026-05-05T09:59:07.844Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 7,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": [
+      "messaoudibesmala1_1"
+    ],
+    "created_at": "2026-04-29T18:09:09.356Z",
+    "updated_at": "2026-04-29T18:12:01.558Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 6,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": null,
+    "created_at": "2026-04-29T14:48:58.097Z",
+    "updated_at": "2026-04-29T14:48:58.097Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 4,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": [
+      "hadil.zidouri_2"
+    ],
+    "created_at": "2026-04-29T14:31:46.226Z",
+    "updated_at": "2026-04-29T15:09:02.334Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 3,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": null,
+    "created_at": "2026-04-29T14:25:57.455Z",
+    "updated_at": "2026-04-29T14:25:57.455Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 2,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": null,
+    "created_at": "2026-04-29T14:24:05.050Z",
+    "updated_at": "2026-04-29T14:24:05.050Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 1,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": 63.0,
+    "start_weight_kg": 66.0,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": [
+      "hadil.zidouri_2"
+    ],
+    "created_at": "2026-04-29T14:21:30.199Z",
+    "updated_at": "2026-05-11T09:34:16.654Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 9,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": null,
+    "start_weight_kg": null,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": null,
+    "created_at": "2026-05-15T06:29:30.500Z",
+    "updated_at": "2026-05-15T06:29:30.500Z"
+  }
+},
+{
+  "model": "profiles.userprofile",
+  "pk": 10,
+  "fields": {
+    "height_cm": null,
+    "current_weight_kg": 56.5,
+    "start_weight_kg": 56.5,
+    "goal_weight_kg": null,
+    "daily_calorie_goal": 2000,
+    "protein_goal_g": 120.0,
+    "carbs_goal_g": 200.0,
+    "fat_goal_g": 65.0,
+    "goal_setting_mode": "auto",
+    "is_subscribed": false,
+    "subscription_plan": "free",
+    "subscription_end_date": null,
+    "managed_by": [
+      "messaoudibesmala1_1"
+    ],
+    "created_at": "2026-05-15T14:24:48.372Z",
+    "updated_at": "2026-05-15T15:47:11.749Z"
+  }
+},
+{
+  "model": "profiles.weightentry",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "date": "2026-05-18",
+    "weight_kg": 56.5,
+    "notes": "",
+    "logged_at": "2026-05-18T14:22:16.554Z"
+  }
+},
+{
+  "model": "profiles.weightentry",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "date": "2026-04-29",
+    "weight_kg": 63.0,
+    "notes": "",
+    "logged_at": "2026-04-29T17:56:49.683Z"
+  }
+},
+{
+  "model": "profiles.bodymeasurement",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "date": "2026-05-18",
+    "waist_cm": 70.0,
+    "hips_cm": 100.0,
+    "chest_cm": 85.0,
+    "arms_cm": 55.0,
+    "neck_cm": null,
+    "notes": "",
+    "logged_at": "2026-05-18T14:22:16.706Z"
+  }
+},
+{
+  "model": "profiles.bodymeasurement",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "date": "2026-04-29",
+    "waist_cm": 44.0,
+    "hips_cm": 44.0,
+    "chest_cm": 33.0,
+    "arms_cm": 23.0,
+    "neck_cm": null,
+    "notes": "",
+    "logged_at": "2026-04-29T17:56:49.786Z"
+  }
+},
+{
+  "model": "profiles.nutritionistfeedback",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "nutritionist": [
+      "messaoudibesmala1_1"
+    ],
+    "title": "great progress",
+    "message": "complete this way ur doing good",
+    "created_at": "2026-04-29T17:58:28.183Z",
+    "updated_at": "2026-04-29T17:58:30.574Z",
+    "is_read": true
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 10,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "High Fiber Plan",
+    "description": "A fiber-forward plan to improve digestion, support gut microbiome, and maintain steady energy.",
+    "overview": "Dietary fiber feeds beneficial gut bacteria, improves bowel regularity, and helps maintain a healthy weight. This plan centers around legumes, whole grains, fruits, vegetables, and seeds. Increasing fiber gradually is important — too much too fast can cause bloating.",
+    "plan_type": "standard",
+    "category": "For Health Conditions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Aim for 25–35g of fiber per day",
+      "Increase fiber intake gradually over 1–2 weeks",
+      "Drink at least 8 glasses of water daily",
+      "Include both soluble and insoluble fiber sources",
+      "Add legumes (lentils, chickpeas, beans) to meals regularly"
+    ],
+    "example_meals": [
+      "Breakfast: Overnight oats with flaxseeds, apple slices, and cinnamon",
+      "Lunch: Chickpea and vegetable stir-fry with brown rice",
+      "Snack: Pear with a tablespoon of almond butter",
+      "Dinner: Black bean tacos with shredded cabbage and salsa"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_181626_4RaWvmG.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:26:34.662Z",
+    "updated_at": "2026-04-29T17:26:34.662Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 9,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Low Sodium Plan",
+    "description": "Heart-healthy meals crafted to reduce sodium intake and support healthy blood pressure.",
+    "overview": "Excess sodium contributes to high blood pressure and increases the risk of heart disease. This plan focuses on fresh, whole foods prepared with herbs and spices instead of salt. It avoids processed foods, canned goods, and restaurant meals — the biggest sources of hidden sodium in modern diets.",
+    "plan_type": "standard",
+    "category": "For Health Conditions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Limit sodium to under 1,500mg per day",
+      "Cook at home using fresh herbs, lemon, and garlic instead of salt",
+      "Avoid processed meats, canned soups, and packaged sauces",
+      "Read nutrition labels — aim for under 200mg sodium per serving",
+      "Drink plenty of water to support kidney function"
+    ],
+    "example_meals": [
+      "Breakfast: Scrambled eggs with spinach and tomatoes, no-salt seasoning",
+      "Lunch: Homemade lentil soup with fresh herbs and whole-grain bread",
+      "Snack: Unsalted rice cakes with mashed avocado",
+      "Dinner: Herb-roasted chicken with steamed green beans and sweet potato"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_180935_BScE1UX.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:25:40.182Z",
+    "updated_at": "2026-04-29T17:25:40.182Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 8,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Low Sugar Plan",
+    "description": "A structured eating plan focused on stabilizing blood sugar through low-glycemic, nutrient-rich foods.",
+    "overview": "This plan is designed for individuals managing diabetes or insulin resistance. It emphasizes whole grains, lean proteins, healthy fats, and fiber-rich vegetables while limiting refined sugars and processed carbohydrates. Consistent meal timing is key to keeping glucose levels stable throughout the day.",
+    "plan_type": "standard",
+    "category": "For Health Conditions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Choose whole grains over refined carbs (oats, quinoa, brown rice)",
+      "Include protein in every meal to slow sugar absorption",
+      "Avoid sugary drinks, fruit juices, and processed snacks",
+      "Eat at consistent times — don't skip meals",
+      "Focus on non-starchy vegetables as the base of each plate"
+    ],
+    "example_meals": [
+      "Breakfast: Oatmeal with chia seeds, walnuts, and a few blueberries",
+      "Lunch: Grilled chicken salad with avocado, olive oil dressing",
+      "Snack: A small handful of almonds with cucumber slices",
+      "Dinner: Baked salmon with roasted broccoli and quinoa"
+    ],
+    "image_url": "",
+    "image": "diet_plans/lowsugar.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:24:48.218Z",
+    "updated_at": "2026-04-29T17:24:48.218Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 7,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Muscle Gain Plan",
+    "description": "A high-protein, calorie-sufficient plan to fuel workouts and support muscle growth.",
+    "overview": "Building muscle requires both a slight calorie surplus and adequate protein intake — typically 1.6–2.2g per kg of body weight. This plan distributes protein evenly across meals and includes complex carbohydrates to fuel training sessions and support recovery.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Eat every 3–4 hours to maintain positive protein balance",
+      "Consume 30–40g of protein per meal for optimal muscle synthesis",
+      "Time carbohydrates around workouts for maximum energy",
+      "Don't neglect healthy fats — they support hormone production",
+      "Prioritize sleep and recovery as much as nutrition"
+    ],
+    "example_meals": [
+      "Breakfast: Oatmeal with protein powder, banana, and peanut butter",
+      "Lunch: Grilled beef or chicken with rice and roasted vegetables",
+      "Pre-workout snack: Greek yogurt with granola and berries",
+      "Dinner: Salmon with sweet potato and steamed broccoli"
+    ],
+    "image_url": "",
+    "image": "",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:20:28.759Z",
+    "updated_at": "2026-04-29T17:20:28.759Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 6,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Weight Loss Plan",
+    "description": "A sustainable calorie-conscious plan focused on whole foods and portion control.",
+    "overview": "Sustainable weight loss comes from a moderate calorie deficit combined with high-volume, nutrient-dense foods that keep you full. This plan avoids crash dieting and focuses on building long-term habits. Protein is prioritized to preserve muscle mass while losing fat.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Target a 300–500 calorie daily deficit — not more",
+      "Eat protein at every meal to stay full and preserve muscle",
+      "Fill half your plate with vegetables at lunch and dinner",
+      "Limit liquid calories — water, herbal tea, and black coffee only",
+      "Plan meals ahead to avoid impulsive food choices"
+    ],
+    "example_meals": [
+      "Breakfast: 2 boiled eggs with sliced tomatoes and whole-grain toast",
+      "Lunch: Large salad with grilled chicken, olive oil, and lemon",
+      "Snack: Apple slices with a tablespoon of peanut butter",
+      "Dinner: Baked cod with roasted zucchini and cauliflower rice"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_181855.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:19:31.264Z",
+    "updated_at": "2026-04-29T17:19:31.264Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 5,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Ramadan Plan  Plan Type",
+    "description": "Balanced Suhoor and Iftar meals to maintain energy, hydration, and nutrition during the holy month.",
+    "overview": "Fasting during Ramadan requires thoughtful nutrition to sustain energy through long hours without food or water. The focus is on slow-digesting foods at Suhoor for lasting energy, and a balanced Iftar to replenish without overeating. Hydration between Iftar and Suhoor is equally important.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Start Iftar with dates and water — a natural and traditional way to break fast",
+      "Eat Suhoor as close to Fajr as possible",
+      "Prioritize complex carbs and protein at Suhoor for sustained energy",
+      "Avoid fried and heavily spiced foods at Iftar",
+      "Drink 8–10 glasses of water between Iftar and Suhoor"
+    ],
+    "example_meals": [
+      "Suhoor: Whole-grain bread with eggs, labneh, and a piece of fruit",
+      "Iftar (break fast): 2–3 dates with water or milk",
+      "Iftar (main): Lentil soup, grilled protein, salad, and a small portion of rice",
+      "After Tarawih snack: Greek yogurt with honey and a handful of nuts"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_181804.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T17:18:36.658Z",
+    "updated_at": "2026-04-29T17:18:36.658Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 4,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "High Fiber Plan",
+    "description": "A fiber-forward plan to improve digestion, support gut microbiome, and maintain steady energy.",
+    "overview": "Dietary fiber feeds beneficial gut bacteria, improves bowel regularity, and helps maintain a healthy weight. This plan centers around legumes, whole grains, fruits, vegetables, and seeds. Increasing fiber gradually is important — too much too fast can cause bloating.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Aim for 25–35g of fiber per day",
+      "Increase fiber intake gradually over 1–2 weeks",
+      "Drink at least 8 glasses of water daily",
+      "Include both soluble and insoluble fiber sources",
+      "Add legumes (lentils, chickpeas, beans) to meals regularly"
+    ],
+    "example_meals": [
+      "Breakfast: Overnight oats with flaxseeds, apple slices, and cinnamon",
+      "Lunch: Chickpea and vegetable stir-fry with brown rice",
+      "Snack: Pear with a tablespoon of almond butter",
+      "Dinner: Black bean tacos with shredded cabbage and salsa"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_181626.png",
+    "is_published": false,
+    "moderation_status": "Rejected",
+    "created_at": "2026-04-29T17:17:03.804Z",
+    "updated_at": "2026-04-29T17:17:03.804Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 3,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Low Sodium Plan",
+    "description": "Heart-healthy meals crafted to reduce sodium intake and support healthy blood pressure.",
+    "overview": "Excess sodium contributes to high blood pressure and increases the risk of heart disease. This plan focuses on fresh, whole foods prepared with herbs and spices instead of salt. It avoids processed foods, canned goods, and restaurant meals — the biggest sources of hidden sodium in modern diets.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Limit sodium to under 1,500mg per day",
+      "Cook at home using fresh herbs, lemon, and garlic instead of salt",
+      "Avoid processed meats, canned soups, and packaged sauces",
+      "Read nutrition labels — aim for under 200mg sodium per serving",
+      "Drink plenty of water to support kidney function"
+    ],
+    "example_meals": [
+      "Breakfast: Scrambled eggs with spinach and tomatoes, no-salt seasoning",
+      "Lunch: Homemade lentil soup with fresh herbs and whole-grain bread",
+      "Snack: Unsalted rice cakes with mashed avocado",
+      "Dinner: Herb-roasted chicken with steamed green beans and sweet potato"
+    ],
+    "image_url": "",
+    "image": "diet_plans/Capture_décran_2026-04-29_180935.png",
+    "is_published": false,
+    "moderation_status": "Rejected",
+    "created_at": "2026-04-29T17:16:05.245Z",
+    "updated_at": "2026-04-29T17:16:05.246Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 2,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "Low Sugar Plan",
+    "description": "A structured eating plan focused on stabilizing blood sugar through low-glycemic, nutrient-rich foods.",
+    "overview": "This plan is designed for individuals managing diabetes or insulin resistance. It emphasizes whole grains, lean proteins, healthy fats, and fiber-rich vegetables while limiting refined sugars and processed carbohydrates. Consistent meal timing is key to keeping glucose levels stable throughout the day.",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": null,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "Choose whole grains over refined carbs (oats, quinoa, brown rice)",
+      "Include protein in every meal to slow sugar absorption",
+      "Avoid sugary drinks, fruit juices, and processed snacks",
+      "Eat at consistent times — don't skip meals",
+      "Focus on non-starchy vegetables as the base of each plate"
+    ],
+    "example_meals": [
+      "Breakfast: Oatmeal with chia seeds, walnuts, and a few blueberries",
+      "Lunch: Grilled chicken salad with avocado, olive oil dressing",
+      "Snack: A small handful of almonds with cucumber slices",
+      "Dinner: Baked salmon with roasted broccoli and quinoa"
+    ],
+    "image_url": "",
+    "image": "diet_plans/lowsugar.png",
+    "is_published": false,
+    "moderation_status": "Rejected",
+    "created_at": "2026-04-29T17:12:17.433Z",
+    "updated_at": "2026-04-29T17:12:17.435Z"
+  }
+},
+{
+  "model": "profiles.dietplantemplate",
+  "pk": 1,
+  "fields": {
+    "created_by": [
+      "hadil.zidouri_2"
+    ],
+    "title": "hello",
+    "description": "grqeh;<vshse r",
+    "overview": "eaFKY RTCYGYDabj;dg",
+    "plan_type": "standard",
+    "category": "Lifestyle & Occasions",
+    "daily_calorie_target": 1800,
+    "protein_target_g": null,
+    "carbs_target_g": null,
+    "fat_target_g": null,
+    "meals_data": {},
+    "key_guidelines": [
+      "dsgQC."
+    ],
+    "example_meals": [
+      "hsjc.QAj;cvsf"
+    ],
+    "image_url": "",
+    "image": "",
+    "is_published": false,
+    "moderation_status": "Rejected",
+    "created_at": "2026-04-29T16:53:15.354Z",
+    "updated_at": "2026-04-29T16:53:15.354Z"
+  }
+},
+{
+  "model": "subscriptions.subscriptionplan",
+  "pk": 4,
+  "fields": {
+    "name": "Free",
+    "price": "0.00",
+    "features": [
+      "3 AI calorie scans per day",
+      "Browse nutritionists & public content",
+      "Progress tracking dashboard"
+    ],
+    "duration_days": 36500,
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 0,
+    "created_at": "2026-04-29T14:48:56.002Z",
+    "updated_at": "2026-04-29T14:48:56.002Z"
+  }
+},
+{
+  "model": "subscriptions.subscriptionplan",
+  "pk": 5,
+  "fields": {
+    "name": "Pro",
+    "price": "9.99",
+    "features": [
+      "Unlimited AI calorie scans",
+      "Online consultation with a nutritionist",
+      "Personalized diet plan assigned by nutritionist",
+      "Diet plan updated based on consultation progress",
+      "Ongoing WhatsApp Mentorship"
+    ],
+    "duration_days": 30,
+    "is_active": true,
+    "is_featured": true,
+    "sort_order": 1,
+    "created_at": "2026-04-29T14:48:56.014Z",
+    "updated_at": "2026-04-29T14:48:56.014Z"
+  }
+},
+{
+  "model": "subscriptions.subscriptionplan",
+  "pk": 1,
+  "fields": {
+    "name": "Monthly",
+    "price": "29.00",
+    "features": [
+      "Unlimited AI meal scans",
+      "Personalized meal plans",
+      "2 consultations/month",
+      "Direct nutritionist messaging",
+      "Progress tracking & reports",
+      "Cancel anytime"
+    ],
+    "duration_days": 30,
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 1,
+    "created_at": "2026-05-15T05:58:30.881Z",
+    "updated_at": "2026-05-15T05:58:30.881Z"
+  }
+},
+{
+  "model": "subscriptions.subscriptionplan",
+  "pk": 2,
+  "fields": {
+    "name": "Quarterly",
+    "price": "69.00",
+    "features": [
+      "All Monthly features",
+      "8 consultations total",
+      "Priority support",
+      "Seasonal meal plans",
+      "Recipe library access",
+      "20% savings"
+    ],
+    "duration_days": 90,
+    "is_active": true,
+    "is_featured": true,
+    "sort_order": 2,
+    "created_at": "2026-05-15T05:58:30.881Z",
+    "updated_at": "2026-05-15T05:58:30.881Z"
+  }
+},
+{
+  "model": "subscriptions.subscriptionplan",
+  "pk": 3,
+  "fields": {
+    "name": "Annual",
+    "price": "199.00",
+    "features": [
+      "All Quarterly features",
+      "Unlimited consultations",
+      "Personal health coach",
+      "Custom meal planning",
+      "Premium analytics",
+      "Best value"
+    ],
+    "duration_days": 365,
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 3,
+    "created_at": "2026-05-15T05:58:30.890Z",
+    "updated_at": "2026-05-15T05:58:30.890Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "subscription_plan": 5,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-05-15T15:41:40.280Z",
+    "end_date": "2026-06-14T15:41:40.264Z",
+    "created_at": "2026-05-15T15:41:40.280Z",
+    "updated_at": "2026-05-15T15:41:40.280Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "besmala"
+    ],
+    "subscription_plan": null,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-05-15T08:56:27.848Z",
+    "end_date": "2026-06-14T08:56:27.848Z",
+    "created_at": "2026-05-15T08:56:27.848Z",
+    "updated_at": "2026-05-15T08:56:27.848Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "subscription_plan": 5,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-05-05T09:59:05.133Z",
+    "end_date": "2026-06-04T09:59:05.131Z",
+    "created_at": "2026-05-05T09:59:05.133Z",
+    "updated_at": "2026-05-05T09:59:05.133Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "subscription_plan": 5,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-04-29T18:11:57.905Z",
+    "end_date": "2026-05-29T18:11:57.903Z",
+    "created_at": "2026-04-29T18:11:57.905Z",
+    "updated_at": "2026-04-29T18:11:57.905Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription_plan": 5,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-04-29T14:49:34.487Z",
+    "end_date": "2026-06-10T09:34:14.451Z",
+    "created_at": "2026-04-29T14:49:34.487Z",
+    "updated_at": "2026-05-11T09:34:14.452Z"
+  }
+},
+{
+  "model": "subscriptions.subscription",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "subscription_plan": 5,
+    "plan": "Pro",
+    "status": "active",
+    "start_date": "2026-04-29T14:32:34.756Z",
+    "end_date": "2026-05-29T15:18:15.341Z",
+    "created_at": "2026-04-29T14:32:34.756Z",
+    "updated_at": "2026-04-29T15:18:15.342Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 8,
+  "fields": {
+    "recipient": [
+      "messaoudibesmala1_1"
+    ],
+    "actor": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "notification_type": "weight",
+    "title": "besmala Messaoudi logged a weigh-in",
+    "message": "New weight: 56.5 kg on 2026-05-18.",
+    "link": "/nutritionist/clients/",
+    "is_read": false,
+    "created_at": "2026-05-18T14:22:16.603Z",
+    "updated_at": "2026-05-18T14:22:16.603Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 5,
+  "fields": {
+    "recipient": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "actor": [
+      "hadil.zidouri_2"
+    ],
+    "notification_type": "system",
+    "title": "New article: HELLO",
+    "message": "By hadil zidouri — HEY",
+    "link": "/blog/2",
+    "is_read": false,
+    "created_at": "2026-05-04T14:38:56.459Z",
+    "updated_at": "2026-05-04T14:38:56.459Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 6,
+  "fields": {
+    "recipient": [
+      "doudikarb@gmail.com"
+    ],
+    "actor": [
+      "hadil.zidouri_2"
+    ],
+    "notification_type": "system",
+    "title": "New article: HELLO",
+    "message": "By hadil zidouri — HEY",
+    "link": "/blog/2",
+    "is_read": false,
+    "created_at": "2026-05-04T14:38:56.459Z",
+    "updated_at": "2026-05-04T14:38:56.459Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 7,
+  "fields": {
+    "recipient": [
+      "douaakarboua098@gmail.com"
+    ],
+    "actor": [
+      "hadil.zidouri_2"
+    ],
+    "notification_type": "system",
+    "title": "New article: HELLO",
+    "message": "By hadil zidouri — HEY",
+    "link": "/blog/2",
+    "is_read": true,
+    "created_at": "2026-05-04T14:38:56.459Z",
+    "updated_at": "2026-05-05T08:22:18.296Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 4,
+  "fields": {
+    "recipient": [
+      "douaakarboua098@gmail.com"
+    ],
+    "actor": [
+      "messaoudibesmala1_1"
+    ],
+    "notification_type": "message",
+    "title": "New feedback: great progress",
+    "message": "Message from messaoudi besmala.",
+    "link": "/progress/",
+    "is_read": true,
+    "created_at": "2026-04-29T17:58:28.199Z",
+    "updated_at": "2026-04-29T18:01:29.193Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 3,
+  "fields": {
+    "recipient": [
+      "messaoudibesmala1_1"
+    ],
+    "actor": [
+      "douaakarboua098@gmail.com"
+    ],
+    "notification_type": "weight",
+    "title": "Douaa Karboua logged a weigh-in",
+    "message": "New weight: 66.0 kg on 2026-04-29.",
+    "link": "/nutritionist/clients/",
+    "is_read": false,
+    "created_at": "2026-04-29T17:56:49.732Z",
+    "updated_at": "2026-04-29T17:56:49.732Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 2,
+  "fields": {
+    "recipient": [
+      "douaakarboua098@gmail.com"
+    ],
+    "actor": null,
+    "notification_type": "appointment",
+    "title": "Meeting link ready",
+    "message": "Your nutritionist has attached a meeting link to your appointment.",
+    "link": "/appointments/",
+    "is_read": true,
+    "created_at": "2026-04-29T17:54:29.681Z",
+    "updated_at": "2026-04-29T18:01:30.015Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 1,
+  "fields": {
+    "recipient": [
+      "messaoudibesmala1_1"
+    ],
+    "actor": [
+      "douaakarboua098@gmail.com"
+    ],
+    "notification_type": "appointment",
+    "title": "New appointment request",
+    "message": "Douaa Karboua booked a consultation.",
+    "link": "/nutritionist/calendar/",
+    "is_read": true,
+    "created_at": "2026-04-29T17:54:18.890Z",
+    "updated_at": "2026-04-29T17:54:18.890Z"
+  }
+},
+{
+  "model": "blogs.blog",
+  "pk": 2,
+  "fields": {
+    "author": [
+      "hadil.zidouri_2"
+    ],
+    "title": "HELLO",
+    "content": "AMRHJABA",
+    "excerpt": "HEY",
+    "image": "",
+    "is_published": false,
+    "moderation_status": "Rejected",
+    "created_at": "2026-05-04T14:38:31.638Z",
+    "updated_at": "2026-05-04T14:38:31.638Z"
+  }
+},
+{
+  "model": "blogs.blog",
+  "pk": 1,
+  "fields": {
+    "author": [
+      "hadil.zidouri_2"
+    ],
+    "title": "The Ultimate Guide to Building Healthy Eating Habits That Last",
+    "content": "Content\r\nHealthy eating isn’t about strict diets or giving up your favorite foods—it’s about creating balanced, sustainable habits that support your overall well-being. Whether you're just starting your nutrition journey or looking to improve your current lifestyle, small changes can make a big difference.\r\n\r\n1. Focus on Balanced Meals\r\n\r\nA healthy plate should include a mix of macronutrients: carbohydrates, proteins, and healthy fats. Try to fill half your plate with vegetables, one-quarter with lean protein, and the rest with whole grains. This balance helps keep your energy levels stable throughout the day.\r\n\r\n2. Stay Hydrated\r\n\r\nWater plays a key role in digestion, metabolism, and overall health. Many people mistake thirst for hunger, leading to unnecessary snacking. Aim to drink at least 6–8 glasses of water daily, and more if you're active.\r\n\r\n3. Don’t Skip Meals\r\n\r\nSkipping meals can lead to overeating later and cause energy crashes. Eating regularly helps maintain blood sugar levels and keeps your metabolism active. Start your day with a nutritious breakfast to fuel your body.\r\n\r\n4. Choose Whole Foods\r\n\r\nMinimize processed foods and focus on whole, natural ingredients like fruits, vegetables, nuts, seeds, and whole grains. These foods are rich in nutrients and free from unnecessary additives.\r\n\r\n5. Practice Mindful Eating\r\n\r\nSlow down and pay attention to what you eat. Avoid distractions like phones or TV during meals. This helps you enjoy your food more and recognize when you're full, preventing overeating.\r\n\r\n6. Plan Ahead\r\n\r\nMeal planning can save time and help you make healthier choices. Prepare meals in advance to avoid relying on fast food or unhealthy snacks when you're busy.\r\n\r\n7. Be Consistent, Not Perfect\r\n\r\nHealthy eating is a long-term commitment. It’s okay to enjoy treats occasionally. What matters most is consistency over time, not perfection.",
+    "excerpt": "Discover simple, science-backed strategies to improve your nutrition, boost your energy, and build healthy eating habits you can maintain for life.",
+    "image": "blogs/healthyfood.png",
+    "is_published": true,
+    "moderation_status": "Approved",
+    "created_at": "2026-04-29T16:09:38.847Z",
+    "updated_at": "2026-04-29T16:09:38.847Z"
+  }
+},
+{
+  "model": "adminpanel.adminaccount",
+  "pk": 1,
+  "fields": {
+    "name": "admin",
+    "email": "admin@nutrilens.com",
+    "password_hash": "$2b$12$bBb5WBiQPtYzZivIV.HW7eJxhrGR0mICRg1vlmiMQNIUv/R6le45.",
+    "phone": "",
+    "role": "Platform Administrator",
+    "timezone": "UTC",
+    "bio": "Platform administrator account.",
+    "created_at": "2026-04-29T14:18:58.078Z",
+    "updated_at": "2026-04-29T14:22:54.397Z"
+  }
+},
+{
+  "model": "adminpanel.supportticket",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "contact_name": "Douaa Karboua",
+    "contact_email": "douaakarboua098@gmail.com",
+    "message": "hi my email is not verified",
+    "subject": "Support request from Douaa Karboua",
+    "priority": "Medium",
+    "status": "Resolved",
+    "assigned": "",
+    "created_at": "2026-04-29T17:46:23.309Z",
+    "updated_at": "2026-05-05T08:18:24.712Z"
+  }
+},
+{
+  "model": "adminpanel.supportticketmessage",
+  "pk": 1,
+  "fields": {
+    "ticket": 1,
+    "from_name": "Douaa Karboua",
+    "role": "user",
+    "text": "hi my email is not verified",
+    "created_at": "2026-04-29T17:46:23.325Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "5329f8ff-5872-47da-97af-4fe698c15019",
+  "fields": {
+    "user": [
+      "besmala.messaoudi@univ-constantine2.dz"
+    ],
+    "subscription": 6,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-15T15:41:40.297Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "e9c97629-7248-4102-a8e0-4f7f3a96469d",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-11T09:34:14.455Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "d663c5d3-085f-4c78-8d5f-91cc2e388699",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-06T11:31:25.282Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "e583c211-ec56-4c9e-a8ad-1038497532b9",
+  "fields": {
+    "user": [
+      "hadil@gmail.com"
+    ],
+    "subscription": 4,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-05T09:59:05.136Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "bc356562-de9c-48b0-b8c0-8c2155641348",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-05T09:40:28.133Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "7e4ce269-b07f-4727-97be-d4793a9d744b",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-05T09:39:30.970Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "d41ad55b-0d2a-41d4-9176-93b50bbe06fc",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-05T08:21:56.997Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "6aebb597-570d-4029-85ac-f776b9b0b016",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-05T08:20:19.484Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "eaa89bfb-4fd3-4c9a-abff-687b5ca60e0c",
+  "fields": {
+    "user": [
+      "doudikarb@gmail.com"
+    ],
+    "subscription": 1,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Refunded",
+    "refund_status": "Processed",
+    "created_at": "2026-05-04T13:50:36.542Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "2588e4dc-3411-46da-905d-240b68e9c65e",
+  "fields": {
+    "user": [
+      "douaakarboua098@gmail.com"
+    ],
+    "subscription": 2,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-04T13:50:36.541Z"
+  }
+},
+{
+  "model": "adminpanel.transaction",
+  "pk": "bf1a8279-311a-4904-9dfd-04f3f01f9d32",
+  "fields": {
+    "user": [
+      "douaa.karboua@univ-constantine2.dz"
+    ],
+    "subscription": 3,
+    "plan": "Pro",
+    "amount": "9.99",
+    "method": "Direct",
+    "status": "Paid",
+    "refund_status": "None",
+    "created_at": "2026-05-04T13:50:36.537Z"
+  }
+},
+{
+  "model": "adminpanel.nutritionistadminprofile",
+  "pk": 2,
+  "fields": {
+    "nutritionist": 2,
+    "linked_user": [
+      "hadil.zidouri_2"
+    ],
+    "status": "Approved"
+  }
+},
+{
+  "model": "adminpanel.nutritionistadminprofile",
+  "pk": 1,
+  "fields": {
+    "nutritionist": 1,
+    "linked_user": [
+      "messaoudibesmala1_1"
+    ],
+    "status": "Approved"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 17,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New blog submitted",
+    "message": "hadil zidouri submitted a blog: “HELLO”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-05-04T14:38:31.641Z",
+    "updated_at": "2026-05-04T14:38:31.641Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 16,
+  "fields": {
+    "recipient": null,
+    "notification_type": "support",
+    "title": "New support ticket",
+    "message": "Douaa Karboua submitted a support request.",
+    "link": "/admin#support",
+    "is_read": true,
+    "created_at": "2026-04-29T17:46:23.338Z",
+    "updated_at": "2026-04-29T17:46:23.338Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 15,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “High Fiber Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:26:34.675Z",
+    "updated_at": "2026-04-29T17:26:34.676Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 14,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Low Sodium Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:25:40.199Z",
+    "updated_at": "2026-04-29T17:25:40.199Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 13,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Low Sugar Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:24:48.234Z",
+    "updated_at": "2026-04-29T17:24:48.234Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 12,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Muscle Gain Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:20:28.775Z",
+    "updated_at": "2026-04-29T17:20:28.775Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 11,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Weight Loss Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:19:31.280Z",
+    "updated_at": "2026-04-29T17:19:31.280Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 10,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Ramadan Plan  Plan Type”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:18:36.672Z",
+    "updated_at": "2026-04-29T17:18:36.672Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 9,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “High Fiber Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:17:03.816Z",
+    "updated_at": "2026-04-29T17:17:03.816Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 8,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Low Sodium Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:16:05.261Z",
+    "updated_at": "2026-04-29T17:16:05.261Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 7,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “Low Sugar Plan”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T17:12:17.447Z",
+    "updated_at": "2026-04-29T17:12:17.447Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 6,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “hello”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T16:53:15.369Z",
+    "updated_at": "2026-04-29T16:53:15.369Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 5,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “hgqei<qhrgl”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T16:32:49.946Z",
+    "updated_at": "2026-04-29T16:32:49.946Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 4,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “satand weight loss”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T16:16:26.961Z",
+    "updated_at": "2026-04-29T16:16:26.961Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 3,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New blog submitted",
+    "message": "hadil zidouri submitted a blog: “The Ultimate Guide to Building Healthy Eating Habits That Last”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T16:09:38.859Z",
+    "updated_at": "2026-04-29T16:09:38.859Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 2,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “hi”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T16:05:00.771Z",
+    "updated_at": "2026-04-29T16:05:00.771Z"
+  }
+},
+{
+  "model": "adminpanel.adminnotification",
+  "pk": 1,
+  "fields": {
+    "recipient": null,
+    "notification_type": "content",
+    "title": "New diet plan submitted",
+    "message": "hadil zidouri submitted a diet plan: “oolll”.",
+    "link": "/admin#content",
+    "is_read": true,
+    "created_at": "2026-04-29T15:59:39.922Z",
+    "updated_at": "2026-04-29T15:59:39.922Z"
+  }
+},
+{
+  "model": "adminpanel.newslettersubscriber",
+  "pk": 1,
+  "fields": {
+    "email": "douaakarboua098@gmail.com",
+    "subscribed_at": "2026-05-04T14:37:02.723Z",
+    "is_active": true
+  }
+}
+]
