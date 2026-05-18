@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 from decouple import config
 
@@ -8,9 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- 1. CORE SECURITY ---
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
+# In .env set: ALLOWED_HOSTS=localhost,127.0.0.1,your-backend.onrender.com
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # --- 2. APPLICATION DEFINITION ---
 INSTALLED_APPS = [
@@ -47,6 +49,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # serves static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,16 +79,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # --- 4. DATABASE ---
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='nutrilens_db'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+# Render provides DATABASE_URL automatically — dj_database_url parses it.
+# Falls back to individual env vars for local development.
+DATABASE_URL = config('DATABASE_URL', default='')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='nutrilens_db'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
 
 
 
@@ -111,6 +123,7 @@ USE_TZ = True
 # --- 7. STATIC & MEDIA FILES ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Only include STATICFILES_DIRS if the folder exists — prevents collectstatic crash
 _static_dir = BASE_DIR / 'static'
@@ -173,11 +186,10 @@ REST_FRAMEWORK = {
 }
 
 # --- 9. CORS ---
-# CORS_ALLOW_ALL_ORIGINS + CORS_ALLOW_CREDENTIALS together are fine for local dev.
-# For production replace with:
-#   CORS_ALLOW_ALL_ORIGINS = False
-#   CORS_ALLOWED_ORIGINS = ['https://yourfrontend.com']
-CORS_ALLOW_ALL_ORIGINS = True
+# In .env set: CORS_ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend.onrender.com
+_cors_origins = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://localhost:3000')
+CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(',') if o.strip()]
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = [

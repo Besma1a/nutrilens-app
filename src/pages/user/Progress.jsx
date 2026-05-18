@@ -192,6 +192,11 @@ export default function Progress() {
   const goalWeight    = profileData?.goal_weight_kg    ?? user?.stats?.goalWeight         ?? 0;
   const lost          = Math.max(0, startWeight - currentWeight).toFixed(1);
 
+  const heightCm  = parseFloat(profileData?.height_cm ?? user?.stats?.height);
+  const weightKg  = parseFloat(currentWeight);
+  const bmiValue  = heightCm > 0 && weightKg > 0 ? weightKg / ((heightCm / 100) ** 2) : null;
+  const bmiLabel  = bmiValue == null ? '—' : bmiValue < 18.5 ? 'Underweight' : bmiValue < 25 ? 'Normal' : bmiValue < 30 ? 'Overweight' : 'Obese';
+
   // ── Weight chart — oldest→newest left→right, all entries ──────────────
   // weightHistory is newest-first, so reverse gives oldest-first
   // Show all entries (not just last 7) to track full history
@@ -492,17 +497,10 @@ export default function Progress() {
               <div className="mtag-l">BMI</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div className="mtag-v">
-                  {isPremium ? (currentWeight && profileData?.height_cm ? (currentWeight / ((profileData.height_cm / 100) ** 2)).toFixed(1) : '—') : '24.2'}
+                  {isPremium ? (bmiValue != null ? bmiValue.toFixed(1) : '—') : '24.2'}
                 </div>
                 <span className="badge badge-amber" style={{ fontSize: 10 }}>
-                  {isPremium ? (() => {
-                    if (!currentWeight || !profileData?.height_cm) return '—';
-                    const bmi = currentWeight / ((profileData.height_cm / 100) ** 2);
-                    if (bmi < 18.5) return 'Underweight';
-                    if (bmi < 25)   return 'Normal';
-                    if (bmi < 30)   return 'Overweight';
-                    return 'Obese';
-                  })() : 'Normal'}
+                  {isPremium ? bmiLabel : 'Normal'}
                 </span>
               </div>
             </div>

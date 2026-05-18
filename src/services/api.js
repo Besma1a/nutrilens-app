@@ -1,14 +1,10 @@
 
-export const getAPIBaseUrl = () => {
-  const protocol = window.location.protocol;
-  const host = window.location.hostname;
-  return `${protocol}//${host}:8000/api/v1`;
-};
-export const getAPIRootUrl = () => {
-  const protocol = window.location.protocol;
-  const host = window.location.hostname;
-  return `${protocol}//${host}:8000/api`;
-};
+const _backendBase = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/$/, '')   // strip trailing slash if any
+  : `${window.location.protocol}//${window.location.hostname}:8000`;
+
+export const getAPIBaseUrl = () => `${_backendBase}/api/v1`;
+export const getAPIRootUrl = () => `${_backendBase}/api`;
 
 const BASE_URL          = getAPIBaseUrl() + "/users";
 const MEALS_URL         = getAPIBaseUrl() + "/meals";
@@ -93,7 +89,7 @@ const request = async (url, method = "GET", body = null) => {
     return data;
   } catch (error) {
     if (error.message === "Failed to fetch") {
-      throw new Error("Cannot reach server. Is Django running on port 8000?");
+      throw new Error("Cannot reach server. Check your connection or try again.");
     }
     throw error;
   }
@@ -255,7 +251,7 @@ const requestMultipart = async (fullUrl, formData, method = "POST") => {
     return data;
   } catch (error) {
     if (error.message === "Failed to fetch") {
-      throw new Error("Cannot reach server. Is Django running on port 8000?");
+      throw new Error("Cannot reach server. Check your connection or try again.");
     }
     throw error;
   }
