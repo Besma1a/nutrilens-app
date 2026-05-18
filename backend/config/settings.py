@@ -81,9 +81,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # --- 4. DATABASE ---
-# Render provides DATABASE_URL automatically — dj_database_url parses it.
-# Falls back to individual env vars for local development.
-DATABASE_URL = config('DATABASE_URL', default='')
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 if DATABASE_URL:
     DATABASES = {
